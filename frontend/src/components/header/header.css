@@ -1,0 +1,21 @@
+.header {
+  width: 100%;
+  height: 70px;
+  border-bottom: 3px solid var(--sub-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10% 0 10%;
+}
+.header__title {
+  width: 200px;
+  height: 80%;
+  background-color: var(--second-color);
+}
+.header__title-link {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

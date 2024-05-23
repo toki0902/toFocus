@@ -1,0 +1,17 @@
+:root {
+  --main-color: #8ddaeb;
+  --sub-color: #ff9f47;
+  --second-color: #c1bdbd;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+}
+.App {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
