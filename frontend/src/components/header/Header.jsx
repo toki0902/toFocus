@@ -4,9 +4,6 @@ import Button from "../button/Button";
 
 const Header = () => {
   const login = false;
-  const goLog = () => {
-    console.log("レッツゴー");
-  };
   return (
     <div className="header">
       <h1 className="header__title">
@@ -15,7 +12,18 @@ const Header = () => {
           logo
         </a>
       </h1>
-      <Button color={"#333"}>会員登録</Button>
+      {login ? (
+        <></>
+      ) : (
+        <div style={{ display: "flex" }}>
+          <Button color={"#333"} isWhiteMain>
+            会員登録
+          </Button>
+          <Button color={"#333"} isWhiteMain>
+            ログイン
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
