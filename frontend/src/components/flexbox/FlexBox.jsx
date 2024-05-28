@@ -9,10 +9,10 @@ const FlexBox = ({
   right = false,
   top = false,
   bottom = false,
-  ml = false,
-  mt = false,
-  mr = false,
-  mb = false,
+  ml = 0,
+  mt = 0,
+  mr = 0,
+  mb = 0,
   sb = false,
   element = false,
   width = "auto",
@@ -35,10 +35,7 @@ const FlexBox = ({
         flexDirection: column ? "column" : "row",
         width: width,
         height: height,
-        marginLeft: ml,
-        marginTop: mt,
-        marginRight: mr,
-        marginBottom: mb,
+        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
       }
     : {
         display: "flex",
@@ -53,19 +50,16 @@ const FlexBox = ({
         flexDirection: column ? "column" : "row",
         width: width,
         height: height,
-        marginLeft: ml,
-        marginTop: mt,
-        marginRight: mr,
-        marginBottom: mb,
+        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
       };
   if (element == "ul") {
     return (
       <ul
         style={style}
         className={className}
-        onClick={onClick ? onClick : null}
-        onMouseOver={onMouseOver ? onMouseOver : null}
-        onMouseOut={onMouseOut ? onMouseOut : null}
+        onClick={onClick || null}
+        onMouseOver={onMouseOver || null}
+        onMouseOut={onMouseOut || null}
       >
         {children}
       </ul>
@@ -75,9 +69,9 @@ const FlexBox = ({
       <li
         style={style}
         className={className}
-        onClick={onClick ? onClick : null}
-        onMouseOver={onMouseOver ? onMouseOver : null}
-        onMouseOut={onMouseOut ? onMouseOut : null}
+        onClick={onClick || null}
+        onMouseOver={onMouseOver || null}
+        onMouseOut={onMouseOut || null}
       >
         {children}
       </li>
@@ -87,9 +81,9 @@ const FlexBox = ({
       <div
         style={style}
         className={className}
-        onClick={onClick ? onClick : null}
-        onMouseOver={onMouseOver ? onMouseOver : null}
-        onMouseOut={onMouseOut ? onMouseOut : null}
+        onClick={onClick || null}
+        onMouseOver={onMouseOver || null}
+        onMouseOut={onMouseOut || null}
       >
         {children}
       </div>

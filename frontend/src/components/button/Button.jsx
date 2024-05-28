@@ -27,45 +27,35 @@ const Button = ({
   };
 
   const border_str = `1px solid ${color}`;
+  const style = isWhiteMain
+    ? {
+        width: width,
+        height: height,
+        backgroundColor: isHover ? color : "#fff",
+        border: border_str,
+        color: isHover ? "#fff" : color,
+        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
+      }
+    : {
+        width: width,
+        height: height,
+        backgroundColor: isHover ? "#fff" : color,
+        border: border_str,
+        color: isHover ? color : "#fff",
+        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
+      };
 
-  if (isWhiteMain) {
-    return (
-      <button
-        className="button"
-        style={{
-          width: width,
-          height: height,
-          backgroundColor: isHover ? color : "#fff",
-          border: border_str,
-          color: isHover ? "#fff" : color,
-          margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
-        }}
-        onClick={func ? func : null}
-        onMouseOver={mouseOver}
-        onMouseOut={mouseOut}
-      >
-        {children}
-      </button>
-    );
-  } else {
-    return (
-      <button
-        className="button"
-        style={{
-          width: width,
-          height: height,
-          backgroundColor: isHover ? "#fff" : color,
-          border: border_str,
-          color: isHover ? color : "#fff",
-        }}
-        onClick={func ? func : null}
-        onMouseOver={mouseOver}
-        onMouseOut={mouseOut}
-      >
-        {children}
-      </button>
-    );
-  }
+  return (
+    <button
+      className="button"
+      style={style}
+      onClick={func || null}
+      onMouseOver={mouseOver}
+      onMouseOut={mouseOut}
+    >
+      {children}
+    </button>
+  );
 };
 
 export default Button;
