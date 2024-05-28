@@ -11,8 +11,12 @@ const Button = ({
   height = 40,
   func = false,
   children,
-  color,
+  color = "#333",
   isWhiteMain = false,
+  mr = 0,
+  ml = 0,
+  mt = 0,
+  mb = 0,
 }) => {
   const [isHover, setIsHover] = useState(false);
   const mouseOver = () => {
@@ -34,6 +38,7 @@ const Button = ({
           backgroundColor: isHover ? color : "#fff",
           border: border_str,
           color: isHover ? "#fff" : color,
+          margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
         }}
         onClick={func ? func : null}
         onMouseOver={mouseOver}
