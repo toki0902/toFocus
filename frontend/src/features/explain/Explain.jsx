@@ -6,9 +6,21 @@ import graph from "@images/graph.svg";
 import tool from "@images/tool.svg";
 import { useWhatIsToFocus } from "./hooks/useWhatIsToFocus";
 import "./explain.css";
+import WhatIsToFocus from "./components/whatistofocus/WhatIsToFocus";
 
 const Explain = () => {
-  const { isOpen, toggleWhatIsToFocus } = useWhatIsToFocus();
+  const {
+    isOpen,
+    toggleWhatIsToFocus,
+    resetPage,
+    whatIsOpen,
+    nextPage,
+    prevPage,
+  } = useWhatIsToFocus();
+  const clickHandle = () => {
+    toggleWhatIsToFocus();
+    resetPage();
+  };
   return (
     <div className="Explain">
       <FlexBox width="100%" sb height="60%">
@@ -17,10 +29,7 @@ const Explain = () => {
           <p className="explain__title">ここは、</p>
           <p className="explain__title">皆様と「集中ワールド」を繋ぐ</p>
           <p className="explain__title">生産性向上プラットフォームです。</p>
-          <p
-            className="explain__text--whatIsToFocus"
-            onClick={toggleWhatIsToFocus}
-          >
+          <p className="explain__text--whatIsToFocus" onClick={clickHandle}>
             toFocusとは？
           </p>
         </FlexBox>
@@ -53,7 +62,15 @@ const Explain = () => {
         </FlexBox>
       </FlexBox>
       {isOpen ? (
-        <div className="mask" onClick={toggleWhatIsToFocus}></div>
+        <>
+          <div className="mask" onClick={toggleWhatIsToFocus}></div>
+          <WhatIsToFocus
+            nextPage={nextPage}
+            prevPage={prevPage}
+            toggleWhatIsToFocus={toggleWhatIsToFocus}
+            whatIsOpen={whatIsOpen}
+          />
+        </>
       ) : null}
     </div>
   );

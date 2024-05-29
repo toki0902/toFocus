@@ -1,0 +1,57 @@
+.whatIsToFocus {
+  background-color: #fff;
+  z-index: 2;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  border-radius: 20px;
+  padding: 2%;
+  border: 10px dotted var(--sub-color);
+  color: var(--main-color);
+}
+.whatIsToFocus__wrap-toPosition {
+  position: relative;
+}
+.whatIsToFocus__title {
+  font-weight: bold;
+  font-size: 40px;
+  margin-bottom: 24px;
+}
+.whatIsToFocus__text--plain {
+  font-size: 20px;
+  margin-bottom: 24px;
+}
+.whatIsToFocus__text--highlight {
+  color: var(--sub-color);
+  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: 24px;
+}
+.whatIsToFocus__next-button,
+.whatIsToFocus__end-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: var(--sub-color);
+  font-size: 20px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  user-select: none;
+}
+.whatIsToFocus__prev-button {
+  position: absolute;
+  right: 90px;
+  bottom: 0;
+  color: var(--sub-color);
+  font-size: 20px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  user-select: none;
+}
+
+.whatIsToFocus__next-button:hover,
+.whatIsToFocus__prev-button:hover,
+.whatIsToFocus__end-button:hover {
+  border-bottom: 1px solid var(--sub-color);
+}
