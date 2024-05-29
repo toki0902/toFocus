@@ -34,7 +34,7 @@ const Button = ({
         backgroundColor: isHover ? color : "#fff",
         border: border_str,
         color: isHover ? "#fff" : color,
-        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
+        margin: `${mt} ${mr} ${mb} ${ml}`,
       }
     : {
         width: width,
@@ -42,7 +42,7 @@ const Button = ({
         backgroundColor: isHover ? "#fff" : color,
         border: border_str,
         color: isHover ? color : "#fff",
-        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
+        margin: `${mt} ${mr} ${mb} ${ml}`,
       };
 
   return (
