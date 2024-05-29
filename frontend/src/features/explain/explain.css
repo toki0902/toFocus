@@ -4,13 +4,19 @@
   overflow: auto;
   padding: 0px 10%;
   color: var(--sub-color);
+  position: relative;
 }
 .explain__title {
   font-size: 32px;
   font-weight: bold;
   color: var(--sub-color);
 }
-.explain__text--whatIsTofoucs {
+.explain__text {
+  font-size: 16px;
+  font-weight: bolder;
+  margin-top: 10px;
+}
+.explain__text--whatIsToFocus {
   color: var(--main-color);
   font-size: 18px;
   cursor: pointer;
@@ -18,11 +24,20 @@
   margin-top: 3px;
   border-bottom: 1px solid transparent;
 }
-.explain__text--whatIsTofoucs:hover {
+.explain__text--whatIsToFocus:hover {
   border-bottom: 1px solid var(--sub-color);
 }
 
 .explain__card {
   padding: 20px 20px;
   border: 3px solid var(--sub-color);
+}
+.mask {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #000;
+  opacity: 0.7;
 }

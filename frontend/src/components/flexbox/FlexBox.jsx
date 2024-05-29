@@ -35,7 +35,7 @@ const FlexBox = ({
         flexDirection: column ? "column" : "row",
         width: width,
         height: height,
-        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
+        margin: `${mt} ${mr} ${mb} ${ml}`,
       }
     : {
         display: "flex",
@@ -50,7 +50,7 @@ const FlexBox = ({
         flexDirection: column ? "column" : "row",
         width: width,
         height: height,
-        margin: `${mt}px ${mr}px ${mb}px ${ml}px`,
+        margin: `${mt} ${mr} ${mb} ${ml}`,
       };
   if (element == "ul") {
     return (

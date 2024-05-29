@@ -8,7 +8,6 @@ import HeaderMenu from "./HeaderMenu";
 const Header = () => {
   const login = true;
   const [isOpenMenu, setIsOpenMenu] = useState(false);
-  console.log(isOpenMenu);
   const openMenu = () => {
     setIsOpenMenu(true);
   };
