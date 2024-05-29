@@ -4,26 +4,37 @@ import Card from "./components/Card";
 import watch from "@images/stopwatch.svg";
 import graph from "@images/graph.svg";
 import tool from "@images/tool.svg";
+import { useWhatIsToFocus } from "./hooks/useWhatIsToFocus";
 import "./explain.css";
 
 const Explain = () => {
+  const { isOpen, toggleWhatIsToFocus } = useWhatIsToFocus();
   return (
     <div className="Explain">
-      <FlexBox width="100%" sb>
-        <FlexBox width="50%" height="500px" column left>
+      <FlexBox width="100%" sb height="60%">
+        <FlexBox width="50%" height="400px" column left>
           <p className="explain__title">toFocusへようこそ。</p>
           <p className="explain__title">ここは、</p>
           <p className="explain__title">皆様と「集中ワールド」を繋ぐ</p>
           <p className="explain__title">生産性向上プラットフォームです。</p>
-          <p className="explain__text--whatIsTofoucs">toFocusとは？</p>
+          <p
+            className="explain__text--whatIsToFocus"
+            onClick={toggleWhatIsToFocus}
+          >
+            toFocusとは？
+          </p>
         </FlexBox>
         <Button color="rgb(255, 159, 71)" width="30%" height="70px">
           <p style={{ fontSize: "25px" }}>集中ワールドへ行く</p>
         </Button>
       </FlexBox>
-      <FlexBox column left width="100%">
+      <hr style={{ width: "100%", position: "absolute", left: "0" }} />
+      <FlexBox column left width="100%" height="60%" top mt="20px">
         <p className="explain__title">何を提供するのか？</p>
-        <FlexBox width="100%" element="ul" height="300px" mt="100px">
+        <p className="explain__text">
+          toFocusではユーザの皆様に以下の機能を提供いたします。
+        </p>
+        <FlexBox width="100%" element="ul" height="300px" mt="50px" sb>
           <Card
             icon={watch}
             title="ポモドーロテクニック"
@@ -41,6 +52,9 @@ const Explain = () => {
           />
         </FlexBox>
       </FlexBox>
+      {isOpen ? (
+        <div className="mask" onClick={toggleWhatIsToFocus}></div>
+      ) : null}
     </div>
   );
 };
