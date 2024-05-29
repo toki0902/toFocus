@@ -1,7 +1,6 @@
 import React from "react";
 import "./whatistofocus.css";
 import { FlexBox } from "@component";
-import { useWhatIsToFocus } from "../../hooks/useWhatIsToFocus";
 
 const WhatIsToFocus = ({
   whatIsOpen,
@@ -9,6 +8,7 @@ const WhatIsToFocus = ({
   prevPage,
   toggleWhatIsToFocus,
 }) => {
+  //fix : えぐいくらい冗長性があるので何とかしたい。
   const page0 = (
     <>
       <h2 className="whatIsToFocus__title">toFocusの目的</h2>
@@ -306,6 +306,7 @@ const WhatIsToFocus = ({
       </p>
     </>
   );
+  //currentPage更新時に何かeffectをかけたい。
   const currentPage =
     whatIsOpen === 0
       ? page0
