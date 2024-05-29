@@ -1,0 +1,8 @@
+.Work {
+  width: 100%;
+  height: calc(100% - 70px);
+  overflow: auto;
+  padding: 0px 10%;
+  color: var(--sub-color);
+  position: relative;
+}

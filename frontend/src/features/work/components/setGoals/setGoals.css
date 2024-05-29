@@ -1,0 +1,42 @@
+.SetGoals {
+  padding: 5% 0;
+}
+.setGoals__text--big {
+  font-size: 32px;
+  font-weight: bold;
+}
+.setGoals__wrap--forPosition {
+  position: relative;
+}
+.setGoals__input--forTask {
+  border: 1px solid var(--sub-color);
+  width: 500px;
+  height: 100%;
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 10px;
+}
+.setGoals__input--forTask::placeholder {
+  color: var(--sub-color);
+}
+.setGoals__icon--forTask {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  -webkit-user-drag: none;
+}
+.setGoals__wrap--forEffect {
+}
+.setGoals-list__item--forSetTime {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: var(--second-color);
+  cursor: pointer;
+  user-select: none;
+}
+.setGoals-list__item--forSetTime.forOpenCustomTime {
+  position: relative;
+}
+.setGoals-list__item--forSetTime.clicked {
+  color: var(--sub-color);
+}
