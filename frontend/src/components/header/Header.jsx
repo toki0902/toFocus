@@ -6,7 +6,7 @@ import userIcon from "@images/react.svg";
 import HeaderMenu from "./HeaderMenu";
 
 const Header = () => {
-  const login = true;
+  const login = false;
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const openMenu = () => {
     setIsOpenMenu(true);
@@ -47,7 +47,7 @@ const Header = () => {
           </a>
         </h1>
         <FlexBox>
-          <Button color={"rgb(255, 159, 71)"} isWhiteMain mr={10}>
+          <Button color={"rgb(255, 159, 71)"} isWhiteMain mr="10px">
             会員登録
           </Button>
           <Button color={"rgb(255, 159, 71)"} isWhiteMain>

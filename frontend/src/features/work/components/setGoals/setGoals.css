@@ -5,6 +5,15 @@
   font-size: 32px;
   font-weight: bold;
 }
+.setGoals__text--forNextStage {
+  color: var(--second-color);
+  margin-top: 25px;
+  cursor: pointer;
+  user-select: none;
+}
+.setGoals__text--forNextStage:hover {
+  color: var(--sub-color);
+}
 .setGoals__wrap--forPosition {
   position: relative;
 }
@@ -26,6 +35,13 @@
   -webkit-user-drag: none;
 }
 .setGoals__wrap--forEffect {
+  transform: scale(0.4);
+  opacity: 0;
+  transition: all 0.7s;
+}
+.setGoals__wrap--forEffect.valid {
+  transform: scale(1);
+  opacity: 1;
 }
 .setGoals-list__item--forSetTime {
   font-size: 20px;
@@ -34,6 +50,10 @@
   cursor: pointer;
   user-select: none;
 }
+.setGoals-list__item--forSetTime:hover {
+  color: var(--sub-color);
+}
+
 .setGoals-list__item--forSetTime.forOpenCustomTime {
   position: relative;
 }

@@ -1,6 +1,9 @@
 import React from "react";
 
-//
+//Flexなwrapを提供する。
+//columnはflex-direction
+//left,right,top.bottomはtrueにすると指定した方向に要素が寄る
+//sbはspace-between
 const FlexBox = ({
   className = null,
   children,
