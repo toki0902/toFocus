@@ -19,11 +19,15 @@ export const useWhatIsToFocus = () => {
   };
 
   const nextPage = () => {
-    setWhatIsOpen((prev) => prev + 1);
+    if (whatIsOpen < 8) {
+      setWhatIsOpen((prev) => prev + 1);
+    }
   };
 
   const prevPage = () => {
-    setWhatIsOpen((prev) => prev - 1);
+    if (whatIsOpen > 0) {
+      setWhatIsOpen((prev) => prev - 1);
+    }
   };
 
   const resetPage = () => {

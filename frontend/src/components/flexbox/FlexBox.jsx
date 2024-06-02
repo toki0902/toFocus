@@ -20,9 +20,10 @@ const FlexBox = ({
   element = false,
   width = "auto",
   height = "auto",
-  onClick = false,
-  onMouseOver = false,
-  onMouseOut = false,
+  onClick = null,
+  onKeyDown = null,
+  onMouseOver = null,
+  onMouseOut = null,
 }) => {
   const style = column
     ? {
@@ -60,9 +61,10 @@ const FlexBox = ({
       <ul
         style={style}
         className={className}
-        onClick={onClick || null}
-        onMouseOver={onMouseOver || null}
-        onMouseOut={onMouseOut || null}
+        onClick={onClick}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        onKeyDown={onKeyDown}
       >
         {children}
       </ul>
@@ -72,9 +74,10 @@ const FlexBox = ({
       <li
         style={style}
         className={className}
-        onClick={onClick || null}
-        onMouseOver={onMouseOver || null}
-        onMouseOut={onMouseOut || null}
+        onClick={onClick}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        onKeyDown={onKeyDown}
       >
         {children}
       </li>
@@ -84,9 +87,10 @@ const FlexBox = ({
       <div
         style={style}
         className={className}
-        onClick={onClick || null}
-        onMouseOver={onMouseOver || null}
-        onMouseOut={onMouseOut || null}
+        onClick={onClick}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        onKeyDown={onKeyDown}
       >
         {children}
       </div>

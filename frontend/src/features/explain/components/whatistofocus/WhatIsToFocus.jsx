@@ -1,6 +1,7 @@
 import React from "react";
 import "./whatistofocus.css";
 import { FlexBox } from "@component";
+import { changePageWhenKeyDown } from "./utils";
 
 const WhatIsToFocus = ({
   whatIsOpen,
@@ -326,7 +327,15 @@ const WhatIsToFocus = ({
       ? page7
       : page8;
   return (
-    <FlexBox className="whatIsToFocus" width="65vw" height="65vh">
+    <FlexBox
+      className="whatIsToFocus"
+      width="65vw"
+      height="65vh"
+      //fix : なぜか発動しないので、直さねば。
+      onKeyDown={(e) => {
+        changePageWhenKeyDown(e, prevPage, nextPage);
+      }}
+    >
       <FlexBox
         className="whatIsToFocus__wrap-toPosition"
         width="100%"
