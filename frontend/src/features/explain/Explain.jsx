@@ -5,6 +5,7 @@ import watch from "@images/stopwatch.svg";
 import graph from "@images/graph.svg";
 import tool from "@images/tool.svg";
 import { useWhatIsToFocus } from "./hooks/useWhatIsToFocus";
+import { useNavigate } from "react-router-dom";
 import "./explain.css";
 import WhatIsToFocus from "./components/whatistofocus/WhatIsToFocus";
 
@@ -17,6 +18,9 @@ const Explain = () => {
     nextPage,
     prevPage,
   } = useWhatIsToFocus();
+
+  const navigate = useNavigate();
+
   const clickHandle = () => {
     toggleWhatIsToFocus();
     resetPage();
@@ -33,7 +37,14 @@ const Explain = () => {
             toFocusとは？
           </p>
         </FlexBox>
-        <Button color="rgb(255, 159, 71)" width="30%" height="70px">
+        <Button
+          color="rgb(255, 159, 71)"
+          width="30%"
+          height="70px"
+          func={() => {
+            navigate("work");
+          }}
+        >
           <p style={{ fontSize: "25px" }}>集中ワールドへ行く</p>
         </Button>
       </FlexBox>
