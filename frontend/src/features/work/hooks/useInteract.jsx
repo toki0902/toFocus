@@ -49,7 +49,9 @@ export function useInteract() {
   };
 
   const disable = () => {
-    interact(interactRef.current).unset();
+    if (interactRef.current) {
+      interact(interactRef.current).unset();
+    }
   };
 
   useEffect(() => {
