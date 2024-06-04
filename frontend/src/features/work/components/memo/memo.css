@@ -1,0 +1,15 @@
+.Memo {
+  background-color: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+.memo__remove-icon {
+  width: 30px;
+  width: 30px;
+  position: absolute;
+  right: -15px;
+  top: -15px;
+  cursor: pointer;
+}
