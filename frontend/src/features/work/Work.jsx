@@ -10,9 +10,10 @@ const Work = () => {
   const [workingHours_min, setWorkingHours_min] = useState(0);
   const [
     workingHours_withoutLongBreak_min,
-    setworkingHours_withoutLongBreak_min,
+    setWorkingHours_withoutLongBreak_min,
   ] = useState(0);
 
+  console.log(workingHours_min);
   //目標タスクを追加で一つ設定するための関数
   //SetGoalsコンポーネントを新規で呼び出す。
   const continueSetGoals = (task_toAdd, time_toAdd) => {
@@ -31,7 +32,7 @@ const Work = () => {
   //Doコンポーネントに渡すためのupdate用の関数
   const updateWorkingTime_useMin = (time_toAdd) => {
     setWorkingHours_min((prev) => prev + time_toAdd);
-    setworkingHours_withoutLongBreak_min((prev) => prev + time_toAdd);
+    setWorkingHours_withoutLongBreak_min((prev) => prev + time_toAdd);
   };
 
   const startDo = () => {
