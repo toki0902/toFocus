@@ -13,3 +13,39 @@
   top: -15px;
   cursor: pointer;
 }
+.bgmMaker__wrap--forText {
+  position: absolute;
+  bottom: -30px;
+}
+.bgmMaker__text {
+  font-size: 16px;
+  margin-right: 10px;
+}
+.bgmMaker__playing-icon {
+  width: 20px;
+  height: 20px;
+  animation: rotate 10s infinite linear;
+  cursor: pointer;
+}
+@keyframes rotate {
+  0% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(90deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  75% {
+    transform: rotate(270deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.bgmMaker__pausing-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}

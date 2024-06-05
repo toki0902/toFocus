@@ -24,7 +24,15 @@ const SetGoals = ({ Continue = false, continueSetGoals, startDo }) => {
 
   const headline = Continue ? "他には何をする？" : "さあ、今日は何をしようか？";
   return (
-    <FlexBox className="SetGoals" width="100%" height="100%" top column>
+    <FlexBox
+      className="SetGoals"
+      width="100%"
+      height="100%"
+      pt="5%"
+      pb="5%"
+      top
+      column
+    >
       <h2 className="setGoals__text--big">{headline}</h2>
       {Continue ? (
         <p className="setGoals__text--forNextStage" onClick={startDo}>

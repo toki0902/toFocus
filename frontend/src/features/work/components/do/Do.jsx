@@ -38,6 +38,7 @@ const Do = ({
         key={Date.now()}
         myKey={Date.now()}
         removeThisTool={removeThisTool}
+        genre="jazz"
       />,
       <Memo
         key={Date.now() + 10}
