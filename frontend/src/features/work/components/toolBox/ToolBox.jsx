@@ -4,6 +4,7 @@ import Memo from "../memo/Memo";
 import "./toolBox.css";
 import BgmMaker from "../bgmMaker/BgmMaker";
 
+//toolをDoコンポーネントに追加するためのメニューを表示するコンポーネント
 const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
   const [isStart, setIsStart] = useState(false);
 
