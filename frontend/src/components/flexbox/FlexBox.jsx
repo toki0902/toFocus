@@ -19,6 +19,10 @@ const FlexBox = forwardRef(
       mt = 0,
       mr = 0,
       mb = 0,
+      pl = 0,
+      pt = 0,
+      pr = 0,
+      pb = 0,
       sb = false,
       element = false,
       width = "auto",
@@ -45,6 +49,7 @@ const FlexBox = forwardRef(
           width: width,
           height: height,
           margin: `${mt} ${mr} ${mb} ${ml}`,
+          padding: `${pt} ${pr} ${pb} ${pl}`,
         }
       : {
           display: "flex",
@@ -60,6 +65,7 @@ const FlexBox = forwardRef(
           width: width,
           height: height,
           margin: `${mt} ${mr} ${mb} ${ml}`,
+          padding: `${pt} ${pr} ${pb} ${pl}`,
         };
 
     if (element === "ul") {
