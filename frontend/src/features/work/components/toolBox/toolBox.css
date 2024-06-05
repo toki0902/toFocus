@@ -1,0 +1,25 @@
+.ToolBox {
+  background-color: #000000;
+  opacity: 0.7;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  border-radius: 10px;
+  animation: open 0.3s;
+  transition: all 0.3s;
+}
+@keyframes open {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.ToolBox.close {
+  transform: scale(0);
+}
+.toolbox__item {
+  border: 1px solid #fff;
+}

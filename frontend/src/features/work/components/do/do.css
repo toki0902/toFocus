@@ -31,14 +31,22 @@
   translate: -50% 0;
 }
 .do__task-list {
-  border: 1px solid #fff;
   position: absolute;
   top: 10%;
   left: 0;
 }
-.do__tool-list {
-  border: 1px solid #fff;
+.do__menu {
   position: absolute;
   top: 10%;
   right: 0;
+}
+.do__menu-item {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.do__menu-item:hover {
+  opacity: 1;
 }

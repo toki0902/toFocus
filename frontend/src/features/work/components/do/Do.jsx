@@ -4,6 +4,7 @@ import { useInteract } from "../../hooks/useInteract";
 import { FlexBox } from "@component";
 import BgmMaker from "../bgmMaker/BgmMaker";
 import Memo from "../memo/Memo";
+import ToolBox from "../toolBox/ToolBox";
 
 //time_limit_msを受け取って作業場を提供する。
 //time_limit後はworkingTimeを更新し、Breakコンポーネントを呼び出す。
@@ -14,7 +15,6 @@ const Do = ({
   //FIX : なぜか最新のタスクが渡されない。タスケテ。
   tasks,
 }) => {
-  console.log(tasks);
   const taskItems = tasks.map((task) => {
     return (
       <FlexBox element="li" sb width="90%" height="2rem">
@@ -22,8 +22,11 @@ const Do = ({
       </FlexBox>
     );
   });
+
+  //作業画面に出現しているツールを管理するState
   const [tools, setTools] = useState([]);
 
+  //各ツールに渡す用の自身を削除する用の関数
   const removeThisTool = (id) => {
     setTools((prev) => {
       return prev.filter((item) => {
@@ -31,6 +34,16 @@ const Do = ({
       });
     });
   };
+
+  //ツールボックスが開いているのかどうかを管理するためのState
+  const [isOpenToolBox, setIsOpenToolBox] = useState(false);
+
+  const toggleToolBox = () => {
+    setIsOpenToolBox((prev) => !prev);
+  };
+
+  const openToolBox = () => setIsOpenToolBox(true);
+  const closeToolBox = () => setIsOpenToolBox(false);
 
   useEffect(() => {
     setTools([
@@ -80,13 +93,32 @@ const Do = ({
         {taskItems}
       </FlexBox>
       <FlexBox
-        className="do__tool-list"
+        className="do__menu"
         element="ul"
         column
-        width="20%"
+        width="200px"
         height="auto"
-      ></FlexBox>
+        left
+        top
+      >
+        <li
+          className="do__menu-item"
+          style={isOpenToolBox ? { opacity: 1 } : {}}
+          onClick={toggleToolBox}
+        >
+          ツール
+        </li>
+        <li className="do__menu-item">休憩する</li>
+        <li className="do__menu-item">ホームに戻る</li>
+      </FlexBox>
       {tools}
+      {isOpenToolBox ? (
+        <ToolBox
+          removeThisTool={removeThisTool}
+          closeToolBox={closeToolBox}
+          setTools={setTools}
+        />
+      ) : null}
     </div>
   );
 };

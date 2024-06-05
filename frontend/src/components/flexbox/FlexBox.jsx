@@ -66,6 +66,7 @@ const FlexBox = forwardRef(
           height: height,
           margin: `${mt} ${mr} ${mb} ${ml}`,
           padding: `${pt} ${pr} ${pb} ${pl}`,
+          flexWrap: "wrap",
         };
 
     if (element === "ul") {
