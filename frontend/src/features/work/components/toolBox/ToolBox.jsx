@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { FlexBox } from "@component";
 import Memo from "../memo/Memo";
 import "./toolBox.css";
-import BgmMaker from "../bgmMaker/BgmMaker";
+import { BgmMaker, BgmMakerConfig } from "../bgmMaker";
 
 //toolをDoコンポーネントに追加するためのメニューを表示するコンポーネント
+//tool自体を生成する関数を定義するのはtoolboxコンポーネントで、
+//実行するのは各toolのconfigページ
 const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
   const [isStart, setIsStart] = useState(false);
 
@@ -14,7 +16,6 @@ const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
   };
 
   const addBgmMaker = (songGenre) => {
-    console.log("実行");
     const newBgmMaker = (
       <BgmMaker
         key={Date.now}
@@ -39,35 +40,49 @@ const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
     );
 
     setTools((prev) => {
-      console.log(prev);
       return [...prev, newMemo];
     });
   };
+
+  const [whichConfigIsOpen, setWhichConfigIsOpen] = useState("home");
+  const value =
+    whichConfigIsOpen === "home" ? (
+      <>
+        <h2 className="toolbox__title">ツールボックス</h2>
+        <FlexBox width="100%" height="80%" element="ul">
+          <FlexBox
+            className="toolbox__item"
+            width="30%"
+            height="40%"
+            onClick={() => setWhichConfigIsOpen("bgmmaker")}
+            element="li"
+          >
+            <p>BGM MAKER</p>
+          </FlexBox>
+          <FlexBox
+            className="toolbox__item"
+            width="30%"
+            height="40%"
+            onClick={addMemo}
+            element="li"
+          >
+            <p>Memo</p>
+          </FlexBox>
+        </FlexBox>
+      </>
+    ) : whichConfigIsOpen === "bgmmaker" ? (
+      <BgmMakerConfig addBgmMaker={addBgmMaker} />
+    ) : null;
 
   return (
     <FlexBox
       className={isStart ? "ToolBox close" : "ToolBox"}
       width="60%"
       height="60%"
-      ul
-      sb
+      column
     >
-      <FlexBox
-        className="toolbox__item"
-        width="30%"
-        height="40%"
-        onClick={addBgmMaker}
-      >
-        <p>BGM MAKER</p>
-      </FlexBox>
-      <FlexBox
-        className="toolbox__item"
-        width="30%"
-        height="40%"
-        onClick={addMemo}
-      >
-        <p>Memo</p>
-      </FlexBox>
+      {value}
+      <div className="toolbox__close-btn" onClick={close} />
     </FlexBox>
   );
 };

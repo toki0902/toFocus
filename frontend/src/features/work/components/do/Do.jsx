@@ -38,10 +38,10 @@ const Do = ({
   //ツールボックスが開いているのかどうかを管理するためのState
   const [isOpenToolBox, setIsOpenToolBox] = useState(false);
 
+  //ツールボックスを開く用の関数群
   const toggleToolBox = () => {
     setIsOpenToolBox((prev) => !prev);
   };
-
   const openToolBox = () => setIsOpenToolBox(true);
   const closeToolBox = () => setIsOpenToolBox(false);
 
@@ -104,7 +104,7 @@ const Do = ({
         <li
           className="do__menu-item"
           style={isOpenToolBox ? { opacity: 1 } : {}}
-          onClick={toggleToolBox}
+          onClick={openToolBox}
         >
           ツール
         </li>

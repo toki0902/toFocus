@@ -5,6 +5,10 @@ import { FlexBox } from "@component";
 import removeIcon from "@images/cross.svg";
 import cdIcon from "@images/cd.svg";
 import playIcon from "@images/play.svg";
+import loudVolumIcon from "@images/loudVolum.svg";
+import middleVolumIcon from "@images/middleVolum.svg";
+import lowVolumIcon from "@images/lowVolum.svg";
+import muteVolumIcon from "@images/muteVolum.svg";
 
 const BgmMaker = ({ myKey, removeThisTool, genre }) => {
   const playerRef = useRef(null);
@@ -81,6 +85,23 @@ const BgmMaker = ({ myKey, removeThisTool, genre }) => {
     removeThisTool(myKey);
   };
 
+  const [volume, setVolume] = useState(30);
+  console.log(volume);
+
+  const onVolumChange = (e) => {
+    setVolume(e.target.value);
+    playerRef.current.setVolume(e.target.value);
+  };
+
+  const volumeIcon =
+    volume < 1
+      ? muteVolumIcon
+      : volume > 0 && volume < 31
+      ? lowVolumIcon
+      : volume > 30 && volume < 71
+      ? middleVolumIcon
+      : loudVolumIcon;
+
   const togglePlayerState = () => {
     const currentState = playerRef.current.getPlayerState();
     if (currentState === 1) {
@@ -95,8 +116,8 @@ const BgmMaker = ({ myKey, removeThisTool, genre }) => {
       className="bgmMaker"
       width="400px"
       height="225px"
-      ref={interact_.ref}
       column
+      ref={interact_.ref}
     >
       <div id={`player-${myKey}`} />
       <img
@@ -107,19 +128,39 @@ const BgmMaker = ({ myKey, removeThisTool, genre }) => {
         src={removeIcon}
         alt="remove"
       />
-      <FlexBox className="bgmMaker__wrap--forText" width="80%" left>
-        <p className="bgmMaker__text">
-          {isPlay ? "Now Playing..." : "Pause Now..."}
-        </p>
-        <img
-          className={
-            isPlay ? "bgmMaker__playing-icon" : "bgmMaker__pausing-icon"
-          }
-          src={isPlay ? cdIcon : playIcon}
-          alt="play"
-          style={{ width: "20px", height: "20px" }}
-          onClick={togglePlayerState}
-        />
+      <FlexBox className="bgmMaker__footer-menu" width="80%" sb>
+        <FlexBox className="bgmMaker__wrap--forText" width="50%" left>
+          <p className="bgmMaker__text">
+            {isPlay ? "Now Playing..." : "Pause Now..."}
+          </p>
+          <img
+            className={
+              isPlay ? "bgmMaker__playing-icon" : "bgmMaker__pausing-icon"
+            }
+            src={isPlay ? cdIcon : playIcon}
+            alt="play"
+            style={{ width: "20px", height: "20px" }}
+            onClick={togglePlayerState}
+          />
+        </FlexBox>
+        <FlexBox width="50%">
+          <input
+            onMouseDown={interact_.disable}
+            onMouseUp={interact_.enable}
+            className="footer-menu__sound-bar"
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={volume}
+            onChange={onVolumChange}
+          />
+          <img
+            style={{ width: "25px", height: "25px" }}
+            src={volumeIcon}
+            alt="volume"
+          />
+        </FlexBox>
       </FlexBox>
     </FlexBox>
   );
