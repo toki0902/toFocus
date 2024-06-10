@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FlexBox, Button } from "@component";
 import crossIcon from "@images/cross.svg";
 import "./setGoals.css";
-import CustomTime from "../customTime/CustomTime";
+import CustomTime from "./components/customTime/CustomTime";
 
 //目標設定のためのコンポーネント。最終的には入力したタスクと時間を追加して、次の段階に移動する。
 const SetGoals = ({ Continue = false, continueSetGoals, startDo }) => {

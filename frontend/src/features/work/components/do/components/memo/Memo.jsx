@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./memo.css";
-import { useInteract } from "../../hooks/useInteract";
+import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
 import removeIcon from "@images/cross.svg";
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./bgmMaker.css";
-import { useInteract } from "../../hooks/useInteract";
+import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
 import removeIcon from "@images/cross.svg";
 import cdIcon from "@images/cd.svg";
@@ -86,7 +86,6 @@ const BgmMaker = ({ myKey, removeThisTool, genre }) => {
   };
 
   const [volume, setVolume] = useState(30);
-  console.log(volume);
 
   const onVolumChange = (e) => {
     setVolume(e.target.value);

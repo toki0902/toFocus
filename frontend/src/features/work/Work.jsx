@@ -4,6 +4,7 @@ import Do from "./components/do/Do";
 import Break from "./components/break/Break";
 import "./work.css";
 
+//目標設定、実際の作業フェーズ、休憩フェーズ、その後の振り返りまでを管理するfeature
 const Work = () => {
   const [tasks, setTasks] = useState([]);
   const [requireTime_min, setRequireTime_min] = useState(0);
@@ -12,6 +13,8 @@ const Work = () => {
     workingHours_withoutLongBreak_min,
     setWorkingHours_withoutLongBreak_min,
   ] = useState(0);
+
+  console.log(workingHours_withoutLongBreak_min);
 
   const startDo = useCallback(() => {
     setCurrentStage(

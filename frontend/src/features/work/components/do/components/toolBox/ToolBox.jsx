@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FlexBox } from "@component";
 import Memo from "../memo/Memo";
 import "./toolBox.css";
@@ -8,6 +8,8 @@ import { BgmMaker, BgmMakerConfig } from "../bgmMaker";
 //tool自体を生成する関数を定義するのはtoolboxコンポーネントで、
 //実行するのは各toolのconfigページ
 const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
+  //閉じるエフェクトを開始するためのuseState。
+  //startがtrueになるとスタイルが当てられ、animaitonが0.3sで開始する。
   const [isStart, setIsStart] = useState(false);
 
   const close = () => {
@@ -80,6 +82,10 @@ const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
       width="60%"
       height="60%"
       column
+      pt="5%"
+      pr="5%"
+      pl="5%"
+      pb="5%"
     >
       {value}
       <div className="toolbox__close-btn" onClick={close} />

@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./do.css";
-import { useInteract } from "../../hooks/useInteract";
 import { FlexBox } from "@component";
-import BgmMaker from "../bgmMaker/BgmMaker";
-import Memo from "../memo/Memo";
-import ToolBox from "../toolBox/ToolBox";
+import { BgmMaker } from "./components/bgmMaker/index.jsx";
+import ToolBox from "./components/toolBox/ToolBox";
+import AlertMenu from "./components/alertMenu/AlertMenu.jsx";
 
 //time_limit_msを受け取って作業場を提供する。
 //time_limit後はworkingTimeを更新し、Breakコンポーネントを呼び出す。
@@ -15,14 +14,6 @@ const Do = ({
   //FIX : なぜか最新のタスクが渡されない。タスケテ。
   tasks,
 }) => {
-  const taskItems = tasks.map((task) => {
-    return (
-      <FlexBox element="li" sb width="90%" height="2rem">
-        <p>{task}</p>
-      </FlexBox>
-    );
-  });
-
   //作業画面に出現しているツールを管理するState
   const [tools, setTools] = useState([]);
 
@@ -45,6 +36,18 @@ const Do = ({
   const openToolBox = () => setIsOpenToolBox(true);
   const closeToolBox = () => setIsOpenToolBox(false);
 
+  //さまざまなアラートを出すメニューが開いているかどうかを管理するためのState
+  //whichAlertMenuIsOpenがアラートメニューの中身を管理する
+  const [isOpenAlert, setIsOpenAlert] = useState(false);
+  const [whichAlertMenuIsOpen, setWhichAlertMenuIsOpen] = useState("");
+
+  const openThisAlertMenu = (menu) => {
+    setWhichAlertMenuIsOpen(menu);
+    setIsOpenAlert(true);
+  };
+
+  const closeAlertMenu = () => setIsOpenAlert(false);
+
   useEffect(() => {
     setTools([
       <BgmMaker
@@ -52,11 +55,6 @@ const Do = ({
         myKey={Date.now()}
         removeThisTool={removeThisTool}
         genre="jazz"
-      />,
-      <Memo
-        key={Date.now() + 10}
-        myKey={Date.now() + 10}
-        removeThisTool={removeThisTool}
       />,
     ]);
 
@@ -89,9 +87,7 @@ const Do = ({
         column
         width="20%"
         height="auto"
-      >
-        {taskItems}
-      </FlexBox>
+      ></FlexBox>
       <FlexBox
         className="do__menu"
         element="ul"
@@ -108,8 +104,22 @@ const Do = ({
         >
           ツール
         </li>
-        <li className="do__menu-item">休憩する</li>
-        <li className="do__menu-item">ホームに戻る</li>
+        <li
+          className="do__menu-item"
+          onClick={() => {
+            openThisAlertMenu("toBreak");
+          }}
+        >
+          休憩する
+        </li>
+        <li
+          className="do__menu-item"
+          onClick={() => {
+            openThisAlertMenu("toHome");
+          }}
+        >
+          ホームに戻る
+        </li>
       </FlexBox>
       {tools}
       {isOpenToolBox ? (
@@ -117,6 +127,12 @@ const Do = ({
           removeThisTool={removeThisTool}
           closeToolBox={closeToolBox}
           setTools={setTools}
+        />
+      ) : null}
+      {isOpenAlert ? (
+        <AlertMenu
+          closeAlertMenu={closeAlertMenu}
+          whichAlertMenuIsOpen={whichAlertMenuIsOpen}
         />
       ) : null}
     </div>

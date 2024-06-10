@@ -1,0 +1,67 @@
+.AlertMenu {
+  background-color: #000000;
+  position: absolute;
+  opacity: 0.9;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  border-radius: 10px;
+  animation: open 0.3s;
+  transition: all 0.3s;
+}
+@keyframes open {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.AlertMenu.close {
+  transform: scale(0);
+}
+.alertmenu__title {
+  height: 20%;
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.alertmenu__close-btn {
+  width: 30px;
+  height: 20%;
+  position: absolute;
+  top: 0;
+  right: 40px;
+  cursor: pointer;
+  opacity: 0.5;
+}
+.alertmenu__close-btn:hover {
+  opacity: 1;
+}
+.alertmenu__close-btn::after {
+  content: "";
+  background-color: #fff;
+  width: 30px;
+  height: 3px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 4px;
+  transform: rotate(45deg);
+  translate: -50% -50%;
+}
+.alertmenu__close-btn::before {
+  content: "";
+  background-color: #fff;
+  width: 30px;
+  height: 3px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 4px;
+  transform: rotate(-45deg);
+  translate: -50% -50%;
+}
