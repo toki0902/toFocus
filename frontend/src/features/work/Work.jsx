@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import SetGoals from "./components/setGoals/SetGoals";
 import Do from "./components/do/Do";
 import Break from "./components/break/Break";
@@ -14,18 +14,64 @@ const Work = () => {
     setWorkingHours_withoutLongBreak_min,
   ] = useState(0);
 
-  console.log(workingHours_withoutLongBreak_min);
-
-  const startDo = useCallback(() => {
-    setCurrentStage(
-      <Do
-        key={Date.now()}
-        startBreak={startBreak}
-        updateWorkingTime_useMin={updateWorkingTime_useMin}
-        tasks={tasks}
-      />
-    );
+  const tasks_Ref = useRef(tasks);
+  useEffect(() => {
+    tasks_Ref.current = tasks;
   }, [tasks]);
+
+  const startDoWithThisTime = (time) => {
+    setCurrentStage(<></>);
+
+    setTimeout(() => {
+      const tmp_task = tasks_Ref.current;
+      setCurrentStage(
+        <Do
+          key={Date.now()}
+          startBreakWithThisTime={startBreakWithThisTime}
+          updateWorkingTime_useMin={updateWorkingTime_useMin}
+          tasks={tmp_task}
+          time_limit_ms={time}
+        />
+      );
+    }, 100);
+  };
+
+  //Doコンポーネントに渡すためのupdate用の関数
+  const updateWorkingTime_useMin = (time_toAdd) => {
+    setWorkingHours_min((prev) => prev + time_toAdd);
+    setWorkingHours_withoutLongBreak_min((prev) => prev + time_toAdd);
+  };
+
+  //Breakコンポーネントに最新のworkingHours_withoutLongBreak_minを渡すためのRef
+  const workingHours_withoutLongBreak_minRef = useRef(
+    workingHours_withoutLongBreak_min
+  );
+
+  useEffect(() => {
+    workingHours_withoutLongBreak_minRef.current =
+      workingHours_withoutLongBreak_min;
+  }, [workingHours_withoutLongBreak_min]);
+
+  const startBreakWithThisTime = (time) => {
+    //useEffectによるRefの更新を待つために一度Doをアンマウントさせてから100ms待つ
+    setCurrentStage(<></>);
+
+    setTimeout(() => {
+      const tmp_time = workingHours_withoutLongBreak_minRef.current;
+
+      setCurrentStage(
+        <Break
+          key={Date.now()}
+          time_limit_ms={time}
+          startDoWithThisTime={startDoWithThisTime}
+          setWorkingHours_withoutLongBreak_min={
+            setWorkingHours_withoutLongBreak_min
+          }
+          workingHours_withoutLongBreak_min={tmp_time}
+        />
+      );
+    }, 100);
+  };
 
   //目標タスクを追加で一つ設定するための関数
   //SetGoalsコンポーネントを新規で呼び出す。
@@ -38,22 +84,12 @@ const Work = () => {
           Continue
           continueSetGoals={continueSetGoals}
           key={Date.now()}
-          startDo={startDo}
+          startDoWithThisTime={startDoWithThisTime}
         />
       );
     },
-    [startDo]
+    [startDoWithThisTime, tasks]
   );
-
-  //Doコンポーネントに渡すためのupdate用の関数
-  const updateWorkingTime_useMin = (time_toAdd) => {
-    setWorkingHours_min((prev) => prev + time_toAdd);
-    setWorkingHours_withoutLongBreak_min((prev) => prev + time_toAdd);
-  };
-
-  const startBreak = () => {
-    setCurrentStage(<Break key={Date.now()} />);
-  };
 
   const [currentStage, setCurrentStage] = useState(
     <SetGoals continueSetGoals={continueSetGoals} />

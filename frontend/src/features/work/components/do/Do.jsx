@@ -11,7 +11,6 @@ const Do = ({
   time_limit_ms = 5000,
   startBreakWithThisTime,
   updateWorkingTime_useMin,
-  //FIX : なぜか最新のタスクが渡されない。タスケテ。
   tasks,
 }) => {
   //作業画面に出現しているツールを管理するState
@@ -111,7 +110,7 @@ const Do = ({
     const start = Date.now();
 
     return () => {
-      clearTimeout(timer);
+      clearInterval(timer);
 
       //10の位の秒数を四捨五入して更新
       //2分30秒 = 3分, 2分29秒 = 2分

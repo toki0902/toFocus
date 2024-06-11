@@ -5,7 +5,11 @@ import "./setGoals.css";
 import CustomTime from "./components/customTime/CustomTime";
 
 //目標設定のためのコンポーネント。最終的には入力したタスクと時間を追加して、次の段階に移動する。
-const SetGoals = ({ Continue = false, continueSetGoals, startDo }) => {
+const SetGoals = ({
+  Continue = false,
+  continueSetGoals,
+  startDoWithThisTime,
+}) => {
   const [input, setInput] = useState("");
   const [howManyTime, setHowManyTime] = useState(0);
   const [isOpenCustomTime, setIsOpenCustomTime] = useState(false);
@@ -35,7 +39,10 @@ const SetGoals = ({ Continue = false, continueSetGoals, startDo }) => {
     >
       <h2 className="setGoals__text--big">{headline}</h2>
       {Continue ? (
-        <p className="setGoals__text--forNextStage" onClick={startDo}>
+        <p
+          className="setGoals__text--forNextStage"
+          onClick={() => startDoWithThisTime(1500000)}
+        >
           → もうしない
         </p>
       ) : null}

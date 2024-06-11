@@ -3,7 +3,11 @@ import "./alertMenu.css";
 import { FlexBox, Button } from "@component";
 import { useNavigate } from "react-router-dom";
 
-const AlertMenu = ({ whichAlertMenuIsOpen, closeAlertMenu }) => {
+const AlertMenu = ({
+  whichAlertMenuIsOpen,
+  closeAlertMenu,
+  startBreakWithThisTime,
+}) => {
   const [isStart, setIsStart] = useState(false);
   const close = () => {
     setIsStart(true);
@@ -20,13 +24,29 @@ const AlertMenu = ({ whichAlertMenuIsOpen, closeAlertMenu }) => {
       title = "何分くらい休憩しますか？";
       value = (
         <FlexBox width="100%" height="80%">
-          <Button width="200px" height="60px" mr="30px" color="#333">
-            3分
+          <Button
+            width="200px"
+            height="60px"
+            mr="30px"
+            color="#333"
+            func={() => startBreakWithThisTime(10000)}
+          >
+            10秒
           </Button>
-          <Button width="200px" height="60px" mr="30px" color="#333">
+          <Button
+            width="200px"
+            height="60px"
+            mr="30px"
+            color="#333"
+            func={() => startBreakWithThisTime(300000)}
+          >
             5分
           </Button>
-          <Button width="200px" height="60px">
+          <Button
+            width="200px"
+            height="60px"
+            func={() => startBreakWithThisTime(600000)}
+          >
             10分
           </Button>
         </FlexBox>

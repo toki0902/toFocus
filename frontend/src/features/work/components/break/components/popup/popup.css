@@ -1,0 +1,65 @@
+.mask {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #000;
+  opacity: 0.7;
+}
+.Popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  border: 2px solid var(--sub-color);
+  color: var(--sub-color);
+  z-index: 10;
+  background-color: #fff;
+  box-shadow: 2px 2px 2px;
+  border-radius: 10px;
+}
+.popup__title {
+  font-size: 28px;
+  font-weight: bold;
+  height: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.popup__close-btn {
+  width: 30px;
+  height: 20%;
+  position: absolute;
+  top: 0;
+  right: 40px;
+  cursor: pointer;
+}
+.popup__close-btn::after {
+  content: "";
+  background-color: var(--second-color);
+  width: 30px;
+  height: 3px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 4px;
+  transform: rotate(45deg);
+  translate: -50% -50%;
+}
+.popup__close-btn::before {
+  content: "";
+  background-color: var(--second-color);
+  width: 30px;
+  height: 3px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 4px;
+  transform: rotate(-45deg);
+  translate: -50% -50%;
+}
+.popup__close-btn:hover::after,
+.popup__close-btn:hover::before {
+  background-color: var(--sub-color);
+}
