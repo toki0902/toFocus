@@ -8,8 +8,8 @@ import AlertMenu from "./components/alertMenu/AlertMenu.jsx";
 //time_limit_msを受け取って作業場を提供する。
 //time_limit後はworkingTimeを更新し、Breakコンポーネントを呼び出す。
 const Do = ({
-  time_limit_ms = 30000,
-  startBreak,
+  time_limit_ms = 5000,
+  startBreakWithThisTime,
   updateWorkingTime_useMin,
   //FIX : なぜか最新のタスクが渡されない。タスケテ。
   tasks,
@@ -48,6 +48,20 @@ const Do = ({
 
   const closeAlertMenu = () => setIsOpenAlert(false);
 
+  //あと何分で終わるかどうかを表示するタイマー
+  const [timeLimit_min, setTimeLimit_min] = useState(() => {
+    let time_limit_min_unmodify = time_limit_ms / 60000;
+    const after_decimal_point =
+      time_limit_min_unmodify - Math.floor(time_limit_min_unmodify);
+    const after_decimal_point_sec = Math.floor(after_decimal_point * 60);
+
+    return `${Math.floor(time_limit_min_unmodify)
+      .toString()
+      .padStart(2, "0")}:${after_decimal_point_sec
+      .toString()
+      .padStart(2, "0")}`;
+  });
+
   useEffect(() => {
     setTools([
       <BgmMaker
@@ -58,13 +72,42 @@ const Do = ({
       />,
     ]);
 
-    const timer = setTimeout(
-      () => {
-        console.log(`${time_limit_ms}マイクロ秒たちました`);
-      },
-      // startBreak,
-      time_limit_ms
-    );
+    //設定された時間が経過したいことを管理するフラグと、
+    //1秒ごとにタイマーを更新していく関数
+    let isOverTimeLimit = false;
+    const timer = setInterval(() => {
+      setTimeLimit_min((prev) => {
+        let min;
+        let sec;
+        if (isOverTimeLimit) {
+          min = Number(prev.split(":")[0].slice(1));
+        } else {
+          min = Number(prev.split(":")[0]);
+        }
+        sec = Number(prev.split(":")[1]);
+
+        if (min === 0 && sec === 0) {
+          isOverTimeLimit = true;
+          openThisAlertMenu("toBreak");
+        }
+
+        if (isOverTimeLimit) {
+          const newMin = sec === 59 ? min + 1 : min;
+          const newSec = sec === 59 ? 0 : sec + 1;
+
+          return `-${newMin.toString().padStart(2, "0")}:${newSec
+            .toString()
+            .padStart(2, "0")}`;
+        } else {
+          const newMin = sec === 0 ? min - 1 : min;
+          const newSec = sec === 0 ? 59 : sec - 1;
+
+          return `${newMin.toString().padStart(2, "0")}:${newSec
+            .toString()
+            .padStart(2, "0")}`;
+        }
+      });
+    }, 1000);
     const start = Date.now();
 
     return () => {
@@ -80,7 +123,7 @@ const Do = ({
 
   return (
     <div className="Do">
-      <h2 className="do__time-limit">どーも</h2>
+      <h2 className="do__time-limit">{timeLimit_min}</h2>
       <FlexBox
         className="do__task-list"
         element="ul"
@@ -133,6 +176,7 @@ const Do = ({
         <AlertMenu
           closeAlertMenu={closeAlertMenu}
           whichAlertMenuIsOpen={whichAlertMenuIsOpen}
+          startBreakWithThisTime={startBreakWithThisTime}
         />
       ) : null}
     </div>
