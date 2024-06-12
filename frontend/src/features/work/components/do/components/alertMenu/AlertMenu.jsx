@@ -29,9 +29,9 @@ const AlertMenu = ({
             height="60px"
             mr="30px"
             color="#333"
-            func={() => startBreakWithThisTime(10000)}
+            func={() => startBreakWithThisTime(180000)}
           >
-            10秒
+            3分
           </Button>
           <Button
             width="200px"

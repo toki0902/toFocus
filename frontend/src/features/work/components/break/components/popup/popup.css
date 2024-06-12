@@ -63,3 +63,9 @@
 .popup__close-btn:hover::before {
   background-color: var(--sub-color);
 }
+.popup__value-box {
+  max-width: 600px;
+}
+.popup__value-box--quit {
+  max-width: 400px;
+}

@@ -7,21 +7,25 @@ import "./work.css";
 //目標設定、実際の作業フェーズ、休憩フェーズ、その後の振り返りまでを管理するfeature
 const Work = () => {
   const [tasks, setTasks] = useState([]);
+
+  //コイツの扱いに悩み中...
+  //タスクにかかるおおよその時間だけど、集中できたか否かのパラメーターに使う予定...？
   const [requireTime_min, setRequireTime_min] = useState(0);
+
   const [workingHours_min, setWorkingHours_min] = useState(0);
   const [
     workingHours_withoutLongBreak_min,
     setWorkingHours_withoutLongBreak_min,
   ] = useState(0);
 
+  //Doコンポーネントに最新のtasksを渡すためのRef
   const tasks_Ref = useRef(tasks);
   useEffect(() => {
     tasks_Ref.current = tasks;
   }, [tasks]);
 
   const startDoWithThisTime = (time) => {
-    setCurrentStage(<></>);
-
+    //上記のRefの更新を待つために100ms待機する
     setTimeout(() => {
       const tmp_task = tasks_Ref.current;
       setCurrentStage(
@@ -59,17 +63,34 @@ const Work = () => {
     setTimeout(() => {
       const tmp_time = workingHours_withoutLongBreak_minRef.current;
 
-      setCurrentStage(
-        <Break
-          key={Date.now()}
-          time_limit_ms={time}
-          startDoWithThisTime={startDoWithThisTime}
-          setWorkingHours_withoutLongBreak_min={
-            setWorkingHours_withoutLongBreak_min
-          }
-          workingHours_withoutLongBreak_min={tmp_time}
-        />
-      );
+      if (time >= 900000) {
+        setCurrentStage(
+          <Break
+            key={Date.now()}
+            time_limit_ms={time}
+            startDoWithThisTime={startDoWithThisTime}
+            startBreakWithThisTime={startBreakWithThisTime}
+            setWorkingHours_withoutLongBreak_min={
+              setWorkingHours_withoutLongBreak_min
+            }
+            workingHours_withoutLongBreak_min={tmp_time}
+            long
+          />
+        );
+      } else {
+        setCurrentStage(
+          <Break
+            key={Date.now()}
+            time_limit_ms={time}
+            startDoWithThisTime={startDoWithThisTime}
+            startBreakWithThisTime={startBreakWithThisTime}
+            setWorkingHours_withoutLongBreak_min={
+              setWorkingHours_withoutLongBreak_min
+            }
+            workingHours_withoutLongBreak_min={tmp_time}
+          />
+        );
+      }
     }, 100);
   };
 

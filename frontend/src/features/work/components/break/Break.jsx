@@ -5,12 +5,15 @@ import breakIcon from "@images/peopleinthebed.svg";
 import dolphinIcon from "@images/dolphin.svg";
 import Column from "./components/column/Column";
 import Popup from "./components/popup/Popup";
+import AlertToLongBreak from "./components/longbreakalert/AlertToLongBreak";
 
 const Break = ({
   time_limit_ms,
   startDoWithThisTime,
+  startBreakWithThisTime,
   setWorkingHours_withoutLongBreak_min,
   workingHours_withoutLongBreak_min,
+  long = false,
 }) => {
   //あと何分で終わるかどうかを表示するタイマー
   const [timeLimit_min, setTimeLimit_min] = useState(() => {
@@ -42,7 +45,7 @@ const Break = ({
   };
 
   useEffect(() => {
-    console.log(workingHours_withoutLongBreak_min);
+    console.log(long);
     const timer = setInterval(() => {
       setTimeLimit_min((prev) => {
         let min;
@@ -79,6 +82,9 @@ const Break = ({
 
     return () => {
       clearInterval(timer);
+      if (long) {
+        setWorkingHours_withoutLongBreak_min(0);
+      }
     };
   }, []);
 
@@ -141,7 +147,13 @@ const Break = ({
         >
           休憩を終わる
         </Button>
-        <Button color="#ff9f47" height="60px" width="200px" isWhiteMain>
+        <Button
+          color="#ff9f47"
+          height="60px"
+          width="200px"
+          isWhiteMain
+          func={() => openThisPopUp("quit")}
+        >
           今日はもうやめる
         </Button>
       </FlexBox>
@@ -149,7 +161,13 @@ const Break = ({
         <Popup
           closePopUp={closePopUp}
           startDoWithThisTime={startDoWithThisTime}
+          startBreakWithThisTime={startBreakWithThisTime}
+          whichPopupIsOpen={whichIsOpenPopUp}
+          workingHours_withoutLongBreak_min={workingHours_withoutLongBreak_min}
         />
+      ) : null}
+      {!long && workingHours_withoutLongBreak_min >= 50 ? (
+        <AlertToLongBreak openThisPopUp={openThisPopUp} />
       ) : null}
     </FlexBox>
   );
