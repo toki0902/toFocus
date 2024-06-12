@@ -12,6 +12,9 @@
 .column__text {
   height: 80%;
   animation: appear 1s;
+  overflow-x: hidden;
+  overflow-y: auto;
+  word-wrap: break-word;
 }
 .column__text.fade-out {
   animation: fade-out 1s;

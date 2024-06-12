@@ -2,6 +2,7 @@ import React, { useCallback, useState, useRef, useEffect } from "react";
 import SetGoals from "./components/setGoals/SetGoals";
 import Do from "./components/do/Do";
 import Break from "./components/break/Break";
+import SetTrack from "./components/setTrack/SetTrack";
 import "./work.css";
 
 //目標設定、実際の作業フェーズ、休憩フェーズ、その後の振り返りまでを管理するfeature
@@ -32,6 +33,7 @@ const Work = () => {
         <Do
           key={Date.now()}
           startBreakWithThisTime={startBreakWithThisTime}
+          startSetTrack={startSetTrack}
           updateWorkingTime_useMin={updateWorkingTime_useMin}
           tasks={tmp_task}
           time_limit_ms={time}
@@ -70,6 +72,7 @@ const Work = () => {
             time_limit_ms={time}
             startDoWithThisTime={startDoWithThisTime}
             startBreakWithThisTime={startBreakWithThisTime}
+            startSetTrack={startSetTrack}
             setWorkingHours_withoutLongBreak_min={
               setWorkingHours_withoutLongBreak_min
             }
@@ -84,6 +87,7 @@ const Work = () => {
             time_limit_ms={time}
             startDoWithThisTime={startDoWithThisTime}
             startBreakWithThisTime={startBreakWithThisTime}
+            startSetTrack={startSetTrack}
             setWorkingHours_withoutLongBreak_min={
               setWorkingHours_withoutLongBreak_min
             }
@@ -96,21 +100,22 @@ const Work = () => {
 
   //目標タスクを追加で一つ設定するための関数
   //SetGoalsコンポーネントを新規で呼び出す。
-  const continueSetGoals = useCallback(
-    (task_toAdd, time_toAdd) => {
-      setTasks((prev) => [...prev, task_toAdd]);
-      setRequireTime_min((prev) => prev + time_toAdd);
-      setCurrentStage(
-        <SetGoals
-          Continue
-          continueSetGoals={continueSetGoals}
-          key={Date.now()}
-          startDoWithThisTime={startDoWithThisTime}
-        />
-      );
-    },
-    [startDoWithThisTime, tasks]
-  );
+  const continueSetGoals = (task_toAdd, time_toAdd) => {
+    setTasks((prev) => [...prev, task_toAdd]);
+    setRequireTime_min((prev) => prev + time_toAdd);
+    setCurrentStage(
+      <SetGoals
+        Continue
+        continueSetGoals={continueSetGoals}
+        key={Date.now()}
+        startDoWithThisTime={startDoWithThisTime}
+      />
+    );
+  };
+
+  const startSetTrack = () => {
+    setCurrentStage(<SetTrack></SetTrack>);
+  };
 
   const [currentStage, setCurrentStage] = useState(
     <SetGoals continueSetGoals={continueSetGoals} />

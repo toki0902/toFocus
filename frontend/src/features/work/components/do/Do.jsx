@@ -10,6 +10,7 @@ import AlertMenu from "./components/alertMenu/AlertMenu.jsx";
 const Do = ({
   time_limit_ms = 5000,
   startBreakWithThisTime,
+  startSetTrack,
   updateWorkingTime_useMin,
   tasks,
 }) => {
@@ -161,6 +162,9 @@ const Do = ({
           }}
         >
           ホームに戻る
+        </li>
+        <li className="do__menu-item" onClick={startSetTrack}>
+          記録して終わる
         </li>
       </FlexBox>
       {tools}

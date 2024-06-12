@@ -11,6 +11,7 @@ const Break = ({
   time_limit_ms,
   startDoWithThisTime,
   startBreakWithThisTime,
+  startSetTrack,
   setWorkingHours_withoutLongBreak_min,
   workingHours_withoutLongBreak_min,
   long = false,
@@ -162,6 +163,7 @@ const Break = ({
           closePopUp={closePopUp}
           startDoWithThisTime={startDoWithThisTime}
           startBreakWithThisTime={startBreakWithThisTime}
+          startSetTrack={startSetTrack}
           whichPopupIsOpen={whichIsOpenPopUp}
           workingHours_withoutLongBreak_min={workingHours_withoutLongBreak_min}
         />

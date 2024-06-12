@@ -9,6 +9,7 @@ const Popup = ({
   closePopUp,
   startDoWithThisTime,
   startBreakWithThisTime,
+  startSetTrack,
   workingHours_withoutLongBreak_min,
 }) => {
   let title;
@@ -75,7 +76,13 @@ const Popup = ({
             >
               いいえ
             </Button>
-            <Button width="180px" height="60px" color="#ff9f47" isWhiteMain>
+            <Button
+              width="180px"
+              height="60px"
+              color="#ff9f47"
+              isWhiteMain
+              func={startSetTrack}
+            >
               はい
             </Button>
           </FlexBox>

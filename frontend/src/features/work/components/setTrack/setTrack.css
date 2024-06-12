@@ -1,0 +1,23 @@
+.SetTrack {
+  position: relative;
+  color: var(--main-color);
+}
+.settrack__text--big {
+  font-size: 32px;
+  font-weight: bold;
+}
+.settrack__end-btn {
+  border: 2px solid var(--main-color);
+  animation: arrivel 1.2s ease-out;
+}
+@keyframes arrivel {
+  0% {
+    transform: translateX(-70vw) scale(0.1, 0.1);
+  }
+  80% {
+    transform: translateX(0) scale(0.1, 0.1);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
