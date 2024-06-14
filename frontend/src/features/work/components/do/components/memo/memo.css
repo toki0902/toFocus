@@ -29,6 +29,7 @@
   padding: 10px;
   overflow-y: auto;
   overflow-x: hidden;
+  cursor: text;
 }
 .memo__editor:focus {
   outline: none;
@@ -43,4 +44,10 @@
   margin-right: 20px;
   cursor: pointer;
   padding: 0;
+  object-fit: cover;
+  opacity: 0.5;
+}
+.memo-menu__tool-item img {
+  width: 70%;
+  height: 70%;
 }
