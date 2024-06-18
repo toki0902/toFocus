@@ -20,7 +20,7 @@ const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
   const addBgmMaker = (songGenre) => {
     const newBgmMaker = (
       <BgmMaker
-        key={Date.now}
+        key={Date.now()}
         myKey={Date.now()}
         genre={songGenre}
         removeThisTool={removeThisTool}

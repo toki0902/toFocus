@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./memo.css";
 import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
 import removeIcon from "@images/cross.svg";
-import lockIcon from "@images/lock.svg";
-import unlockIcon from "@images/unlock.svg";
 // Import the Slate editor factory.
-import { Editor, createEditor, Text, Element, Transforms } from "slate";
+import { Editor, createEditor, Text, Element, Transforms, Range } from "slate";
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
+import MemoMenu from "./MemoMenu";
 
 const Memo = ({ myKey, removeThisTool }) => {
   const interact_ = useInteract();
@@ -29,8 +28,6 @@ const Memo = ({ myKey, removeThisTool }) => {
   };
 
   const [editor] = useState(() => withReact(createEditor()));
-
-  const { selection } = editor;
 
   const initialElement = [
     {
@@ -62,8 +59,10 @@ const Memo = ({ myKey, removeThisTool }) => {
     const isNeedApply = !isActiveThisMark(font);
     if (isNeedApply) {
       Editor.addMark(editor, font, true);
+      setCurrentState((prev) => [...prev, font]);
     } else {
       Editor.removeMark(editor, font, true);
+      setCurrentState((prev) => prev.filter((item) => item !== font));
     }
   };
 
@@ -74,8 +73,10 @@ const Memo = ({ myKey, removeThisTool }) => {
   //↑の場合isActiveThisMark("bold")はtrueを返しisActiveThisMark("italic")はfalseを返す
   const isActiveThisMark = (mark) => {
     const selectedNodes = Editor.nodes(editor, {
+      reverse: true,
       match: (n) => Text.isText(n),
     });
+
     return selectedNodes.every((item) => {
       //markは文字列なので、obj内のmark keyを持つプロパティには[]でアクセスする。
       return item[0][mark];
@@ -119,17 +120,20 @@ const Memo = ({ myKey, removeThisTool }) => {
         { type: element },
         { match: (n) => Element.isElement(n) }
       );
+      setCurrentState((prev) => [...prev, element]);
     } else {
       Transforms.setNodes(
         editor,
         { type: "paragraph" },
         { match: (n) => Element.isElement(n) }
       );
+      setCurrentState((prev) => prev.filter((item) => item !== element));
     }
   };
 
   const isActiveThisElement = (element) => {
     const selectedNodes = Editor.nodes(editor, {
+      reverse: true,
       match: (n) => Element.isElement(n),
     });
 
@@ -138,18 +142,32 @@ const Memo = ({ myKey, removeThisTool }) => {
     });
   };
 
+  //Memoの設定menuが開いているかを管理するState
+  //何についてのmenuが開いているのかを管理するState
+  const [isOpenMemoMenu, setIsOpenMemoMenu] = useState(false);
+  const [whichMemoMenuIsOpen, setWhichMemoMenuIsOpen] = useState("leaf");
+  const appearMenu = () => {
+    updateSelection();
+    const { selection } = editor;
+    if (selection && !Range.isCollapsed(selection)) {
+      setWhichMemoMenuIsOpen("leaf");
+      setIsOpenMemoMenu(true);
+    } else {
+      setIsOpenMemoMenu(false);
+    }
+  };
+
   const element_arr = ["h1", "h2", "list", "paragraph"];
   const leaf_arr = ["bold", "italic", "underline"];
   //現在の選択範囲に何の要素が適応しているかを配列で管理するState
   //使用用途はtoolのスタイル適応
   const [currentState, setCurrentState] = useState(["paragraph"]);
-  console.log(currentState);
 
   //現在の選択範囲の要素を更新する用の関数
-  //fix : いつ実行したらよいかが定まっていない。
+  //FIX : いつ実行したらよいかが定まっていない。
   //ボタン押したときの更新が遅れている
   //フォントの境目の時の更新が遅れている
-  const checkSelection = () => {
+  const updateSelection = () => {
     const newState = [];
     element_arr.forEach((element) => {
       const isNeedPush = isActiveThisElement(element);
@@ -163,97 +181,75 @@ const Memo = ({ myKey, removeThisTool }) => {
         newState.push(leaf);
       }
     });
+
     setCurrentState(newState);
   };
 
+  //ショートカット設定用onKeyDownイベントを登録する関数
+  const onKeyDown = (event) => {
+    console.log(`${event.key} is down`);
+    switch (event.key) {
+      case "/": {
+        //appearMenu関数の選択範囲がない時にMenuを閉じる処理の後にMenuを開くためにtimeout使用
+        setTimeout(() => {
+          setWhichMemoMenuIsOpen("element");
+          setIsOpenMemoMenu(true);
+        }, 100);
+
+        break;
+      }
+      case "Backspace": {
+        setIsOpenMemoMenu(false);
+        break;
+      }
+    }
+  };
+
   return (
-    <FlexBox
-      className="Memo"
-      width="200px"
-      height="200px"
-      pb="10px"
-      pl="10px"
-      pr="10px"
-      pt="10px"
-      top
-      ref={interact_.ref}
-    >
-      <img
-        onClick={() => {
-          removeThisTool(myKey);
-        }}
-        className="memo__remove-icon"
-        src={removeIcon}
-        alt="remove"
-      />
-      <FlexBox className="memo__menu" width="100%" height="18%">
-        <strong
-          className="memo-menu__tool-item"
-          onClick={(event) => applyFont(event, "bold")}
-          style={currentState.includes("bold") ? { opacity: 1 } : null}
+    <>
+      <FlexBox
+        className="Memo"
+        width="200px"
+        height="200px"
+        pb="10px"
+        pl="10px"
+        pr="10px"
+        pt="10px"
+        top
+        ref={interact_.ref}
+      >
+        <img
+          onClick={() => {
+            removeThisTool(myKey);
+          }}
+          className="memo__remove-icon"
+          src={removeIcon}
+          alt="remove"
+        />
+
+        <Slate
+          editor={editor}
+          initialValue={initialElement}
+          onChange={appearMenu}
         >
-          B
-        </strong>
-        <em
-          className="memo-menu__tool-item"
-          onClick={(event) => applyFont(event, "italic")}
-          style={currentState.includes("italic") ? { opacity: 1 } : null}
-        >
-          I
-        </em>
-        <u
-          className="memo-menu__tool-item"
-          onClick={(event) => applyFont(event, "underline")}
-          style={currentState.includes("underline") ? { opacity: 1 } : null}
-        >
-          U
-        </u>
-        <div
-          className="memo-menu__tool-item"
-          onClick={toggleInteract}
-          style={isInteract ? null : { opacity: 1 }}
-        >
-          <img
-            src={isInteract ? unlockIcon : lockIcon}
-            alt={isInteract ? "unlock" : "lock"}
-          />
-        </div>
-        <div
-          className="memo-menu__tool-item"
-          onClick={() => applyElement("h1")}
-          style={currentState.includes("h1") ? { opacity: 1 } : null}
-        >
-          h1
-        </div>
-        <div
-          className="memo-menu__tool-item"
-          onClick={() => applyElement("h2")}
-          style={currentState.includes("h2") ? { opacity: 1 } : null}
-        >
-          h2
-        </div>
-        <div
-          className="memo-menu__tool-item"
-          onClick={() => applyElement("list")}
-          style={currentState.includes("list") ? { opacity: 1 } : null}
-        >
-          li
-        </div>
-        <div className="memo-menu__tool-item" onClick={checkSelection}>
-          c
-        </div>
+          <Editable
+            className="memo__editor"
+            renderLeaf={renderLeaf}
+            renderElement={renderElement}
+            onKeyDown={(e) => onKeyDown(e)}
+          ></Editable>
+        </Slate>
+        <MemoMenu
+          isInteract={isInteract}
+          applyFont={applyFont}
+          applyElement={applyElement}
+          currentState={currentState}
+          isOpenMemoMenu={isOpenMemoMenu}
+          toggleInteract={toggleInteract}
+          whichMemoMenuIsOpen={whichMemoMenuIsOpen}
+        />
       </FlexBox>
-      <Slate editor={editor} initialValue={initialElement}>
-        <Editable
-          className="memo__editor"
-          renderLeaf={renderLeaf}
-          renderElement={renderElement}
-          onKeyDown={checkSelection}
-          onMouseDown={checkSelection}
-          onMouseUp={checkSelection}
-        ></Editable>
-      </Slate>
-    </FlexBox>
+    </>
   );
 };
 

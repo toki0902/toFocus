@@ -31,6 +31,7 @@ const FlexBox = forwardRef(
       onKeyDown = null,
       onMouseOver = null,
       onMouseOut = null,
+      noWrap,
     },
     ref
   ) => {
@@ -66,7 +67,7 @@ const FlexBox = forwardRef(
           height: height,
           margin: `${mt} ${mr} ${mb} ${ml}`,
           padding: `${pt} ${pr} ${pb} ${pl}`,
-          flexWrap: "wrap",
+          flexWrap: noWrap ? "nowrap" : "wrap",
         };
 
     if (element === "ul") {
