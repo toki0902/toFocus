@@ -4,7 +4,15 @@ import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
 import removeIcon from "@images/cross.svg";
 // Import the Slate editor factory.
-import { Editor, createEditor, Text, Element, Transforms, Range } from "slate";
+import {
+  Editor,
+  createEditor,
+  Text,
+  Element,
+  Transforms,
+  Range,
+  Node,
+} from "slate";
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
 import MemoMenu from "./MemoMenu";
@@ -32,7 +40,7 @@ const Memo = ({ myKey, removeThisTool }) => {
   const initialElement = [
     {
       type: "paragraph",
-      children: [{ text: "sample text" }],
+      children: [{ text: "" }],
     },
   ];
 
@@ -84,28 +92,102 @@ const Memo = ({ myKey, removeThisTool }) => {
   };
 
   const renderElement = ({ children, attributes, element }) => {
+    const isEmpty = Node.string(element).length === 0;
     switch (element.type) {
+      //fix : 全角入力だとなぜか、placeholderの削除が遅い
       case "paragraph": {
-        return <p {...attributes}>{children}</p>;
+        return (
+          //fix : 改行した箇所すべてにplaceholderがついてしまうので、それを避けたい。
+          //そのためには、現在のNodeが最終行かどうかを判定しなければいけない。
+          <p {...attributes} style={{ position: "relative" }}>
+            {isEmpty ? (
+              <span
+                contentEditable={false}
+                style={{
+                  opacity: 0.3,
+                  pointerEvents: "none",
+                  position: "absolute",
+                  top: "50%",
+                  translate: "0 -50%",
+                }}
+              >
+                テキストを入力するか、「/」でコマンドを呼び出しましょう
+              </span>
+            ) : null}
+            {children}
+          </p>
+        );
       }
       case "h1": {
         return (
-          <h1 style={{ fontSize: 28 }} {...attributes}>
+          <h1
+            style={{ fontSize: 28, fontWeight: "bold", position: "relative" }}
+            {...attributes}
+          >
             {children}
+            {isEmpty ? (
+              <span
+                contentEditable={false}
+                style={{
+                  opacity: 0.3,
+                  pointerEvents: "none",
+                  position: "absolute",
+                  top: "50%",
+                  translate: "0 -50%",
+                }}
+              >
+                見出し1
+              </span>
+            ) : null}
           </h1>
         );
       }
       case "h2": {
         return (
-          <h2 style={{ fontSize: 24 }} {...attributes}>
+          <h2
+            style={{ fontSize: 22, fontWeight: "bolder", position: "relative" }}
+            {...attributes}
+          >
             {children}
+            {isEmpty ? (
+              <span
+                contentEditable={false}
+                style={{
+                  opacity: 0.3,
+                  pointerEvents: "none",
+                  position: "absolute",
+                  top: "50%",
+                  translate: "0 -50%",
+                }}
+              >
+                見出し2
+              </span>
+            ) : null}
           </h2>
         );
       }
       case "list": {
         return (
-          <li style={{ listStyleType: "disc" }} {...attributes}>
+          <li
+            style={{ listStyleType: "disc", position: "relative" }}
+            {...attributes}
+          >
             {children}
+            {isEmpty ? (
+              <span
+                contentEditable={false}
+                style={{
+                  opacity: 0.3,
+                  pointerEvents: "none",
+                  position: "absolute",
+                  top: "50%",
+                  left: "20px",
+                  translate: "0 -50%",
+                }}
+              >
+                リスト
+              </span>
+            ) : null}
           </li>
         );
       }
@@ -113,22 +195,12 @@ const Memo = ({ myKey, removeThisTool }) => {
   };
 
   const applyElement = (element) => {
-    const isNeedApply = !isActiveThisElement(element);
-    if (isNeedApply) {
-      Transforms.setNodes(
-        editor,
-        { type: element },
-        { match: (n) => Element.isElement(n) }
-      );
-      setCurrentState((prev) => [...prev, element]);
-    } else {
-      Transforms.setNodes(
-        editor,
-        { type: "paragraph" },
-        { match: (n) => Element.isElement(n) }
-      );
-      setCurrentState((prev) => prev.filter((item) => item !== element));
-    }
+    Transforms.setNodes(
+      editor,
+      { type: element },
+      { match: (n) => Element.isElement(n) }
+    );
+    setCurrentState((prev) => [...prev, element]);
   };
 
   const isActiveThisElement = (element) => {
@@ -143,14 +215,18 @@ const Memo = ({ myKey, removeThisTool }) => {
   };
 
   //Memoの設定menuが開いているかを管理するState
+  //leafMenuでつかうsubMenuが開いているかを管理するState
   //何についてのmenuが開いているのかを管理するState
   const [isOpenMemoMenu, setIsOpenMemoMenu] = useState(false);
+  const [isOpenChoiseElementMenu, setIsOpenChoiseElementMenu] = useState(false);
   const [whichMemoMenuIsOpen, setWhichMemoMenuIsOpen] = useState("leaf");
   const appearMenu = () => {
     updateSelection();
     const { selection } = editor;
     if (selection && !Range.isCollapsed(selection)) {
       setWhichMemoMenuIsOpen("leaf");
+      //MemoMenuを開くときはchoiseElementMenuは初期化動作として閉じることにする
+      setIsOpenChoiseElementMenu(false);
       setIsOpenMemoMenu(true);
     } else {
       setIsOpenMemoMenu(false);
@@ -187,9 +263,12 @@ const Memo = ({ myKey, removeThisTool }) => {
 
   //ショートカット設定用onKeyDownイベントを登録する関数
   const onKeyDown = (event) => {
-    console.log(`${event.key} is down`);
+    const [selectedNode] = Editor.nodes(editor, {
+      match: (n) => Element.isElement(n),
+    });
     switch (event.key) {
       case "/": {
+        event.preventDefault();
         //appearMenu関数の選択範囲がない時にMenuを閉じる処理の後にMenuを開くためにtimeout使用
         setTimeout(() => {
           setWhichMemoMenuIsOpen("element");
@@ -199,8 +278,128 @@ const Memo = ({ myKey, removeThisTool }) => {
         break;
       }
       case "Backspace": {
+        if (selectedNode[0].type === "list") {
+          const [textnode] = Editor.nodes(editor, {
+            match: (n) => Text.isText(n),
+          });
+
+          if (textnode[0].text === "") {
+            Transforms.insertText(editor, "\n");
+            applyElement("paragraph");
+          }
+        }
         setIsOpenMemoMenu(false);
+
         break;
+      }
+      case "ArrowDown": {
+        event.preventDefault();
+        //elementMenuが開いてるときに、矢印キーで選択できるようにするためのcase
+        if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
+          const [element_menu] =
+            document.getElementsByClassName("memo__element-menu");
+          const children = element_menu.children;
+          const childArray = Array.from(children);
+          const selectedItem_index = childArray.findIndex((item) =>
+            item.classList.contains("selected")
+          );
+          if (
+            selectedItem_index < 0 ||
+            selectedItem_index === childArray.length - 1
+          ) {
+            children[selectedItem_index]?.classList.remove("selected");
+            children[0].classList.add("selected");
+          } else if (
+            selectedItem_index >= 0 &&
+            selectedItem_index < childArray.length - 1
+          ) {
+            children[selectedItem_index].classList.remove("selected");
+            children[selectedItem_index + 1].classList.add("selected");
+          }
+          //FIX : ここに記述すると、choiseElementMenu内での
+          //onKeyDownが発火しないため別の場所に記述しよう。
+        } else if (isOpenMemoMenu && isOpenChoiseElementMenu) {
+          console.log("open");
+          const [choiseElement_menu] =
+            document.getElementsByClassName("memo-sub-menu");
+          const children = choiseElement_menu.children;
+          const childArray = Array.from(children);
+          const selectedItem_index = childArray.findIndex((item) => {
+            item.classList.contains("selected");
+          });
+          if (
+            selectedItem_index < 0 ||
+            selectedItem_index === childArray.length - 1
+          ) {
+            children[selectedItem_index]?.classList.remove("selected");
+            children[0].classList.add("selected");
+          } else if (
+            selectedItem_index >= 0 &&
+            selectedItem_index < childArray.length - 1
+          ) {
+            children[selectedItem_index].classList.remove("selected");
+            children[selectedItem_index + 1].classList.add("selected");
+          }
+        }
+        break;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+        //elementMenuが開いてるときに、矢印キーで選択できるようにするためのcase
+        if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
+          const [element_menu] =
+            document.getElementsByClassName("memo__element-menu");
+          const children = element_menu.children;
+          const childArray = Array.from(children);
+          const selectedItem_index = childArray.findIndex((item) =>
+            item.classList.contains("selected")
+          );
+
+          if (selectedItem_index <= 0) {
+            children[selectedItem_index]?.classList.remove("selected");
+            children[childArray.length - 1].classList.add("selected");
+          } else if (selectedItem_index > 0) {
+            children[selectedItem_index].classList.remove("selected");
+            children[selectedItem_index - 1].classList.add("selected");
+          }
+        }
+        break;
+      }
+      case "Enter": {
+        if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
+          event.preventDefault();
+          const [element_menu] =
+            document.getElementsByClassName("memo__element-menu");
+          const selectNode = Array.from(element_menu.children).find((item) =>
+            item.classList.contains("selected")
+          );
+          switch (
+            selectNode.getElementsByClassName("element-menu__item-title")[0]
+              .innerText
+          ) {
+            case "テキスト": {
+              applyElement("paragraph");
+              setIsOpenMemoMenu(false);
+              console.log(isOpenChoiseElementMenu);
+              break;
+            }
+            case "見出し1": {
+              applyElement("h1");
+              setIsOpenMemoMenu(false);
+              break;
+            }
+            case "見出し2": {
+              applyElement("h2");
+              setIsOpenMemoMenu(false);
+              break;
+            }
+            case "リスト": {
+              applyElement("list");
+              setIsOpenMemoMenu(false);
+              break;
+            }
+          }
+        }
       }
     }
   };
@@ -241,11 +440,13 @@ const Memo = ({ myKey, removeThisTool }) => {
         </Slate>
         <MemoMenu
           isInteract={isInteract}
+          toggleInteract={toggleInteract}
           applyFont={applyFont}
           applyElement={applyElement}
           currentState={currentState}
           isOpenMemoMenu={isOpenMemoMenu}
-          toggleInteract={toggleInteract}
+          isOpenChoiseElementMenu={isOpenChoiseElementMenu}
+          setIsOpenChoiseElementMenu={setIsOpenChoiseElementMenu}
           whichMemoMenuIsOpen={whichMemoMenuIsOpen}
         />
       </FlexBox>
