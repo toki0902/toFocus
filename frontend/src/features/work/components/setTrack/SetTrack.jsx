@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./setTrack.css";
 import { FlexBox, Button } from "@component";
 import { useNavigate } from "react-router-dom";
+import TrackMemo from "./components/trackMemo/TrackMemo";
 
 const SetTrack = () => {
   const [isActiveTrackMode, setIsActiveTrackMode] = useState(false);
@@ -60,21 +61,17 @@ const SetTrack = () => {
         </Button>
       </FlexBox>
       {isClicked ? (
-        <FlexBox className="settrack__end-btn" width="100%" mt="100px">
+        <FlexBox className="settrack__end-btn" width="100%" mt="100px" column>
           {isActiveTrackMode ? (
             <>
-              <FlexBox
-                className="end__memo"
-                width="100%"
-                height="400px"
-                column
-              ></FlexBox>
+              <TrackMemo />
               <Button
                 width="200px"
                 height="50px"
                 color="#8ddaeb"
                 isWhiteMain
                 func={kiorkusurukansuu}
+                mt="30px"
               >
                 記録して終わる
               </Button>

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SetGoals from "./components/setGoals/SetGoals";
 import Do from "./components/do/Do";
 import Break from "./components/break/Break";

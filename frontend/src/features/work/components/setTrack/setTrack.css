@@ -7,7 +7,6 @@
   font-weight: bold;
 }
 .settrack__end-btn {
-  border: 2px solid var(--main-color);
   animation: arrivel 1.2s ease-out;
 }
 @keyframes arrivel {

@@ -1,8 +1,6 @@
 import React, { useMemo, useState } from "react";
-import "./memo.css";
-import { useInteract } from "../../../../hooks/useInteract";
+import "./trackMemo.css";
 import { FlexBox } from "@component";
-import removeIcon from "@images/cross.svg";
 // Import the Slate editor factory.
 import {
   Editor,
@@ -16,26 +14,9 @@ import {
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
-import MemoMenu from "./MemoMenu";
+import MemoMenu from "./TrackMemoMenu";
 
-const Memo = ({ myKey, removeThisTool }) => {
-  const interact_ = useInteract();
-
-  //要素を動かせるかどうかを管理するStateと、
-
-  //要素可動を切り替える関数
-  const [isInteract, setIsInteract] = useState(true);
-
-  const toggleInteract = () => {
-    if (isInteract) {
-      interact_.disable();
-      setIsInteract(false);
-    } else {
-      interact_.enable();
-      setIsInteract(true);
-    }
-  };
-
+const TrackMemo = () => {
   const [editor] = useState(() => withHistory(withReact(createEditor())));
 
   const initialElement = [
@@ -327,8 +308,9 @@ const Memo = ({ myKey, removeThisTool }) => {
           event.preventDefault();
           //elementMenuが開いてるときに、矢印キーで選択できるようにするためのcase
           if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
-            const [element_menu] =
-              document.getElementsByClassName("memo__element-menu");
+            const [element_menu] = document.getElementsByClassName(
+              "trackmemo__element-menu"
+            );
             const children = element_menu.children;
             const childArray = Array.from(children);
             const selectedItem_index = childArray.findIndex((item) =>
@@ -352,7 +334,7 @@ const Memo = ({ myKey, removeThisTool }) => {
           } else if (isOpenMemoMenu && isOpenChoiseElementMenu) {
             console.log("open");
             const [choiseElement_menu] =
-              document.getElementsByClassName("memo-sub-menu");
+              document.getElementsByClassName("trackmemo-sub-menu");
             const children = choiseElement_menu.children;
             const childArray = Array.from(children);
             const selectedItem_index = childArray.findIndex((item) => {
@@ -378,8 +360,9 @@ const Memo = ({ myKey, removeThisTool }) => {
           event.preventDefault();
           //elementMenuが開いてるときに、矢印キーで選択できるようにするためのcase
           if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
-            const [element_menu] =
-              document.getElementsByClassName("memo__element-menu");
+            const [element_menu] = document.getElementsByClassName(
+              "trackmemo__element-menu"
+            );
             const children = element_menu.children;
             const childArray = Array.from(children);
             const selectedItem_index = childArray.findIndex((item) =>
@@ -400,14 +383,16 @@ const Memo = ({ myKey, removeThisTool }) => {
           if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
             event.preventDefault();
             Transforms.delete(editor, { unit: "character", reverse: true });
-            const [element_menu] =
-              document.getElementsByClassName("memo__element-menu");
+            const [element_menu] = document.getElementsByClassName(
+              "trackmemo__element-menu"
+            );
             const selectNode = Array.from(element_menu.children).find((item) =>
               item.classList.contains("selected")
             );
             switch (
-              selectNode.getElementsByClassName("element-menu__item-title")[0]
-                .innerText
+              selectNode.getElementsByClassName(
+                "track-element-menu__item-title"
+              )[0].innerText
             ) {
               case "テキスト": {
                 applyElement("paragraph");
@@ -446,9 +431,9 @@ const Memo = ({ myKey, removeThisTool }) => {
   return (
     <>
       <FlexBox
-        className="Memo"
+        className="TrackMemo"
         width="500px"
-        height="800px"
+        height="400px"
         pb="10px"
         pl="10px"
         pr="10px"
@@ -456,24 +441,14 @@ const Memo = ({ myKey, removeThisTool }) => {
         column
         sb
         top
-        ref={interact_.ref}
       >
-        <img
-          onClick={() => {
-            removeThisTool(myKey);
-          }}
-          className="memo__remove-icon"
-          src={removeIcon}
-          alt="remove"
-        />
-
         <Slate
           editor={editor}
           initialValue={initialElement}
           onChange={onChangeEditor}
         >
           <Editable
-            className="memo__editor"
+            className="trackmemo__editor"
             spellCheck="false"
             renderLeaf={renderLeaf}
             renderElement={renderElement}
@@ -481,8 +456,6 @@ const Memo = ({ myKey, removeThisTool }) => {
           ></Editable>
         </Slate>
         <MemoMenu
-          isInteract={isInteract}
-          toggleInteract={toggleInteract}
           applyFont={applyFont}
           applyElement={applyElement}
           currentState={currentState}
@@ -499,4 +472,4 @@ const Memo = ({ myKey, removeThisTool }) => {
   );
 };
 
-export default Memo;
+export default TrackMemo;

@@ -1,12 +1,10 @@
-.Memo {
+.TrackMemo {
   background-color: #fff;
-  position: absolute;
-  top: 50px;
-  right: 250px;
+  position: relative;
   color: #333;
   border-radius: 5px;
 }
-.memo__remove-icon {
+.trackmemo__remove-icon {
   width: 30px;
   width: 30px;
   position: absolute;
@@ -14,17 +12,17 @@
   top: -15px;
   cursor: pointer;
 }
-.memo__menu {
+.trackmemo__menu {
   background-color: #fff;
   border-radius: 5px;
   box-shadow: 2px 2px 2px;
-  border: 1px solid #333;
+  border: 1px solid var(--sub-color);
   position: absolute;
   top: -50px;
   z-index: 10;
   opacity: 0;
   animation: closeMenu 0.3s;
-  color: #8c8c8c;
+  color: var(--sub-color);
 }
 @keyframes closeMenu {
   0% {
@@ -34,7 +32,7 @@
     opacity: 0;
   }
 }
-.memo__menu.open {
+.trackmemo__menu.open {
   animation: appearMenu 0.3s;
   opacity: 1;
 }
@@ -47,120 +45,117 @@
   }
 }
 
-.memo__editor {
+.trackmemo__editor {
   width: 100%;
   height: calc(100% - 30px);
   line-height: 2em;
-  border: 1px solid #333;
+  border: 1px solid var(--sub-color);
   border-radius: 5px;
   box-shadow: 2px 2px 2px;
+  color: var(--sub-color);
   padding: 10px;
   overflow-y: auto;
   overflow-x: hidden;
   cursor: text;
 }
-.memo__editor:focus {
+.trackmemo__editor:focus {
   outline: none;
 }
-.memo-menu__element-tool:hover {
+.trackmemo-menu__element-tool:hover {
   display: flex;
   justify-content: center;
   cursor: pointer;
 }
-.memo-menu__element-tool:hover {
+.trackmemo-menu__element-tool:hover {
   background-color: #dcdcdc;
 }
-.memo-menu__tool-item {
-  color: #333;
+.trackmemo-menu__tool-item {
+  color: var(--sub-color);
   width: 30px;
   height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #333;
+  border: 1px solid var(--sub-color);
   margin-left: 20px;
   cursor: pointer;
   padding: 0;
   object-fit: cover;
   opacity: 0.5;
 }
-.memo-menu__tool-item img {
+.trackmemo-menu__tool-item img {
   width: 70%;
   height: 70%;
 }
 
-.memo__element-menu {
+.trackmemo__element-menu {
   background-color: #fff;
   border-radius: 5px;
   box-shadow: 2px 2px 2px;
-  border: 1px solid #333;
+  border: 1px solid var(--sub-color);
   position: absolute;
   top: 50%;
   z-index: 10;
   opacity: 0;
   animation: closeMenu 0.3s;
-  color: #8c8c8c;
+  color: var(--sub-color);
   overflow-y: auto;
 }
-.memo__element-menu.open {
+.trackmemo__element-menu.open {
   animation: appearMenu 0.3s;
   opacity: 1;
 }
-.element-menu__item {
+.track-element-menu__item {
   border-radius: 5px;
   cursor: pointer;
 }
-.element-menu__item.selected {
+.track-element-menu__item.selected {
   background-color: #f0f0f0;
 }
-.element-menu__item:hover {
+.track-element-menu__item:hover {
   background-color: #f0f0f0;
 }
-.element-menu__image {
+.track-element-menu__image {
   width: 56px;
   height: 56px;
   margin-right: 10px;
   border-radius: 5px;
-  border: 1px solid #8c8c8c;
+  border: 1px solid var(--sub-color);
 }
-.element-menu__text-box {
+.track-element-menu__text-box {
   font-size: 12px;
 }
-.element-menu__item-title {
-  color: #0a0a0a;
+.track-element-menu__text {
+  opacity: 0.5;
+}
+.track-element-menu__item-title {
+  color: var(--sub-color);
   font-size: 16px;
 }
 
-.mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-}
-.memo-sub-menu {
+.trackmemo-sub-menu {
   position: absolute;
   top: 110%;
   left: 0;
   background-color: #fff;
   box-shadow: 2px 2px 2px;
   border-radius: 5px;
-  color: #333;
+  color: var(--sub-color);
 }
-.memo-sub-menu__item {
+.trackmemo-sub-menu__item {
   margin-bottom: 5px;
   border-radius: 5px;
   cursor: pointer;
 }
-.memo-sub-menu__item.selected {
+.trackmemo-sub-menu__item.selected {
   background-color: #f0f0f0;
 }
-.memo-sub-menu__item:hover {
+.trackmemo-sub-menu__item:hover {
   background-color: #f0f0f0;
 }
-.memo-sub-menu__image {
+.trackmemo-sub-menu__image {
   width: 25px;
   height: 25px;
-  border: 1px solid #8c8c8c;
+  border: 1px solid var(--sub-color);
   margin-right: 5px;
 }
