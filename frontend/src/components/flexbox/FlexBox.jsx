@@ -23,6 +23,7 @@ const FlexBox = forwardRef(
       pt = 0,
       pr = 0,
       pb = 0,
+      pd = false,
       sb = false,
       element = false,
       width = "auto",
@@ -35,6 +36,8 @@ const FlexBox = forwardRef(
     },
     ref
   ) => {
+    const [Pt, Pr, Pb, Pl] = pd ? pd.split(" ") : [0, 0, 0, 0];
+
     const style = column
       ? {
           display: "flex",
@@ -50,7 +53,7 @@ const FlexBox = forwardRef(
           width: width,
           height: height,
           margin: `${mt} ${mr} ${mb} ${ml}`,
-          padding: `${pt} ${pr} ${pb} ${pl}`,
+          padding: pd ? `${Pt} ${Pr} ${Pb} ${Pl}` : `${pt} ${pr} ${pb} ${pl}`,
         }
       : {
           display: "flex",

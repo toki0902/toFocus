@@ -1,0 +1,27 @@
+.Sidebar {
+  border: 1px solid var(--sub-color);
+  border-radius: 5px;
+  box-shadow: 2px 2px 2px;
+}
+.sidebar__title {
+  font-size: 18px;
+  width: 100%;
+  border-bottom: 1px solid #dcdcdc;
+  height: 25px;
+}
+.sidebar-menu__item {
+  border-radius: 5px;
+  cursor: pointer;
+}
+.sidebar-menu__item:hover {
+  background-color: #f0f0f0;
+}
+.sidebar-menu__item.selected {
+  color: var(--main-color);
+}
+.sidebar-menu-item__image {
+  fill: var(--main-color);
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
