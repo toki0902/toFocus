@@ -32,6 +32,7 @@ const FlexBox = forwardRef(
       onKeyDown = null,
       onMouseOver = null,
       onMouseOut = null,
+      onMouseMove = null,
       noWrap,
     },
     ref
@@ -69,7 +70,7 @@ const FlexBox = forwardRef(
           width: width,
           height: height,
           margin: `${mt} ${mr} ${mb} ${ml}`,
-          padding: `${pt} ${pr} ${pb} ${pl}`,
+          padding: pd ? `${Pt} ${Pr} ${Pb} ${Pl}` : `${pt} ${pr} ${pb} ${pl}`,
           flexWrap: noWrap ? "nowrap" : "wrap",
         };
 
@@ -81,6 +82,7 @@ const FlexBox = forwardRef(
           onClick={onClick}
           onMouseOver={onMouseOver}
           onMouseOut={onMouseOut}
+          onMouseMove={onMouseMove}
           onKeyDown={onKeyDown}
           ref={ref}
         >
@@ -95,6 +97,7 @@ const FlexBox = forwardRef(
           onClick={onClick}
           onMouseOver={onMouseOver}
           onMouseOut={onMouseOut}
+          onMouseMove={onMouseMove}
           onKeyDown={onKeyDown}
           ref={ref}
         >
@@ -109,6 +112,7 @@ const FlexBox = forwardRef(
           onClick={onClick}
           onMouseOver={onMouseOver}
           onMouseOut={onMouseOut}
+          onMouseMove={onMouseMove}
           onKeyDown={onKeyDown}
           ref={ref}
         >
