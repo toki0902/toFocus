@@ -4,9 +4,11 @@ import { Button, FlexBox } from "@component";
 //このiconはデモです
 import userIcon from "@images/react.svg";
 import HeaderMenu from "./HeaderMenu";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const login = false;
+  const navigate = useNavigate();
+  const login = true;
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const openMenu = () => {
     setIsOpenMenu(true);
@@ -17,7 +19,7 @@ const Header = () => {
   if (login) {
     return (
       <div className="header">
-        <h1 className="header__title">
+        <h1 className="header__title" onClick={() => navigate("/")}>
           <a href="#" className="header__title-link">
             {/* todo: 本当はtoFocusのロゴが入る */}
             logo
