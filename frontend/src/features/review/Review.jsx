@@ -6,6 +6,32 @@ import Analysis from "./components/analysis/Analysis";
 import Track from "./components/track/Track";
 
 const Review = () => {
+  //仮のデータの形
+  const sampleData = [
+    {
+      dateString: "2024/06/23",
+      year: 2024,
+      month: 6,
+      day: 26,
+      completeTasks: ["出材カンプを作成する。", "VSCodeのインストール"],
+      focusTime: [
+        { start: "15:00", end: "16:00" },
+        { start: "17:00", end: "18:00" },
+      ],
+    },
+    {
+      dateString: "2024/06/21",
+      year: 2024,
+      month: 6,
+      day: 23,
+      completeTasks: ["出材カンプを作成する。", "VSCodeのインストール"],
+      focusTime: [
+        { start: "15:00", end: "16:00" },
+        { start: "17:00", end: "18:00" },
+      ],
+    },
+  ];
+
   const [whichMenuIsOpen, setWhichMenuIsOpen] = useState("analysis");
   const sidebarRef = useRef(null);
 
@@ -14,14 +40,10 @@ const Review = () => {
       sidebarRef.current.classList.add("open");
     }
   };
-  const removeOpenClass = () => {
-    console.log("over");
-    sidebarRef.current.classList.remove("open");
-  };
 
   const currentMenu =
     whichMenuIsOpen === "analysis" ? (
-      <Analysis />
+      <Analysis sampleData={sampleData} />
     ) : whichMenuIsOpen === "track" ? (
       <Track />
     ) : null;

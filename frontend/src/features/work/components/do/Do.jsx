@@ -117,6 +117,7 @@ const Do = ({
       //2分30秒 = 3分, 2分29秒 = 2分
       const end = Date.now();
       const time_toAdd = Math.round((end - start) / 60000);
+      //何時から何時まで作業したのかを管理したい。
       updateWorkingTime_useMin(time_toAdd);
     };
   }, []);
