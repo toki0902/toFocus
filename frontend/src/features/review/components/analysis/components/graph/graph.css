@@ -1,0 +1,33 @@
+.Graph {
+  border: 1px solid var(--main-color);
+  color: var(--main-color);
+  user-select: none;
+}
+.graph__render-mode-list {
+  border-bottom: 1px solid var(--main-color);
+  font-size: 20px;
+  font-weight: bold;
+}
+.graph__render-mode-list p {
+  cursor: pointer;
+}
+.graph__selected-date {
+  color: var(--sub-color);
+  font-weight: bold;
+}
+.graph__arrow {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.graph__time-wrap {
+  border-bottom: 1px solid var(--main-color);
+}
+.graph__time-bar {
+  background-color: var(--main-color);
+  cursor: pointer;
+  width: 40%;
+}
+.graph__date {
+  cursor: pointer;
+}

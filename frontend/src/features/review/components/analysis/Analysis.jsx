@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import "./analysis.css";
 import { FlexBox } from "@component";
 import { eachDayOfInterval } from "date-fns";
 import Graph from "./components/graph/Graph";
 
 const Analysis = ({ sampleData }) => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
   //指定した日付のデータをフィルタリングしてくれる関数。
   const searchDataWithThisDay = (thisDay) => {
     const filtered = sampleData.filter((item) => {
@@ -16,6 +17,7 @@ const Analysis = ({ sampleData }) => {
 
     return filtered;
   };
+
   //期間内のデータをフィルタリングして返してくれる関数。
   //引数はDate型のオブジェクト。
   const searchDataWithThisDuration = (start, end) => {
@@ -43,7 +45,11 @@ const Analysis = ({ sampleData }) => {
         「」さんの<span className="analysis__title--main-color">記録</span>
       </h2>
       <FlexBox width="100%" height="80%">
-        <Graph searchDataWithThisDay={searchDataWithThisDay} />
+        <Graph
+          searchDataWithThisDay={searchDataWithThisDay}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+        />
         <FlexBox
           className="analysis__data--text"
           width="30%"
