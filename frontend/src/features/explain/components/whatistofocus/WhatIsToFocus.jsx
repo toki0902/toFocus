@@ -343,6 +343,7 @@ const WhatIsToFocus = ({
         column
         left
         top
+        pd="2% 2% 2% 2%"
       >
         {currentPage}
         {whatIsOpen <= 7 ? (

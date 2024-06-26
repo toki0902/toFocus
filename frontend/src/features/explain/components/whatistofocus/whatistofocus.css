@@ -31,8 +31,8 @@
 .whatIsToFocus__next-button,
 .whatIsToFocus__end-button {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: 2%;
+  bottom: 2%;
   color: var(--sub-color);
   font-size: 20px;
   cursor: pointer;
@@ -41,8 +41,8 @@
 }
 .whatIsToFocus__prev-button {
   position: absolute;
-  right: 90px;
-  bottom: 0;
+  right: calc(2% + 70px);
+  bottom: 2%;
   color: var(--sub-color);
   font-size: 20px;
   cursor: pointer;
