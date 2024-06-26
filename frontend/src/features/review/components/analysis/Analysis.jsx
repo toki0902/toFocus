@@ -5,6 +5,8 @@ import { eachDayOfInterval } from "date-fns";
 import Graph from "./components/graph/Graph";
 
 const Analysis = ({ sampleData }) => {
+  const [renderMode, setRenderMode] = useState("date");
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   //指定した日付のデータをフィルタリングしてくれる関数。
   const searchDataWithThisDay = (thisDay) => {
@@ -20,6 +22,7 @@ const Analysis = ({ sampleData }) => {
 
   //期間内のデータをフィルタリングして返してくれる関数。
   //引数はDate型のオブジェクト。
+  //もしかしたら、月単位の検索ならオプションを付けてみた方が速いかも？？
   const searchDataWithThisDuration = (start, end) => {
     const dayArr = eachDayOfInterval({ start: start, end: end });
 
@@ -47,8 +50,11 @@ const Analysis = ({ sampleData }) => {
       <FlexBox width="100%" height="80%">
         <Graph
           searchDataWithThisDay={searchDataWithThisDay}
+          searchDataWithThisDuration={searchDataWithThisDuration}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
+          renderMode={renderMode}
+          setRenderMode={setRenderMode}
         />
         <FlexBox
           className="analysis__data--text"

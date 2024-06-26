@@ -2,13 +2,28 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./graph.css";
 import { FlexBox } from "@component";
 import arrowIcon from "@images/arrow.svg";
-import { addWeeks, eachDayOfInterval, endOfWeek, startOfWeek } from "date-fns";
+import {
+  addMonths,
+  addWeeks,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subDays,
+  subMonths,
+} from "date-fns";
 
-const Graph = ({ searchDataWithThisDay, selectedDate, setSelectedDate }) => {
-  //renderModeはどの単位ごとに勉強時間を表示するかを管理する。
-  //取り得る値はdate, month, year
-  const [renderMode, setRenderMode] = useState("date");
-
+const Graph = ({
+  searchDataWithThisDay,
+  searchDataWithThisDuration,
+  selectedDate,
+  setSelectedDate,
+  renderMode,
+  setRenderMode,
+}) => {
   //renderItemはgraph内で表示される一つの要素を配列で管理する。
   const [renderItem, setRenderItem] = useState([
     //{ date_str: "06/24", focusTime: 168 }データはこんな感じ
@@ -18,6 +33,22 @@ const Graph = ({ searchDataWithThisDay, selectedDate, setSelectedDate }) => {
   //criterionを基準にrenderModeにあったItemに更新する。
   const updateItem = useCallback(
     (criterion) => {
+      //HH:MM形式の時間の差分を「分」で返してくれる関数
+      const timeDifference = (start, end) => {
+        const convertToMinutes = (time) => {
+          const [hour, minute] = time.split(":").map(Number);
+          return hour * 60 + minute;
+        };
+
+        const [startMinute, endMinute] = [
+          convertToMinutes(start),
+          convertToMinutes(end),
+        ];
+
+        const different = endMinute - startMinute;
+        return different;
+      };
+
       switch (renderMode) {
         case "date": {
           //renderModeがdateだった場合、
@@ -31,22 +62,6 @@ const Graph = ({ searchDataWithThisDay, selectedDate, setSelectedDate }) => {
             start: firstDayOfWeek,
             end: lastDayOfWeek,
           });
-
-          //HH:MM形式の時間の差分を「分」で返してくれる関数
-          const timeDifference = (start, end) => {
-            const convertToMinutes = (time) => {
-              const [hour, minute] = time.split(":").map(Number);
-              return hour * 60 + minute;
-            };
-
-            const [startMinute, endMinute] = [
-              convertToMinutes(start),
-              convertToMinutes(end),
-            ];
-
-            const different = endMinute - startMinute;
-            return different;
-          };
 
           const newArray = weekDays_arr.map((item) => {
             const month = String(item.getMonth() + 1);
@@ -76,6 +91,55 @@ const Graph = ({ searchDataWithThisDay, selectedDate, setSelectedDate }) => {
           break;
         }
         case "month": {
+          //月の前半だったら1月から6月を、後半だったら6月から12月を取得する
+          let pastHarfYear = [];
+          const isFirstHarf = criterion.getMonth() < 6;
+          //過去6ヵ月の日付を獲得
+
+          const firstDayOfFirstHarfYear = startOfYear(criterion);
+          const firstDayOfLastHarfYear = addMonths(firstDayOfFirstHarfYear, 6);
+          for (let i = 0; i < 6; i++) {
+            if (isFirstHarf) {
+              pastHarfYear.push(addMonths(firstDayOfFirstHarfYear, i));
+            } else {
+              pastHarfYear.push(addMonths(firstDayOfLastHarfYear, i));
+            }
+          }
+
+          //それらの配列に対して、最初と最後を獲得
+          const newArray = pastHarfYear.map((item) => {
+            const firstDayOfMonth = startOfMonth(item);
+            const endDayOfMonth = endOfMonth(item);
+
+            //該当するデータを獲得し、focus_timeを算出
+
+            const focusDataOfTheMonth = searchDataWithThisDuration(
+              firstDayOfMonth,
+              endDayOfMonth
+            );
+
+            const date_str = `${firstDayOfMonth.getFullYear()}/${
+              firstDayOfMonth.getMonth() + 1
+            }月`;
+
+            const focus_Time = focusDataOfTheMonth[0]
+              ? focusDataOfTheMonth.reduce((prev, current) => {
+                  const sum_time = current.focusTime.reduce((prev, current) => {
+                    return prev + timeDifference(current.start, current.end);
+                  }, 0);
+
+                  return prev + sum_time;
+                }, 0)
+              : 0;
+
+            return {
+              date_str: date_str,
+              focusTime: focus_Time,
+              dateObj: firstDayOfMonth,
+            };
+          });
+
+          setRenderItem(newArray);
           break;
         }
         case "year": {
@@ -86,89 +150,181 @@ const Graph = ({ searchDataWithThisDay, selectedDate, setSelectedDate }) => {
     [renderMode]
   );
 
+  const today = new Date();
+
   useEffect(() => {
     updateItem(selectedDate);
-  }, [selectedDate]);
+  }, [selectedDate, renderMode]);
 
   //選択されている日付とその日に集中した時間をレンダリングするためのmap
   const renderedSelectedDate = renderItem.map((item) => {
-    const year = item.dateObj.getFullYear();
-    const month = item.dateObj.getMonth();
-    const day = item.dateObj.getDate();
-    const isSelected =
-      selectedDate.getFullYear() === year &&
-      selectedDate.getMonth() === month &&
-      selectedDate.getDate() === day;
+    if (renderMode === "date") {
+      const year = item.dateObj.getFullYear();
+      const month = item.dateObj.getMonth();
+      const day = item.dateObj.getDate();
+      const isSelected =
+        selectedDate.getFullYear() === year &&
+        selectedDate.getMonth() === month &&
+        selectedDate.getDate() === day;
 
-    if (isSelected) {
-      //選択された日付を見つけたら、その日を基準として、その週の日付を獲得する。
-      const firstDayOfWeek = startOfWeek(item.dateObj, { weekStartsOn: 1 });
-      const lastDayOfWeek = endOfWeek(item.dateObj, { weekStartsOn: 1 });
+      if (isSelected) {
+        //選択された日付を見つけたら、その日を基準として、その週の日付を獲得する。
+        const firstDayOfWeek = startOfWeek(item.dateObj, { weekStartsOn: 1 });
+        const lastDayOfWeek = endOfWeek(item.dateObj, { weekStartsOn: 1 });
 
-      const month_firstDay = String(firstDayOfWeek.getMonth() + 1).padStart(
-        2,
-        "0"
-      );
-      const day_firstDay = String(firstDayOfWeek.getDate()).padStart(2, "0");
-      const month_lastDay = String(lastDayOfWeek.getMonth() + 1).padStart(
-        2,
-        "0"
-      );
-      const day_lastDay = String(lastDayOfWeek.getDate()).padStart(2, "0");
-      //ここで週の日付を文字列で表す
-      const duration_str = `${firstDayOfWeek.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${month_lastDay}/${day_lastDay}`;
-      const month_str = String(month).padStart(2, "0");
-      const day_str = String(day).padStart(2, "0");
+        const month_firstDay = String(firstDayOfWeek.getMonth() + 1).padStart(
+          2,
+          "0"
+        );
+        const day_firstDay = String(firstDayOfWeek.getDate()).padStart(2, "0");
+        const month_lastDay = String(lastDayOfWeek.getMonth() + 1).padStart(
+          2,
+          "0"
+        );
+        const day_lastDay = String(lastDayOfWeek.getDate()).padStart(2, "0");
+        //ここで週の日付を文字列で表す
+        const duration_str = `${firstDayOfWeek.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${month_lastDay}/${day_lastDay}`;
+        const month_str = String(month).padStart(2, "0");
+        const day_str = String(day).padStart(2, "0");
 
-      //選択された日付の集中した時間を「〇〇時間〇〇分」の形で表す
-      const focusTime_hour = Math.floor(item.focusTime / 60);
-      const focusTime_minute = item.focusTime % 60;
-      return (
-        <FlexBox width="100%" height="100%" column>
-          <FlexBox width="100%" height="40%">
-            <img
-              src={arrowIcon}
-              alt=""
-              className="graph__arrow"
-              style={{
-                rotate: "180deg",
-                marginRight: "50px",
-              }}
-              onClick={() => {
-                setSelectedDate((prev) => {
-                  return addWeeks(prev, -1);
-                });
-              }}
-            />
-            <p style={{ fontWeight: "bold", fontSize: "20px" }}>
-              {duration_str}
-            </p>
-            <img
-              src={arrowIcon}
-              alt=""
-              className="graph__arrow"
-              style={{
-                marginLeft: "50px",
-              }}
-              onClick={() => {
-                setSelectedDate((prev) => {
-                  return addWeeks(prev, 1);
-                });
-              }}
-            />
+        //選択された日付の集中した時間を「〇〇時間〇〇分」の形で表す
+        const focusTime_hour = Math.floor(item.focusTime / 60);
+        const focusTime_minute = item.focusTime % 60;
+        return (
+          <FlexBox width="100%" height="100%" column>
+            <FlexBox width="100%" height="40%">
+              <img
+                src={arrowIcon}
+                alt=""
+                className="graph__arrow"
+                style={{
+                  rotate: "180deg",
+                  marginRight: "50px",
+                }}
+                onClick={() => {
+                  setSelectedDate((prev) => {
+                    return addWeeks(prev, -1);
+                  });
+                }}
+              />
+              <p style={{ fontWeight: "bold", fontSize: "20px" }}>
+                {duration_str}
+              </p>
+              <img
+                src={arrowIcon}
+                alt=""
+                className="graph__arrow"
+                style={{
+                  marginLeft: "50px",
+                }}
+                onClick={() => {
+                  setSelectedDate((prev) => {
+                    return addWeeks(prev, 1);
+                  });
+                }}
+              />
+            </FlexBox>
+            <FlexBox width="100%" height="60%">
+              <p style={{ fontWeight: "bold", color: "#ff9f47" }}>
+                {year} {month_str}/{day_str} :
+                <span style={{ fontSize: "26px" }}>
+                  {focusTime_hour}時間{focusTime_minute}分
+                </span>
+              </p>
+            </FlexBox>
           </FlexBox>
-          <FlexBox width="100%" height="60%">
-            <p style={{ fontWeight: "bold", color: "#ff9f47" }}>
-              {year} {month_str}/{day_str} :
-              <span style={{ fontSize: "26px" }}>
-                {focusTime_hour}時間{focusTime_minute}分
-              </span>
-            </p>
+        );
+      } else {
+        return null;
+      }
+    } else if (renderMode === "month") {
+      const year = item.dateObj.getFullYear();
+      const month = item.dateObj.getMonth();
+      const day = item.dateObj.getDate();
+
+      const lastDayOfMonth = endOfMonth(item.dateObj);
+
+      const isSelected =
+        selectedDate.getFullYear() === year &&
+        selectedDate.getMonth() === month;
+
+      if (isSelected) {
+        const isFirstHarf = item.dateObj.getMonth() < 6;
+        const firstDayOfHarfYear = isFirstHarf
+          ? startOfYear(item.dateObj)
+          : addMonths(startOfYear(item.dateObj), 6);
+        const lastDayOfHarfYear = isFirstHarf
+          ? subDays(addMonths(startOfYear(item.dateObj), 6), 1)
+          : endOfYear(item.dateObj);
+
+        const month_firstDay = String(
+          firstDayOfHarfYear.getMonth() + 1
+        ).padStart(2, "0");
+        const day_firstDay = String(firstDayOfHarfYear.getDate()).padStart(
+          2,
+          "0"
+        );
+        const month_lastDay = String(lastDayOfHarfYear.getMonth() + 1).padStart(
+          2,
+          "0"
+        );
+        const day_lastDay = String(lastDayOfHarfYear.getDate()).padStart(
+          2,
+          "0"
+        );
+
+        const duration_str = `${firstDayOfHarfYear.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${lastDayOfHarfYear.getFullYear()} ${month_lastDay}/${day_lastDay}`;
+        const month_str = String(month + 1).padStart(2, "0");
+        const day_str = String(day).padStart(2, "0");
+        const selected_duration_str = `${year} ${month_str}/${day_str} ~ ${year} ${month_str}/${lastDayOfMonth.getDate()}`;
+
+        const focusTime_hour = Math.floor(item.focusTime / 60);
+        const focusTime_minute = item.focusTime % 60;
+        return (
+          <FlexBox width="100%" height="100%" column>
+            <FlexBox width="100%" height="40%">
+              <img
+                src={arrowIcon}
+                alt=""
+                className="graph__arrow"
+                style={{
+                  rotate: "180deg",
+                  marginRight: "50px",
+                }}
+                onClick={() => {
+                  setSelectedDate((prev) => {
+                    return subMonths(prev, 6);
+                  });
+                }}
+              />
+              <p style={{ fontWeight: "bold", fontSize: "20px" }}>
+                {duration_str}
+              </p>
+              <img
+                src={arrowIcon}
+                alt=""
+                className="graph__arrow"
+                style={{
+                  marginLeft: "50px",
+                }}
+                onClick={() => {
+                  setSelectedDate((prev) => {
+                    return addMonths(prev, 6);
+                  });
+                }}
+              />
+            </FlexBox>
+            <FlexBox width="100%" height="60%">
+              <p style={{ fontWeight: "bold", color: "#ff9f47" }}>
+                {selected_duration_str} :
+                <span style={{ fontSize: "26px" }}>
+                  {focusTime_hour}時間{focusTime_minute}分
+                </span>
+              </p>
+            </FlexBox>
           </FlexBox>
-        </FlexBox>
-      );
-    } else {
-      return null;
+        );
+      }
     }
   });
 
@@ -183,89 +339,184 @@ const Graph = ({ searchDataWithThisDay, selectedDate, setSelectedDate }) => {
     return Math.max(prev, current.focusTime);
   }, 0);
   const hasSixHoursFocusTime = maxFocusTime >= 360;
-  const maxHeight = (Math.floor(maxFocusTime / 60) + 2) * 60;
+  const maxHeight_forDateMode = (Math.floor(maxFocusTime / 60) + 2) * 60;
+
+  const has120HoursFocusTime = maxFocusTime >= 7200;
+  const maxHeight_forMonthMode = (Math.floor(maxFocusTime / 60) + 10) * 60;
 
   //実際にtime-barをレンダリングするmap
   //選択されている日付だった場合は--sub-colorに光る
   const renderedTimeBar = renderItem.map((item) => {
-    const isSelected =
-      selectedDate.getFullYear() === item.dateObj.getFullYear() &&
-      selectedDate.getMonth() === item.dateObj.getMonth() &&
-      selectedDate.getDate() === item.dateObj.getDate();
-    const height = hasSixHoursFocusTime
-      ? Math.max((item.focusTime / maxHeight) * 100, 0.2) + "%"
-      : Math.max((item.focusTime / 360) * 100, 0.2) + "%";
+    if (renderMode === "date") {
+      const isSelected =
+        selectedDate.getFullYear() === item.dateObj.getFullYear() &&
+        selectedDate.getMonth() === item.dateObj.getMonth() &&
+        selectedDate.getDate() === item.dateObj.getDate();
+      const height = hasSixHoursFocusTime
+        ? Math.max((item.focusTime / maxHeight_forDateMode) * 100, 0.2) + "%"
+        : Math.max((item.focusTime / 360) * 100, 0.2) + "%";
 
-    return (
-      <FlexBox width={width} height="100%" bottom>
-        <div
-          className="graph__time-bar"
-          key={item.date_str}
-          onClick={() => {
-            setSelectedDate(item.dateObj);
-          }}
-          style={
-            isSelected
-              ? { height: height, backgroundColor: "#ff9f47" }
-              : { height: height }
-          }
-        ></div>
-      </FlexBox>
-    );
+      return (
+        <FlexBox width={width} height="100%" bottom>
+          <div
+            className="graph__time-bar"
+            key={item.date_str}
+            onClick={() => {
+              setSelectedDate(item.dateObj);
+            }}
+            style={
+              isSelected
+                ? { height: height, backgroundColor: "#ff9f47" }
+                : { height: height }
+            }
+          ></div>
+        </FlexBox>
+      );
+    } else if (renderMode === "month") {
+      const isSelected =
+        selectedDate.getFullYear() === item.dateObj.getFullYear() &&
+        selectedDate.getMonth() === item.dateObj.getMonth();
+
+      const height = has120HoursFocusTime
+        ? Math.max((item.focusTime / maxHeight_forMonthMode) * 100, 0.2) + "%"
+        : Math.max((item.focusTime / 7200) * 100, 0.2) + "%";
+      return (
+        <FlexBox width={width} height="100%" bottom>
+          <div
+            className="graph__time-bar"
+            key={item.date_str}
+            onClick={() => {
+              setSelectedDate(item.dateObj);
+            }}
+            style={
+              isSelected
+                ? { height: height, backgroundColor: "#ff9f47" }
+                : { height: height }
+            }
+          ></div>
+        </FlexBox>
+      );
+    }
   });
+
+  const renderedTimeBarScale = Array.from({ length: 5 }, (_, index) => index)
+    .reverse()
+    .map((reverseIndex) => {
+      if (renderMode === "date") {
+        const hour = hasSixHoursFocusTime
+          ? Math.round(
+              (maxHeight_forDateMode / 60 / 5) * (reverseIndex + 1) * 10
+            ) / 10
+          : Math.round((6 / 5) * (reverseIndex + 1) * 10) / 10;
+        return (
+          <FlexBox
+            className="graph-scale__item"
+            key={reverseIndex}
+            width="100%"
+            height="20%"
+            top
+            right
+          >
+            <p>{hour} -</p>
+          </FlexBox>
+        );
+      } else if (renderMode === "month") {
+        const hour = has120HoursFocusTime
+          ? Math.round(
+              (maxHeight_forMonthMode / 60 / 5) * (reverseIndex + 1) * 10
+            ) / 10
+          : Math.round((120 / 5) * (reverseIndex + 1) * 10) / 10;
+        return (
+          <FlexBox
+            className="graph-scale__item"
+            key={reverseIndex}
+            width="100%"
+            height="20%"
+            top
+            right
+          >
+            <p>{hour} -</p>
+          </FlexBox>
+        );
+      }
+      return null; // この場合、nullを返してレンダリングしない
+    });
 
   //下の日付欄をレンダリングするためのmap
   //選択されている日付だった場合は--sub-colorに光る
   const renderedStr = renderItem.map((item) => {
-    const isSelected =
-      selectedDate.getFullYear() === item.dateObj.getFullYear() &&
-      selectedDate.getMonth() === item.dateObj.getMonth() &&
-      selectedDate.getDate() === item.dateObj.getDate();
-    return (
-      <FlexBox width={width}>
-        <p
-          className="graph__date"
-          key={item.date_str}
-          onClick={() => {
-            setSelectedDate(item.dateObj);
-          }}
-          style={isSelected ? { color: "#ff9f47" } : null}
-        >
-          {item.date_str}
-        </p>
-      </FlexBox>
-    );
+    if (renderMode === "date") {
+      const isSelected =
+        selectedDate.getFullYear() === item.dateObj.getFullYear() &&
+        selectedDate.getMonth() === item.dateObj.getMonth() &&
+        selectedDate.getDate() === item.dateObj.getDate();
+      return (
+        <FlexBox width={width}>
+          <p
+            className="graph__date"
+            key={item.date_str}
+            onClick={() => {
+              setSelectedDate(item.dateObj);
+            }}
+            style={isSelected ? { color: "#ff9f47" } : null}
+          >
+            {item.date_str}
+          </p>
+        </FlexBox>
+      );
+    } else if (renderMode === "month") {
+      const isSelected =
+        selectedDate.getFullYear() === item.dateObj.getFullYear() &&
+        selectedDate.getMonth() === item.dateObj.getMonth();
+      return (
+        <FlexBox width={width}>
+          <p
+            className="graph__date"
+            key={item.date_str}
+            onClick={() => {
+              setSelectedDate(item.dateObj);
+            }}
+            style={isSelected ? { color: "#ff9f47" } : null}
+          >
+            {item.date_str}
+          </p>
+        </FlexBox>
+      );
+    }
   });
 
   return (
-    <FlexBox className="Graph" width="70%" height="100%">
-      <FlexBox
-        className="graph__render-mode-list"
-        width="100%"
-        height="40px"
-        sb
-      >
-        <FlexBox width="33%">
-          <p
-            style={renderMode === "date" ? { color: "#ff9f47" } : null}
-            onClick={() => {
-              setRenderMode("date");
-            }}
-          >
-            週
-          </p>
-        </FlexBox>
-        <FlexBox width="33%">
-          <p
-            style={renderMode === "month" ? { color: "#ff9f47" } : null}
-            onClick={() => {
-              setRenderMode("month");
-            }}
-          >
-            月
-          </p>
-        </FlexBox>
-        <FlexBox width="33%">
+    <>
+      <FlexBox className="Graph" width="70%" height="100%">
+        <FlexBox
+          className="graph__render-mode-list"
+          width="100%"
+          height="40px"
+          sb
+        >
+          <FlexBox width="49%">
+            <p
+              style={renderMode === "date" ? { color: "#ff9f47" } : null}
+              onClick={() => {
+                setSelectedDate(today);
+                setRenderMode("date");
+              }}
+            >
+              週
+            </p>
+          </FlexBox>
+          <FlexBox width="49%">
+            <p
+              style={renderMode === "month" ? { color: "#ff9f47" } : null}
+              onClick={() => {
+                setSelectedDate(today);
+                setRenderMode("month");
+              }}
+            >
+              月
+            </p>
+          </FlexBox>
+          {/* <FlexBox width="33%">
           <p
             style={renderMode === "year" ? { color: "#ff9f47" } : null}
             onClick={() => {
@@ -274,27 +525,37 @@ const Graph = ({ searchDataWithThisDay, selectedDate, setSelectedDate }) => {
           >
             年
           </p>
+        </FlexBox> */}
+        </FlexBox>
+        <FlexBox
+          className="graph__selected-date-wrap"
+          width="100%"
+          height="15%"
+          column
+        >
+          {renderedSelectedDate}
+        </FlexBox>
+        <FlexBox
+          className="graph__time-wrap"
+          width="100%"
+          height="calc(85% - 80px)"
+        >
+          {renderedTimeBar}
+          <FlexBox
+            className="graph__scale"
+            width="100%"
+            height="100%"
+            top
+            right
+          >
+            {renderedTimeBarScale}
+          </FlexBox>
+        </FlexBox>
+        <FlexBox className="graph__date-wrap" width="100%" height="40px">
+          {renderedStr}
         </FlexBox>
       </FlexBox>
-      <FlexBox
-        className="graph__selected-date-wrap"
-        width="100%"
-        height="15%"
-        column
-      >
-        {renderedSelectedDate}
-      </FlexBox>
-      <FlexBox
-        className="graph__time-wrap"
-        width="100%"
-        height="calc(85% - 80px)"
-      >
-        {renderedTimeBar}
-      </FlexBox>
-      <FlexBox className="graph__date-wrap" width="100%" height="40px">
-        {renderedStr}
-      </FlexBox>
-    </FlexBox>
+    </>
   );
 };
 

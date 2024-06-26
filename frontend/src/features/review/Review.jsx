@@ -6,10 +6,9 @@ import Analysis from "./components/analysis/Analysis";
 import Track from "./components/track/Track";
 
 const Review = () => {
-  //仮のデータの形
   const sampleData = [
     {
-      dateString: "2024/06/23",
+      dateString: "2024/06/26",
       year: 2024,
       month: 6,
       day: 26,
@@ -20,7 +19,7 @@ const Review = () => {
       ],
     },
     {
-      dateString: "2024/06/21",
+      dateString: "2024/06/23",
       year: 2024,
       month: 6,
       day: 23,
