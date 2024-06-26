@@ -3,6 +3,7 @@ import "./analysis.css";
 import { FlexBox } from "@component";
 import { eachDayOfInterval } from "date-fns";
 import Graph from "./components/graph/Graph";
+import TextData from "./components/textData/TextData";
 
 const Analysis = ({ sampleData }) => {
   const [renderMode, setRenderMode] = useState("date");
@@ -56,11 +57,12 @@ const Analysis = ({ sampleData }) => {
           renderMode={renderMode}
           setRenderMode={setRenderMode}
         />
-        <FlexBox
-          className="analysis__data--text"
-          width="30%"
-          height="100%"
-        ></FlexBox>
+        <TextData
+          searchDataWithThisDay={searchDataWithThisDay}
+          searchDataWithThisDuration={searchDataWithThisDuration}
+          selectedDate={selectedDate}
+          renderMode={renderMode}
+        ></TextData>
       </FlexBox>
     </FlexBox>
   );

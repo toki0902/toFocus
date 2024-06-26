@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./graph.css";
 import { FlexBox } from "@component";
 import arrowIcon from "@images/arrow.svg";
+import { timeDifference } from "../../../../utils";
 import {
   addMonths,
   addWeeks,
@@ -33,22 +34,6 @@ const Graph = ({
   //criterionを基準にrenderModeにあったItemに更新する。
   const updateItem = useCallback(
     (criterion) => {
-      //HH:MM形式の時間の差分を「分」で返してくれる関数
-      const timeDifference = (start, end) => {
-        const convertToMinutes = (time) => {
-          const [hour, minute] = time.split(":").map(Number);
-          return hour * 60 + minute;
-        };
-
-        const [startMinute, endMinute] = [
-          convertToMinutes(start),
-          convertToMinutes(end),
-        ];
-
-        const different = endMinute - startMinute;
-        return different;
-      };
-
       switch (renderMode) {
         case "date": {
           //renderModeがdateだった場合、
@@ -94,10 +79,11 @@ const Graph = ({
           //月の前半だったら1月から6月を、後半だったら6月から12月を取得する
           let pastHarfYear = [];
           const isFirstHarf = criterion.getMonth() < 6;
-          //過去6ヵ月の日付を獲得
 
+          //criterionの1月1日と、7月1日を取得する
           const firstDayOfFirstHarfYear = startOfYear(criterion);
           const firstDayOfLastHarfYear = addMonths(firstDayOfFirstHarfYear, 6);
+          //pastHarfYearに1 ~ 6、もしくは7 ~ 12月の初日を追加
           for (let i = 0; i < 6; i++) {
             if (isFirstHarf) {
               pastHarfYear.push(addMonths(firstDayOfFirstHarfYear, i));
@@ -106,31 +92,31 @@ const Graph = ({
             }
           }
 
-          //それらの配列に対して、最初と最後を獲得
+          //pastHarfYearを基準に「期間」、「月の集中時間」、「dateオブジェクト」を作成しrenderItemを更新
           const newArray = pastHarfYear.map((item) => {
             const firstDayOfMonth = startOfMonth(item);
             const endDayOfMonth = endOfMonth(item);
 
-            //該当するデータを獲得し、focus_timeを算出
-
+            //focusDataを検索
             const focusDataOfTheMonth = searchDataWithThisDuration(
               firstDayOfMonth,
               endDayOfMonth
             );
 
+            //各月の期間をYYYY/MM形式の文字列で整形 ex)2024年 6月
             const date_str = `${firstDayOfMonth.getFullYear()}/${
               firstDayOfMonth.getMonth() + 1
             }月`;
 
-            const focus_Time = focusDataOfTheMonth[0]
-              ? focusDataOfTheMonth.reduce((prev, current) => {
-                  const sum_time = current.focusTime.reduce((prev, current) => {
-                    return prev + timeDifference(current.start, current.end);
-                  }, 0);
+            //月のデータをもとに合計のfocusTimeを算出
+            const focus_Time =
+              focusDataOfTheMonth?.reduce((prev, current) => {
+                const sum_time = current.focusTime.reduce((prev, current) => {
+                  return prev + timeDifference(current.start, current.end);
+                }, 0);
 
-                  return prev + sum_time;
-                }, 0)
-              : 0;
+                return prev + sum_time;
+              }, 0) ?? 0;
 
             return {
               date_str: date_str,
@@ -184,7 +170,7 @@ const Graph = ({
         const day_lastDay = String(lastDayOfWeek.getDate()).padStart(2, "0");
         //ここで週の日付を文字列で表す
         const duration_str = `${firstDayOfWeek.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${month_lastDay}/${day_lastDay}`;
-        const month_str = String(month).padStart(2, "0");
+        const month_str = String(month + 1).padStart(2, "0");
         const day_str = String(day).padStart(2, "0");
 
         //選択された日付の集中した時間を「〇〇時間〇〇分」の形で表す
@@ -249,6 +235,9 @@ const Graph = ({
         selectedDate.getMonth() === month;
 
       if (isSelected) {
+        //選択された月を見つけたら、表示する期間を決める
+        //年の前半だったら、その年の1月 ~ 6月
+        //年の後半だったら、その年の7月 ~ 12月
         const isFirstHarf = item.dateObj.getMonth() < 6;
         const firstDayOfHarfYear = isFirstHarf
           ? startOfYear(item.dateObj)
@@ -257,6 +246,7 @@ const Graph = ({
           ? subDays(addMonths(startOfYear(item.dateObj), 6), 1)
           : endOfYear(item.dateObj);
 
+        //レンダリングする用の文字列を整形
         const month_firstDay = String(
           firstDayOfHarfYear.getMonth() + 1
         ).padStart(2, "0");
@@ -273,11 +263,13 @@ const Graph = ({
           "0"
         );
 
-        const duration_str = `${firstDayOfHarfYear.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${lastDayOfHarfYear.getFullYear()} ${month_lastDay}/${day_lastDay}`;
+        const duration_str = `${firstDayOfHarfYear.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${month_lastDay}/${day_lastDay}`;
         const month_str = String(month + 1).padStart(2, "0");
         const day_str = String(day).padStart(2, "0");
-        const selected_duration_str = `${year} ${month_str}/${day_str} ~ ${year} ${month_str}/${lastDayOfMonth.getDate()}`;
+        const selected_duration_str = `${year} ${month_str}/${day_str} ~ ${month_str}/${lastDayOfMonth.getDate()}`;
 
+        //レンダリングする用のfocusTimeの算出
+        //〇〇時間〇〇分の形式
         const focusTime_hour = Math.floor(item.focusTime / 60);
         const focusTime_minute = item.focusTime % 60;
         return (
@@ -332,16 +324,20 @@ const Graph = ({
   const width = 100 / renderItem.length + "%";
 
   //time-bar部分の最大値を決めるための変数群
-  //6時間を越している集中時間がある場合は、その集中時間 + 2時間を最大値としてheightを算出する
-  //ex)最大集中時間が3時間の場合は、time-barの最大heightは6時間分の60 * 6
-  //最大集中時間が8時間の場合は、time-barの最大heightは(8 + 2) * 60
+
   const maxFocusTime = renderItem.reduce((prev, current) => {
     return Math.max(prev, current.focusTime);
   }, 0);
   const hasSixHoursFocusTime = maxFocusTime >= 360;
+  //日ごとの集中時間が6時間を越している集中時間がある場合は、その集中時間 + 2時間を最大値としてheightを算出する
+  //ex)最大集中時間が3時間の場合は、time-barの最大heightの100%は6時間分の60 * 6 = 360
+  //最大集中時間が8時間の場合は、time-barの最大heightは(8 + 2) * 60 = 600
   const maxHeight_forDateMode = (Math.floor(maxFocusTime / 60) + 2) * 60;
 
   const has120HoursFocusTime = maxFocusTime >= 7200;
+  //日ごとの集中時間が120時間を越している集中時間がある場合は、その集中時間 + 10時間を最大値としてheightを算出する
+  //ex)最大集中時間が90時間の場合は、time-barの最大heightは120時間分の100%は60 * 120 = 7200
+  //最大集中時間が160時間の場合は、time-barの最大heightは(160 + 10) * 60 = 10200
   const maxHeight_forMonthMode = (Math.floor(maxFocusTime / 60) + 10) * 60;
 
   //実際にtime-barをレンダリングするmap
@@ -399,10 +395,13 @@ const Graph = ({
     }
   });
 
+  //グラフのメモリを表示するためのmap
   const renderedTimeBarScale = Array.from({ length: 5 }, (_, index) => index)
     .reverse()
     .map((reverseIndex) => {
       if (renderMode === "date") {
+        //日ごとの集中時間が時間を超えていた場合は、集中時間を5で割った数を下から順に足していってそれを四捨五入した値を表示する
+        //越してなかったら6を5で割る
         const hour = hasSixHoursFocusTime
           ? Math.round(
               (maxHeight_forDateMode / 60 / 5) * (reverseIndex + 1) * 10
@@ -421,6 +420,8 @@ const Graph = ({
           </FlexBox>
         );
       } else if (renderMode === "month") {
+        //月ごとの集中時間が時間を超えていた場合は、集中時間を5で割った数を下から順に足していってそれを四捨五入した値を表示する
+        //越してなかったら120を5で割る
         const hour = has120HoursFocusTime
           ? Math.round(
               (maxHeight_forMonthMode / 60 / 5) * (reverseIndex + 1) * 10
