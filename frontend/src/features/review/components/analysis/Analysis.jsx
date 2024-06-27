@@ -5,43 +5,8 @@ import { eachDayOfInterval } from "date-fns";
 import Graph from "./components/graph/Graph";
 import TextData from "./components/textData/TextData";
 
-const Analysis = ({ sampleData }) => {
+const Analysis = ({ selectedDate, setSelectedDate, sampleData }) => {
   const [renderMode, setRenderMode] = useState("date");
-
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  //指定した日付のデータをフィルタリングしてくれる関数。
-  const searchDataWithThisDay = (thisDay) => {
-    const filtered = sampleData.filter((item) => {
-      const date = thisDay.getDate();
-      const month = thisDay.getMonth() + 1;
-      const year = thisDay.getFullYear();
-      return date === item.day && month === item.month && year === item.year;
-    });
-
-    return filtered;
-  };
-
-  //期間内のデータをフィルタリングして返してくれる関数。
-  //引数はDate型のオブジェクト。
-  //もしかしたら、月単位の検索ならオプションを付けてみた方が速いかも？？
-  const searchDataWithThisDuration = (start, end) => {
-    const dayArr = eachDayOfInterval({ start: start, end: end });
-
-    const filtered = sampleData.filter((item) => {
-      let isMatch = false;
-
-      dayArr.forEach((dayItem) => {
-        const date = dayItem.getDate();
-        const month = dayItem.getMonth() + 1;
-        const year = dayItem.getFullYear();
-        if (date == item.day && month == item.month && year == item.year) {
-          isMatch = true;
-        }
-      });
-      return isMatch;
-    });
-    return filtered;
-  };
 
   return (
     <FlexBox className="Analysis" width="100%" height="100%" top column>
@@ -50,16 +15,14 @@ const Analysis = ({ sampleData }) => {
       </h2>
       <FlexBox width="100%" height="80%">
         <Graph
-          searchDataWithThisDay={searchDataWithThisDay}
-          searchDataWithThisDuration={searchDataWithThisDuration}
+          sampleData={sampleData}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
           renderMode={renderMode}
           setRenderMode={setRenderMode}
         />
         <TextData
-          searchDataWithThisDay={searchDataWithThisDay}
-          searchDataWithThisDuration={searchDataWithThisDuration}
+          sampleData={sampleData}
           selectedDate={selectedDate}
           renderMode={renderMode}
         ></TextData>

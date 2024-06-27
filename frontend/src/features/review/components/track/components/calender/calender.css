@@ -1,0 +1,46 @@
+.Calender {
+  border: 1px solid var(--main-color);
+  user-select: none;
+}
+.calender__title {
+  height: 10%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+.calender__date-item {
+  position: relative;
+  background-color: var(--main-pale-color);
+  font-size: 15px;
+  cursor: pointer;
+}
+.calender__date-item.selected {
+  border: 2px solid var(--sub-color);
+}
+.calender__date-item--holiday {
+  position: relative;
+  background-color: var(--sub-pale-color);
+  color: var(--sub-color);
+  font-size: 15px;
+  cursor: pointer;
+}
+.calender__date-item--holiday.selected {
+  border: 2px solid var(--sub-color);
+}
+.calender__date-item--not-this-month {
+  position: relative;
+  color: var(--second-color);
+  background-color: #e5e5e5;
+  font-size: 15px;
+}
+.calender__date-item-image {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}

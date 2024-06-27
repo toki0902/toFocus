@@ -1,0 +1,16 @@
+.Track {
+  color: var(--main-color);
+  overflow: hidden;
+}
+.track__title {
+  height: 10%;
+  width: 100%;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  font-size: 28px;
+  font-weight: bold;
+}
+.track__title--sub-color {
+  color: var(--sub-color);
+}

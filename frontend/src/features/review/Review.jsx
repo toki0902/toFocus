@@ -31,6 +31,8 @@ const Review = () => {
     },
   ];
 
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const [whichMenuIsOpen, setWhichMenuIsOpen] = useState("analysis");
   const sidebarRef = useRef(null);
 
@@ -42,9 +44,17 @@ const Review = () => {
 
   const currentMenu =
     whichMenuIsOpen === "analysis" ? (
-      <Analysis sampleData={sampleData} />
+      <Analysis
+        sampleData={sampleData}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
     ) : whichMenuIsOpen === "track" ? (
-      <Track />
+      <Track
+        sampleData={sampleData}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
     ) : null;
 
   return (

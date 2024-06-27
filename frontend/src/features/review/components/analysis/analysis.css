@@ -2,13 +2,14 @@
   display: flex;
   font-size: 28px;
   font-weight: bold;
+  color: var(--main-color);
   justify-content: left;
   align-items: center;
   width: 100%;
   height: 10%;
 }
 .analysis__title--main-color {
-  color: var(--main-color);
+  color: var(--sub-color);
 }
 .analysis__graph {
   border: 1px solid var(--main-color);

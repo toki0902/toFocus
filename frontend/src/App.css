@@ -1,6 +1,8 @@
 :root {
   --main-color: #8ddaeb;
+  --main-pale-color: #eaf5f8;
   --sub-color: #ff9f47;
+  --sub-pale-color: #ffe0c2;
   --second-color: #c1bdbd;
 }
 body {

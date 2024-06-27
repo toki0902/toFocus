@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./graph.css";
 import { FlexBox } from "@component";
 import arrowIcon from "@images/arrow.svg";
-import { timeDifference } from "../../../../utils";
+import {
+  timeDifference,
+  searchDataWithThisDay,
+  searchDataWithThisDuration,
+  toPadStart,
+} from "../../../../utils";
 import {
   addMonths,
   addWeeks,
@@ -18,8 +23,7 @@ import {
 } from "date-fns";
 
 const Graph = ({
-  searchDataWithThisDay,
-  searchDataWithThisDuration,
+  sampleData,
   selectedDate,
   setSelectedDate,
   renderMode,
@@ -49,16 +53,13 @@ const Graph = ({
           });
 
           const newArray = weekDays_arr.map((item) => {
-            const month = String(item.getMonth() + 1);
-            const date = String(item.getDate());
+            const month = item.getMonth() + 1;
+            const date = item.getDate();
             //mm:ddの形式の文字列を作成
-            const date_str = `${month.padStart(2, "0")}/${date.padStart(
-              2,
-              "0"
-            )}`;
+            const date_str = `${toPadStart(month)}/${toPadStart(date)}`;
 
             //日付に該当するデータを検索
-            const filteredData = searchDataWithThisDay(item);
+            const filteredData = searchDataWithThisDay(item, sampleData);
 
             //該当するデータ内のfocusTimeを「分」で計算する。
             const focus_time =
@@ -100,7 +101,8 @@ const Graph = ({
             //focusDataを検索
             const focusDataOfTheMonth = searchDataWithThisDuration(
               firstDayOfMonth,
-              endDayOfMonth
+              endDayOfMonth,
+              sampleData
             );
 
             //各月の期間をYYYY/MM形式の文字列で整形 ex)2024年 6月
@@ -158,21 +160,14 @@ const Graph = ({
         const firstDayOfWeek = startOfWeek(item.dateObj, { weekStartsOn: 1 });
         const lastDayOfWeek = endOfWeek(item.dateObj, { weekStartsOn: 1 });
 
-        const month_firstDay = String(firstDayOfWeek.getMonth() + 1).padStart(
-          2,
-          "0"
-        );
-        const day_firstDay = String(firstDayOfWeek.getDate()).padStart(2, "0");
-        const month_lastDay = String(lastDayOfWeek.getMonth() + 1).padStart(
-          2,
-          "0"
-        );
-        const day_lastDay = String(lastDayOfWeek.getDate()).padStart(2, "0");
+        const month_firstDay = toPadStart(firstDayOfWeek.getMonth() + 1);
+        const day_firstDay = toPadStart(firstDayOfWeek.getDate());
+        const month_lastDay = toPadStart(lastDayOfWeek.getMonth() + 1);
+        const day_lastDay = toPadStart(lastDayOfWeek.getDate());
         //ここで週の日付を文字列で表す
         const duration_str = `${firstDayOfWeek.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${month_lastDay}/${day_lastDay}`;
-        const month_str = String(month + 1).padStart(2, "0");
-        const day_str = String(day).padStart(2, "0");
-
+        const month_str = toPadStart(month + 1);
+        const day_str = toPadStart(day);
         //選択された日付の集中した時間を「〇〇時間〇〇分」の形で表す
         const focusTime_hour = Math.floor(item.focusTime / 60);
         const focusTime_minute = item.focusTime % 60;
@@ -247,25 +242,14 @@ const Graph = ({
           : endOfYear(item.dateObj);
 
         //レンダリングする用の文字列を整形
-        const month_firstDay = String(
-          firstDayOfHarfYear.getMonth() + 1
-        ).padStart(2, "0");
-        const day_firstDay = String(firstDayOfHarfYear.getDate()).padStart(
-          2,
-          "0"
-        );
-        const month_lastDay = String(lastDayOfHarfYear.getMonth() + 1).padStart(
-          2,
-          "0"
-        );
-        const day_lastDay = String(lastDayOfHarfYear.getDate()).padStart(
-          2,
-          "0"
-        );
+        const month_firstDay = toPadStart(firstDayOfHarfYear.getMonth() + 1);
+        const day_firstDay = toPadStart(firstDayOfHarfYear.getDate());
+        const month_lastDay = toPadStart(lastDayOfHarfYear.getMonth() + 1);
+        const day_lastDay = toPadStart(lastDayOfHarfYear.getDate());
 
         const duration_str = `${firstDayOfHarfYear.getFullYear()} ${month_firstDay}/${day_firstDay} ~ ${month_lastDay}/${day_lastDay}`;
-        const month_str = String(month + 1).padStart(2, "0");
-        const day_str = String(day).padStart(2, "0");
+        const month_str = toPadStart(month + 1);
+        const day_str = toPadStart(day);
         const selected_duration_str = `${year} ${month_str}/${day_str} ~ ${month_str}/${lastDayOfMonth.getDate()}`;
 
         //レンダリングする用のfocusTimeの算出

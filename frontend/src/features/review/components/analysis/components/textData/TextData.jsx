@@ -1,27 +1,23 @@
 import React from "react";
 import "./textData.css";
 import { FlexBox } from "@component";
-import { timeDifference } from "../../../../utils";
-import { endOfMonth, startOfMonth } from "date-fns";
-
-const TextData = ({
+import {
+  timeDifference,
+  toPadStart,
   searchDataWithThisDay,
   searchDataWithThisDuration,
-  selectedDate,
-  renderMode,
-}) => {
-  const toPadStart = (text) => {
-    return String(text).padStart(2, "0");
-  };
+} from "../../../../utils";
+import { endOfMonth, startOfMonth } from "date-fns";
 
+const TextData = ({ sampleData, selectedDate, renderMode }) => {
   const firstDayOfMonth = startOfMonth(selectedDate);
   const firstDate = toPadStart(firstDayOfMonth.getDate());
   const lastDayOfMonth = endOfMonth(selectedDate);
   const lastDate = toPadStart(lastDayOfMonth.getDate());
   const focusData =
     renderMode === "date"
-      ? searchDataWithThisDay(selectedDate)
-      : searchDataWithThisDuration(firstDayOfMonth, lastDayOfMonth);
+      ? searchDataWithThisDay(selectedDate, sampleData)
+      : searchDataWithThisDuration(firstDayOfMonth, lastDayOfMonth, sampleData);
 
   const focus_Year = toPadStart(selectedDate.getFullYear());
   const focus_Month = toPadStart(selectedDate.getMonth() + 1);
