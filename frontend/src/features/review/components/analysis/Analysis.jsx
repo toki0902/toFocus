@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./analysis.css";
 import { FlexBox } from "@component";
 import { eachDayOfInterval } from "date-fns";
@@ -7,6 +7,10 @@ import TextData from "./components/textData/TextData";
 
 const Analysis = ({ selectedDate, setSelectedDate, sampleData }) => {
   const [renderMode, setRenderMode] = useState("date");
+
+  useEffect(() => {
+    setSelectedDate(new Date());
+  }, []);
 
   return (
     <FlexBox className="Analysis" width="100%" height="100%" top column>

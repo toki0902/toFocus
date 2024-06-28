@@ -2,13 +2,16 @@ import React from "react";
 import "./calender.css";
 import { FlexBox } from "@component";
 import trackIcon from "@images/track.svg";
+import arrowIcon from "@images/arrow.svg";
 import { searchDataWithThisDay, toPadStart } from "../../../../utils";
 import {
+  addMonths,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
   startOfMonth,
   startOfWeek,
+  subMonths,
 } from "date-fns";
 
 const Calender = ({ sampleData, selectedDate, setSelectedDate }) => {
@@ -21,8 +24,6 @@ const Calender = ({ sampleData, selectedDate, setSelectedDate }) => {
 
   const firstDayOfFirstWeek = startOfWeek(firstDayOfMonth);
   const lastDayOfLastWeek = endOfWeek(lastDayOfMonth);
-
-  console.log(firstDayOfFirstWeek, lastDayOfLastWeek);
 
   const date_arr = eachDayOfInterval({
     start: firstDayOfFirstWeek,
@@ -83,7 +84,37 @@ const Calender = ({ sampleData, selectedDate, setSelectedDate }) => {
   });
   return (
     <FlexBox className="Calender" width="100%" height="80%" top column>
-      <h2 className="calender__title">{calender_title_str}</h2>
+      <h2 className="calender__title">
+        <img
+          src={arrowIcon}
+          alt=""
+          className="graph__arrow"
+          style={{
+            rotate: "180deg",
+            marginRight: "50px",
+          }}
+          onClick={() => {
+            setSelectedDate((prev) => {
+              return subMonths(prev, 1);
+            });
+          }}
+        />
+        {calender_title_str}
+        <img
+          src={arrowIcon}
+          alt=""
+          className="graph__arrow"
+          style={{
+            marginLeft: "50px",
+          }}
+          onClick={() => {
+            setSelectedDate((prev) => {
+              return addMonths(prev, 1);
+            });
+          }}
+        />
+      </h2>
+
       <FlexBox width="100%" height="80%">
         {calender_items}
       </FlexBox>

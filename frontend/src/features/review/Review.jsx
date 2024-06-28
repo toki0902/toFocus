@@ -17,6 +17,54 @@ const Review = () => {
         { start: "15:00", end: "22:23" },
         { start: "10:00", end: "13:30" },
       ],
+      tracks: [
+        [
+          { type: "h1", children: [{ text: "タイトル1" }] },
+          {
+            type: "paragraph",
+            children: [{ text: "見出しこれはテキストサンプルです" }],
+          },
+          {
+            type: "paragraph",
+            children: [
+              {
+                text: "これはテキストサンプルですこれはテキストサンプルですこれはテキストサンプルですこれはテ",
+              },
+              { text: "キストサ", bold: true },
+              { text: "ンプル", underline: true, bold: true },
+              { underline: true, text: "ですこれはテキストサンプルですこれ" },
+              {
+                text: "はテキストサンプルですこれはテキストサンプルですこれはテキストサンプルです",
+              },
+              { text: "これはテキストサンプルですこれはテキスト", bold: true },
+              {
+                text: "サンプルですこれはテキストサンプルですこれはテキストサンプル",
+              },
+              { text: "ですこれはテキストサンプルで", italic: true },
+            ],
+          },
+          { type: "paragraph", children: [{ italic: true, text: "" }] },
+          {
+            type: "list",
+            children: [{ italic: true, text: "これはリストです" }],
+          },
+          {
+            type: "paragraph",
+            children: [{ italic: true, text: "colaについての講義なう" }],
+          },
+          { type: "paragraph", children: [{ italic: true, text: "" }] },
+        ],
+        [
+          {
+            type: "h1",
+            children: [{ text: "" }],
+          },
+          {
+            type: "paragraph",
+            children: [{ text: "" }],
+          },
+        ],
+      ],
     },
     {
       dateString: "2024/06/23",
@@ -58,20 +106,14 @@ const Review = () => {
     ) : null;
 
   return (
-    <FlexBox
-      className="Review"
-      width="100%"
-      height="calc(100% - 70px)"
-      pd="0 10% 0 10%"
-      onMouseMove={(event) => onMouseMove(event)}
-    >
+    <div className="Review" onMouseMove={(event) => onMouseMove(event)}>
       <Sidebar
         whichMenuIsOpen={whichMenuIsOpen}
         setWhichMenuIsOpen={setWhichMenuIsOpen}
         ref={sidebarRef}
       />
       {currentMenu}
-    </FlexBox>
+    </div>
   );
 };
 

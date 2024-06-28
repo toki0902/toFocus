@@ -36,8 +36,6 @@ const Memo = ({ myKey, removeThisTool }) => {
     }
   };
 
-  const [editor] = useState(() => withHistory(withReact(createEditor())));
-
   const initialElement = [
     {
       type: "h1",
@@ -48,6 +46,8 @@ const Memo = ({ myKey, removeThisTool }) => {
       children: [{ text: "" }],
     },
   ];
+
+  const [editor] = useState(() => withHistory(withReact(createEditor())));
 
   //インライン要素(フォント等)をレンダリングする関数。
   //ブロック要素(liやh1等)とは区別してレンダリングされる。
@@ -312,8 +312,6 @@ const Memo = ({ myKey, removeThisTool }) => {
               match: (n) => Text.isText(n),
             });
 
-            console.log(textnode);
-
             if (textnode[0].text === "") {
               Transforms.insertText(editor, "\n");
               applyElement("paragraph");
@@ -469,8 +467,8 @@ const Memo = ({ myKey, removeThisTool }) => {
 
         <Slate
           editor={editor}
-          initialValue={initialElement}
           onChange={onChangeEditor}
+          initialValue={initialElement}
         >
           <Editable
             className="memo__editor"

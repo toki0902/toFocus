@@ -1,7 +1,8 @@
 .Review {
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0px 10%;
+  width: 100%;
+  height: calc(100% - 70px);
+  padding: 0 10%;
+  overflow: auto;
   color: var(--sub-color);
   position: relative;
 }
