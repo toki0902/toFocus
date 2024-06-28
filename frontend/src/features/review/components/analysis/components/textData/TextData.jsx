@@ -59,19 +59,6 @@ const TextData = ({ sampleData, selectedDate, renderMode }) => {
     return prev + (current?.tracks?.length || 0);
   }, 0);
 
-  const focus_tracks = [];
-  focusData?.forEach((item) => {
-    if (item?.tracks) {
-      focus_tracks.push(
-        ...item.tracks.map((track) => {
-          return (
-            <p style={{ width: "100%", marginTop: "10px" }}> 　・{track}</p>
-          );
-        })
-      );
-    }
-  });
-
   return (
     <FlexBox
       className="TextData"
@@ -95,9 +82,6 @@ const TextData = ({ sampleData, selectedDate, renderMode }) => {
       </FlexBox>
       <FlexBox width="100%" mb="10px" left>
         残した足跡数 : {focus_tracks_num || "なし"}
-      </FlexBox>
-      <FlexBox width="100%" mb="10px" left>
-        残した足跡 : {focus_tracks.length === 0 ? "なし" : focus_tracks}
       </FlexBox>
     </FlexBox>
   );

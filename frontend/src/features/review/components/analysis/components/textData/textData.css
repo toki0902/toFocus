@@ -5,4 +5,5 @@
   color: var(--sub-color);
   font-size: 18px;
   font-weight: bold;
+  overflow-y: auto;
 }
