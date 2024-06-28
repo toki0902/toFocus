@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "./review.css";
 import Sidebar from "./components/sidebar/Sidebar";
 import { FlexBox } from "@component";
@@ -53,6 +53,16 @@ const Review = () => {
             children: [{ italic: true, text: "colaについての講義なう" }],
           },
           { type: "paragraph", children: [{ italic: true, text: "" }] },
+        ],
+        [
+          {
+            type: "h1",
+            children: [{ text: "" }],
+          },
+          {
+            type: "paragraph",
+            children: [{ text: "" }],
+          },
         ],
         [
           {

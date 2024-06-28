@@ -49,7 +49,7 @@ const Track = ({ sampleData, selectedDate, setSelectedDate }) => {
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
       />
-      <FlexBox width="100%" pd="30px 0 30px 0" sb ref={targetRef}>
+      <FlexBox width="100%" pd="30px 0 60px 0" sb ref={targetRef}>
         {tracks}
       </FlexBox>
     </div>

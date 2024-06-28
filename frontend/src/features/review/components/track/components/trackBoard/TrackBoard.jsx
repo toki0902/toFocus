@@ -63,7 +63,7 @@ const TrackBoard = ({ initialValue, focusData }) => {
     }
   };
   return (
-    <FlexBox className="TrackBoard" width="45%">
+    <FlexBox className="TrackBoard" width="45%" mt="30px">
       <h2 className="trackboard__title">{focusData.dateString}の足跡</h2>
       <Slate editor={editor} initialValue={initialValue}>
         <Editable

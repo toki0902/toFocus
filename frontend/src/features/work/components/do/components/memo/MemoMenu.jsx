@@ -13,6 +13,7 @@ const MemoMenu = ({
   isInteract,
   toggleInteract,
   applyFont,
+  applyColor,
   applyElement,
   currentState,
   isOpenMemoMenu,
@@ -187,6 +188,36 @@ const MemoMenu = ({
             className="memo-menu__element-tool"
           >
             <p style={{ paddingRight: "5px" }}>リンク</p>
+            <img
+              src={triangleIcon}
+              alt=""
+              style={{
+                width: "10px",
+                height: "10px",
+                transform: "rotate(180deg)",
+              }}
+            />
+          </FlexBox>
+          <FlexBox
+            mr="10px"
+            pr="10px"
+            pl="10px"
+            height="80%"
+            className="memo-menu__element-tool"
+          >
+            <input
+              className="memo-menu__color-input"
+              type="color"
+              style={{
+                width: "25px",
+                height: "25px",
+                borderRadius: "50%",
+                marginRight: "5px",
+                overflow: "hidden",
+              }}
+              value={currentState.color || "#333"}
+              onChange={(e) => applyColor(e.target.value)}
+            ></input>
             <img
               src={triangleIcon}
               alt=""

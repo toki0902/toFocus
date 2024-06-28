@@ -62,7 +62,11 @@ const Memo = ({ myKey, removeThisTool }) => {
       children = <u>{children}</u>;
     }
 
-    return <span {...attributes}>{children}</span>;
+    return (
+      <span style={leaf.color ? { color: leaf.color } : null} {...attributes}>
+        {children}
+      </span>
+    );
   };
 
   //特定のインライン要素を適応させる関数
@@ -77,6 +81,10 @@ const Memo = ({ myKey, removeThisTool }) => {
       Editor.removeMark(editor, font, true);
       setCurrentState((prev) => prev.filter((item) => item !== font));
     }
+  };
+
+  const applyColor = (color) => {
+    Editor.addMark(editor, "color", color);
   };
 
   //特定のインライン要素が適応してるかどうかを判別する関数。
@@ -94,6 +102,15 @@ const Memo = ({ myKey, removeThisTool }) => {
       //markは文字列なので、obj内のmark keyを持つプロパティには[]でアクセスする。
       return item[0][mark];
     });
+  };
+
+  const whatColorIsActive = () => {
+    const [selectedNode] = Editor.nodes(editor, {
+      reverse: true,
+      match: (n) => Text.isText(n),
+    });
+
+    return selectedNode[0].color;
   };
 
   const renderElement = ({ children, attributes, element }) => {
@@ -258,7 +275,7 @@ const Memo = ({ myKey, removeThisTool }) => {
   };
 
   const element_arr = ["h1", "h2", "list", "paragraph"];
-  const leaf_arr = ["bold", "italic", "underline"];
+  const leaf_arr = ["bold", "italic", "underline", "color"];
   //現在の選択範囲に何の要素が適応しているかを配列で管理するState
   //使用用途はtoolのスタイル適応
   const [currentState, setCurrentState] = useState(["paragraph"]);
@@ -273,9 +290,14 @@ const Memo = ({ myKey, removeThisTool }) => {
       }
     });
     leaf_arr.forEach((leaf) => {
-      const isNeedPush = isActiveThisMark(leaf);
-      if (isNeedPush) {
-        newState.push(leaf);
+      if (leaf === "color") {
+        const colorToAdd = whatColorIsActive();
+        newState.color = colorToAdd;
+      } else {
+        const isNeedPush = isActiveThisMark(leaf);
+        if (isNeedPush) {
+          newState.push(leaf);
+        }
       }
     });
 
@@ -482,6 +504,7 @@ const Memo = ({ myKey, removeThisTool }) => {
           isInteract={isInteract}
           toggleInteract={toggleInteract}
           applyFont={applyFont}
+          applyColor={applyColor}
           applyElement={applyElement}
           currentState={currentState}
           isOpenMemoMenu={isOpenMemoMenu}
