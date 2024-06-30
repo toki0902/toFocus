@@ -48,7 +48,14 @@
   bottom: 45px;
   left: 5px;
 }
-
+.auth-email__forget-msg {
+  color: var(--main-color);
+  font-size: 14px;
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  cursor: pointer;
+}
 .auth__sns-box {
   border: 1px solid var(--sub-color);
   border-radius: 5px;

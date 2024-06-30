@@ -86,6 +86,7 @@ const Authenticate = () => {
           >
             password
           </label>
+          <p className="auth-email__forget-msg">パスワードを忘れた</p>
         </FlexBox>
         <Button
           className="auth-email__btn"
