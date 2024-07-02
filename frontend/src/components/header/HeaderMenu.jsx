@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 import homeIcon from "@images/home.svg";
 import graphIcon from "@images/graph main-color.svg";
 import focusIcon from "@images/focus.png";
+import loginIcon from "@images/user.svg";
+import logoutIcon from "@images/logout.svg";
 
-const HeaderMenu = ({ isMenuOpen }) => {
+const HeaderMenu = ({ login, setLogin, isMenuOpen }) => {
   const navigate = useNavigate();
 
   const header_menuItems = [
@@ -31,7 +33,14 @@ const HeaderMenu = ({ isMenuOpen }) => {
         navigate("/work");
       },
     },
-  ];
+    !login && {
+      text: "ログインする",
+      imgUrl: loginIcon,
+      onClick: () => {
+        navigate("/auth");
+      },
+    },
+  ].filter(Boolean);
 
   const header_menuItems_rendered = header_menuItems.map((item) => {
     return (
@@ -51,6 +60,7 @@ const HeaderMenu = ({ isMenuOpen }) => {
       </FlexBox>
     );
   });
+
   return (
     //todo:headerのメニューに何を入れるか考える
     <nav
@@ -63,16 +73,35 @@ const HeaderMenu = ({ isMenuOpen }) => {
       }}
     >
       <FlexBox column width="100%" height="100%" top>
-        <FlexBox
-          className="header-menu__userinfo"
-          width="100%"
-          pt="10px"
-          pb="10px"
-          left
-        >
-          <img src={userIcon} alt="" className="header__user-icon" />
-          <h2 className="header-menu__username">庄野時</h2>
-        </FlexBox>
+        {login ? (
+          <FlexBox
+            className="header-menu__userinfo"
+            width="100%"
+            pt="10px"
+            pb="10px"
+            left
+          >
+            <img src={userIcon} alt="" className="header__user-icon" />
+            <h2 className="header-menu__username">庄野時</h2>
+            <FlexBox
+              className="header-menu__item"
+              width="100%"
+              height="30px"
+              left
+              onClick={() => setLogin(false)}
+              pl="10px"
+              pr="10px"
+              mt="10px"
+            >
+              <img
+                src={logoutIcon}
+                alt=""
+                className="header-menu-item__image"
+              />
+              <p className="header-menu-item__text">ログアウトする</p>
+            </FlexBox>
+          </FlexBox>
+        ) : null}
         {header_menuItems_rendered}
       </FlexBox>
     </nav>

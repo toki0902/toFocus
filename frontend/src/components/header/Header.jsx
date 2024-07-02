@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const navigate = useNavigate();
-  const login = true;
+  const [login, setLogin] = useState(true);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const openMenu = () => {
     setIsOpenMenu(true);
@@ -35,7 +35,11 @@ const Header = () => {
             <img src={userIcon} alt="" className="header__user-icon" />
             <p className="header__user-info">demoでログイン中</p>
           </FlexBox>
-          <HeaderMenu isMenuOpen={isOpenMenu} />
+          <HeaderMenu
+            login={login}
+            setLogin={setLogin}
+            isMenuOpen={isOpenMenu}
+          />
         </FlexBox>
       </div>
     );
@@ -52,7 +56,11 @@ const Header = () => {
           <Button color={"rgb(255, 159, 71)"} isWhiteMain mr="10px">
             会員登録
           </Button>
-          <Button color={"rgb(255, 159, 71)"} isWhiteMain>
+          <Button
+            color={"rgb(255, 159, 71)"}
+            isWhiteMain
+            func={() => setLogin(true)}
+          >
             ログイン
           </Button>
         </FlexBox>

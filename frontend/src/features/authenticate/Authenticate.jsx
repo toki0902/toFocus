@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import "./authenticate.css";
 import { FlexBox, Button } from "@component";
+import instaIcon from "@images/instaIcon.svg";
+import XIcon from "@images/XIcon.svg";
+import lineIcon from "@images/lineIcon.svg";
+import githubIcon from "@images/githubIcon.svg";
+import googleIcon from "@images/googleIcon.svg";
+
 const Authenticate = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,6 +19,49 @@ const Authenticate = () => {
     setPassword(e.target.value);
   };
 
+  const sns_arr = [
+    {
+      name: "google",
+      iconUrl: googleIcon,
+      className: "auth-sns__item auth-sns__google",
+    },
+    {
+      name: "Line",
+      iconUrl: lineIcon,
+      className: "auth-sns__item auth-sns__line",
+    },
+    { name: "X", iconUrl: XIcon, className: "auth-sns__item auth-sns__x" },
+    {
+      name: "Instagram",
+      iconUrl: instaIcon,
+      className: "auth-sns__item auth-sns__instagram",
+    },
+    {
+      name: "github",
+      iconUrl: githubIcon,
+      className: "auth-sns__item auth-sns__github",
+    },
+  ];
+
+  const rendered_sns_arr = sns_arr.map((item) => {
+    return (
+      <FlexBox
+        className={item.className}
+        width="90%"
+        height="55px"
+        left
+        pd="0 10px 0 10px"
+        mb="10px"
+        mt="10px"
+      >
+        <FlexBox width="40px" height="40px" left>
+          <img src={item.iconUrl} alt="icon" className="auth-sns-item__icon" />
+        </FlexBox>
+        <p>{item.name}でログインする</p>
+      </FlexBox>
+    );
+  });
+
   return (
     <div className="Authenticate">
       <FlexBox
@@ -24,7 +73,7 @@ const Authenticate = () => {
         mr="50px"
         pd="50px 20px 50px 20px"
       >
-        <h2 className="auth-email__title">email認証</h2>
+        <h2 className="auth__title">email認証</h2>
         <FlexBox
           className="auth-email__item"
           width="75%"
@@ -100,10 +149,20 @@ const Authenticate = () => {
       </FlexBox>
       <FlexBox
         className="auth__sns-box"
-        ml="50px"
         width="450px"
         height="550px"
-      ></FlexBox>
+        top
+        column
+        mr="50px"
+        pd="50px 20px 50px 20px"
+      >
+        <h2 className="auth__title" style={{ height: "15%" }}>
+          SNS認証
+        </h2>
+        <FlexBox className="auth-sns__btn-box" width="100%" height="85%" column>
+          {rendered_sns_arr}
+        </FlexBox>
+      </FlexBox>
     </div>
   );
 };
