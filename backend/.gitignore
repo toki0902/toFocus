@@ -1,0 +1,5 @@
+#環境変数を排除
+.env
+
+#node_modulesディレクトリ削除
+node_modules/

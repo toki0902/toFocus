@@ -121,12 +121,6 @@ const Work = () => {
     <SetGoals continueSetGoals={continueSetGoals} />
   );
 
-  useEffect(() => {
-    fetch("http://localhost:8000/api/auth/").then((res) => {
-      console.log(res.json());
-    });
-  }, []);
-
   return <div className="Work">{currentStage}</div>;
 };
 

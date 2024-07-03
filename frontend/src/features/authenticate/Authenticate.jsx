@@ -24,22 +24,42 @@ const Authenticate = () => {
       name: "google",
       iconUrl: googleIcon,
       className: "auth-sns__item auth-sns__google",
+      onClick: async () => {
+        const response = await fetch("http://localhost:8000/api/auth/google");
+        console.log(response);
+      },
     },
     {
       name: "Line",
       iconUrl: lineIcon,
       className: "auth-sns__item auth-sns__line",
+      onClick: () => {
+        console.log("CLICKED!");
+      },
     },
-    { name: "X", iconUrl: XIcon, className: "auth-sns__item auth-sns__x" },
+    {
+      name: "X",
+      iconUrl: XIcon,
+      className: "auth-sns__item auth-sns__x",
+      onClick: () => {
+        console.log("CLICKED!");
+      },
+    },
     {
       name: "Instagram",
       iconUrl: instaIcon,
       className: "auth-sns__item auth-sns__instagram",
+      onClick: () => {
+        console.log("CLICKED!");
+      },
     },
     {
       name: "github",
       iconUrl: githubIcon,
       className: "auth-sns__item auth-sns__github",
+      onClick: () => {
+        console.log("CLICKED!");
+      },
     },
   ];
 
@@ -53,6 +73,7 @@ const Authenticate = () => {
         pd="0 10px 0 10px"
         mb="10px"
         mt="10px"
+        onClick={item.onClick}
       >
         <FlexBox width="40px" height="40px" left>
           <img src={item.iconUrl} alt="icon" className="auth-sns-item__icon" />
