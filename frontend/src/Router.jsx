@@ -11,7 +11,7 @@ import Authenticate from "./features/authenticate/Authenticate";
 const Router = () => {
   return (
     <Routes>
-      <Route path="/" element={<Explain />}></Route>
+      <Route exact path="/" element={<Explain />}></Route>
       <Route path="/work" element={<Work />}></Route>
       <Route path="/review" element={<Review />}></Route>
       <Route path="/auth" element={<Authenticate />}></Route>
