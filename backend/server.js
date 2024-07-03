@@ -2,6 +2,8 @@ const express = require("express");
 const path = require("path");
 const app = express();
 
+const { pool } = require("./db");
+
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 app.use(express.json());
 
@@ -15,7 +17,7 @@ app.use("/api/explain", explainRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/work", workRouter);
 
-app.get("*", (req, res) => {
+app.get("*", async (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
