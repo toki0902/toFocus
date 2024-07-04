@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FlexBox, Button } from "@component";
 import Card from "./components/Card";
 import watch from "@images/stopwatch.svg";
@@ -25,6 +25,22 @@ const Explain = () => {
     toggleWhatIsToFocus();
     resetPage();
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/explain/getProfile", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        console.log(userData);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="Explain">
       <FlexBox width="100%" sb height="60%">

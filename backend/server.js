@@ -1,9 +1,21 @@
 const express = require("express");
 const path = require("path");
+const session = require("express-session");
+const passport = require("passport");
 const app = express();
 
 const { pool } = require("./db");
 
+app.use(
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 app.use(express.json());
 

@@ -26,7 +26,6 @@ const Authenticate = () => {
       className: "auth-sns__item auth-sns__google",
       onClick: async () => {
         const response = await fetch("http://localhost:8000/api/auth/google");
-        console.log(response);
       },
     },
     {
