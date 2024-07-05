@@ -4,9 +4,10 @@ const router = express.Router();
 router.get("/getProfile", (req, res) => {
   if (req.isAuthenticated()) {
     console.log("get PROFILE");
-    res.json(req.user);
+    res.status(200).json(req.user);
   } else {
-    res.json({ msg: "unLogin" });
+    console.log("not found profile");
+    res.status(204).send();
   }
 });
 

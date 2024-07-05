@@ -6,7 +6,7 @@ import userIcon from "@images/react.svg";
 import HeaderMenu from "./HeaderMenu";
 import { useNavigate } from "react-router-dom";
 
-const Header = () => {
+const Header = ({ userProfile, setUserProfile }) => {
   const navigate = useNavigate();
   const [login, setLogin] = useState(true);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -16,7 +16,7 @@ const Header = () => {
   const closeMenu = () => {
     setIsOpenMenu(false);
   };
-  if (login) {
+  if (userProfile) {
     return (
       <div className="header">
         <h1 className="header__title" onClick={() => navigate("/")}>
@@ -32,12 +32,16 @@ const Header = () => {
           onMouseOut={closeMenu}
         >
           <FlexBox width="100%" height="100%">
-            <img src={userIcon} alt="" className="header__user-icon" />
-            <p className="header__user-info">demoでログイン中</p>
+            <img
+              src={userProfile.icon_path}
+              alt=""
+              className="header__user-icon"
+            />
+            <p className="header__user-info">{userProfile.name}でログイン中</p>
           </FlexBox>
           <HeaderMenu
-            login={login}
-            setLogin={setLogin}
+            userProfile={userProfile}
+            setUserProfile={setUserProfile}
             isMenuOpen={isOpenMenu}
           />
         </FlexBox>
@@ -53,15 +57,13 @@ const Header = () => {
           </a>
         </h1>
         <FlexBox>
-          <Button color={"rgb(255, 159, 71)"} isWhiteMain mr="10px">
-            会員登録
-          </Button>
           <Button
             color={"rgb(255, 159, 71)"}
             isWhiteMain
-            func={() => setLogin(true)}
+            func={() => navigate("/auth")}
+            width="200px"
           >
-            ログイン
+            ログイン / サインアップ
           </Button>
         </FlexBox>
       </div>

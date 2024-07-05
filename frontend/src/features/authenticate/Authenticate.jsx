@@ -6,10 +6,13 @@ import XIcon from "@images/XIcon.svg";
 import lineIcon from "@images/lineIcon.svg";
 import githubIcon from "@images/githubIcon.svg";
 import googleIcon from "@images/googleIcon.svg";
+import { useNavigate } from "react-router-dom";
 
 const Authenticate = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
 
   const onChangeEmail = (e) => {
     setEmail(e.target.value);
@@ -24,8 +27,8 @@ const Authenticate = () => {
       name: "google",
       iconUrl: googleIcon,
       className: "auth-sns__item auth-sns__google",
-      onClick: async () => {
-        const response = await fetch("http://localhost:8000/api/auth/google");
+      onClick: () => {
+        window.open("http://localhost:8000/api/auth/google");
       },
     },
     {
@@ -33,31 +36,31 @@ const Authenticate = () => {
       iconUrl: lineIcon,
       className: "auth-sns__item auth-sns__line",
       onClick: () => {
-        console.log("CLICKED!");
+        window.open("http://localhost:8000/api/auth/line");
       },
     },
-    {
-      name: "X",
-      iconUrl: XIcon,
-      className: "auth-sns__item auth-sns__x",
-      onClick: () => {
-        console.log("CLICKED!");
-      },
-    },
-    {
-      name: "Instagram",
-      iconUrl: instaIcon,
-      className: "auth-sns__item auth-sns__instagram",
-      onClick: () => {
-        console.log("CLICKED!");
-      },
-    },
+    // {
+    //   name: "X",
+    //   iconUrl: XIcon,
+    //   className: "auth-sns__item auth-sns__x",
+    //   onClick: () => {
+    //     window.open("http://localhost:8000/api/auth/X");
+    //   },
+    // },
+    // {
+    //   name: "Instagram",
+    //   iconUrl: instaIcon,
+    //   className: "auth-sns__item auth-sns__instagram",
+    //   onClick: () => {
+    //     window.open("http://localhost:8000/api/auth/instagram");
+    //   },
+    // },
     {
       name: "github",
       iconUrl: githubIcon,
       className: "auth-sns__item auth-sns__github",
       onClick: () => {
-        console.log("CLICKED!");
+        window.open("http://localhost:8000/api/auth/github");
       },
     },
   ];
@@ -65,6 +68,7 @@ const Authenticate = () => {
   const rendered_sns_arr = sns_arr.map((item) => {
     return (
       <FlexBox
+        key={item.name}
         className={item.className}
         width="90%"
         height="55px"
@@ -93,6 +97,9 @@ const Authenticate = () => {
         mr="50px"
         pd="50px 20px 50px 20px"
       >
+        <p className="auth__back-home" onClick={() => navigate("/")}>
+          ←ホームへ戻る
+        </p>
         <h2 className="auth__title">email認証</h2>
         <FlexBox
           className="auth-email__item"

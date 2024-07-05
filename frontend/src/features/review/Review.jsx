@@ -5,7 +5,7 @@ import { FlexBox } from "@component";
 import Analysis from "./components/analysis/Analysis";
 import Track from "./components/track/Track";
 
-const Review = () => {
+const Review = ({ userProfile }) => {
   const sampleData = [
     {
       dateString: "2024/06/26",

@@ -11,10 +11,25 @@
   justify-content: center;
   align-items: center;
 }
+.auth__back-home {
+  position: absolute;
+  left: 0;
+  top: -10%;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  height: 30px;
+  border-bottom: 1px solid var(--sub-color);
+  transition: all 0.4s;
+}
+.auth__back-home:hover {
+  transform: translateX(-10px);
+}
 .auth__email-box {
   border: 1px solid var(--sub-color);
   border-radius: 5px;
   box-shadow: 2px 2px 2px;
+  position: relative;
 }
 .auth__title {
   font-size: 30px;
@@ -70,6 +85,7 @@
   position: relative;
   border-radius: 5px;
   transition: all 0.5s;
+  cursor: pointer;
 }
 
 .auth-sns-item__icon {

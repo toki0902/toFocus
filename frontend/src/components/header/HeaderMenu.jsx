@@ -7,8 +7,9 @@ import graphIcon from "@images/graph main-color.svg";
 import focusIcon from "@images/focus.png";
 import loginIcon from "@images/user.svg";
 import logoutIcon from "@images/logout.svg";
+import { set } from "date-fns";
 
-const HeaderMenu = ({ login, setLogin, isMenuOpen }) => {
+const HeaderMenu = ({ userProfile, setUserProfile, isMenuOpen }) => {
   const navigate = useNavigate();
 
   const header_menuItems = [
@@ -33,13 +34,6 @@ const HeaderMenu = ({ login, setLogin, isMenuOpen }) => {
         navigate("/work");
       },
     },
-    !login && {
-      text: "ログインする",
-      imgUrl: loginIcon,
-      onClick: () => {
-        navigate("/auth");
-      },
-    },
   ].filter(Boolean);
 
   const header_menuItems_rendered = header_menuItems.map((item) => {
@@ -54,6 +48,7 @@ const HeaderMenu = ({ login, setLogin, isMenuOpen }) => {
         pr="10px"
         mt="10px"
         mb="10px"
+        key={item.text}
       >
         <img src={item.imgUrl} alt="" className="header-menu-item__image" />
         <p className="header-menu-item__text">{item.text}</p>
@@ -73,7 +68,7 @@ const HeaderMenu = ({ login, setLogin, isMenuOpen }) => {
       }}
     >
       <FlexBox column width="100%" height="100%" top>
-        {login ? (
+        {userProfile ? (
           <FlexBox
             className="header-menu__userinfo"
             width="100%"
@@ -81,14 +76,24 @@ const HeaderMenu = ({ login, setLogin, isMenuOpen }) => {
             pb="10px"
             left
           >
-            <img src={userIcon} alt="" className="header__user-icon" />
-            <h2 className="header-menu__username">庄野時</h2>
+            <img
+              src={userProfile.icon_path}
+              alt=""
+              className="header__user-icon"
+            />
+            <h2 className="header-menu__username">{userProfile.name}</h2>
             <FlexBox
               className="header-menu__item"
               width="100%"
               height="30px"
               left
-              onClick={() => setLogin(false)}
+              onClick={async () => {
+                setUserProfile(null);
+                await fetch("/api/auth/logout", {
+                  method: "GET",
+                });
+                location.reload();
+              }}
               pl="10px"
               pr="10px"
               mt="10px"

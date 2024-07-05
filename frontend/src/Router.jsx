@@ -8,13 +8,25 @@ import Work from "./features/work/Work";
 import Review from "./features/review/Review";
 import Authenticate from "./features/authenticate/Authenticate";
 
-const Router = () => {
+const Router = ({ userProfile, setUserProfile }) => {
   return (
     <Routes>
-      <Route exact path="/" element={<Explain />}></Route>
-      <Route path="/work" element={<Work />}></Route>
-      <Route path="/review" element={<Review />}></Route>
-      <Route path="/auth" element={<Authenticate />}></Route>
+      <Route
+        exact
+        path="/"
+        element={
+          <Explain userProfile={userProfile} setUserProfile={setUserProfile} />
+        }
+      ></Route>
+      <Route path="/work" element={<Work userProfile={userProfile} />}></Route>
+      <Route
+        path="/review"
+        element={<Review userProfile={userProfile} />}
+      ></Route>
+      <Route
+        path="/auth"
+        element={<Authenticate userProfile={userProfile} />}
+      ></Route>
     </Routes>
   );
 };

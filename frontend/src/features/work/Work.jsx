@@ -6,7 +6,7 @@ import SetTrack from "./components/setTrack/SetTrack";
 import "./work.css";
 
 //目標設定、実際の作業フェーズ、休憩フェーズ、その後の振り返りまでを管理するfeature
-const Work = () => {
+const Work = ({ userProfile }) => {
   const [tasks, setTasks] = useState([]);
 
   //コイツの扱いに悩み中...

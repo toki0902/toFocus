@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import "./explain.css";
 import WhatIsToFocus from "./components/whatistofocus/WhatIsToFocus";
 
-const Explain = () => {
+const Explain = ({ userProfile, setUserProfile }) => {
   const {
     isOpen,
     toggleWhatIsToFocus,
@@ -32,9 +32,14 @@ const Explain = () => {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-      if (res.ok) {
+      //認証されていない場合204が返ってくる。
+      if (res.status === 200) {
         const userData = await res.json();
-        console.log(userData);
+        setUserProfile({
+          id: userData.id,
+          name: userData.name,
+          icon_path: userData.iconPath,
+        });
       }
     };
 
