@@ -19,6 +19,21 @@ const Work = ({ userProfile }) => {
     setWorkingHours_withoutLongBreak_min,
   ] = useState(0);
 
+  //目標タスクを追加で一つ設定するための関数
+  //SetGoalsコンポーネントを新規で呼び出す。
+  const continueSetGoals = (task_toAdd, time_toAdd) => {
+    setTasks((prev) => [...prev, task_toAdd]);
+    setRequireTime_min((prev) => prev + time_toAdd);
+    setCurrentStage(
+      <SetGoals
+        Continue
+        continueSetGoals={continueSetGoals}
+        key={Date.now()}
+        startDoWithThisTime={startDoWithThisTime}
+      />
+    );
+  };
+
   //Doコンポーネントに最新のtasksを渡すためのRef
   const tasks_Ref = useRef(tasks);
   useEffect(() => {
@@ -37,6 +52,7 @@ const Work = ({ userProfile }) => {
           updateWorkingTime_useMin={updateWorkingTime_useMin}
           tasks={tmp_task}
           time_limit_ms={time}
+          userProfile={userProfile}
         />
       );
     }, 100);
@@ -96,21 +112,6 @@ const Work = ({ userProfile }) => {
         );
       }
     }, 100);
-  };
-
-  //目標タスクを追加で一つ設定するための関数
-  //SetGoalsコンポーネントを新規で呼び出す。
-  const continueSetGoals = (task_toAdd, time_toAdd) => {
-    setTasks((prev) => [...prev, task_toAdd]);
-    setRequireTime_min((prev) => prev + time_toAdd);
-    setCurrentStage(
-      <SetGoals
-        Continue
-        continueSetGoals={continueSetGoals}
-        key={Date.now()}
-        startDoWithThisTime={startDoWithThisTime}
-      />
-    );
   };
 
   const startSetTrack = () => {

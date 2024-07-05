@@ -13,6 +13,7 @@ const Do = ({
   startSetTrack,
   updateWorkingTime_useMin,
   tasks,
+  userProfile,
 }) => {
   //作業画面に出現しているツールを管理するState
   const [tools, setTools] = useState([]);
@@ -108,16 +109,37 @@ const Do = ({
         }
       });
     }, 1000);
-    const start = Date.now();
+    const start = new Date();
 
     return () => {
       clearInterval(timer);
 
       //10の位の秒数を四捨五入して更新
       //2分30秒 = 3分, 2分29秒 = 2分
-      const end = Date.now();
+      const end = new Date();
       const time_toAdd = Math.round((end - start) / 60000);
-      //何時から何時まで作業したのかを管理したい。
+
+      //何時から何時まで作業したのかをデータベースに送信
+      if (userProfile) {
+        const submitWorkingTime = () => {
+          const start_timeDataType = `${start.getHours()}:${start.getMinutes()}`;
+          const end_timeDataType = `${end.getHours()}:${end.getMinutes()}`;
+          const data = {
+            id: userProfile.id,
+            start: start_timeDataType,
+            end: end_timeDataType,
+          };
+          fetch("http://localhost:8000/api/work/registerFocusData", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+        };
+        submitWorkingTime();
+      }
+
+      //アプリケーション内でも何時間作業しているかを管理
+      //使用用途は休憩を促すメッセージのためなど。
       updateWorkingTime_useMin(time_toAdd);
     };
   }, []);
