@@ -86,6 +86,7 @@ const Review = ({ userProfile }) => {
         { start: "15:00", end: "16:00" },
         { start: "17:00", end: "18:30" },
       ],
+      tracks: [],
     },
   ];
 

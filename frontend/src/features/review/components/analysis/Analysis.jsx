@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./analysis.css";
 import { FlexBox } from "@component";
 import { eachDayOfInterval } from "date-fns";
@@ -11,6 +11,20 @@ const Analysis = ({ selectedDate, setSelectedDate, sampleData }) => {
   useEffect(() => {
     setSelectedDate(new Date());
   }, []);
+
+  const prevDateRef = useRef();
+
+  useEffect(() => {
+    if (prevDateRef.current) {
+      if (selectedDate.getFullYear() !== prevDateRef.current.getFullYear()) {
+        console.log("year change");
+        const fetchCurrentYearFocusData = async () => {
+          const res = await fetch("http://localhost:8000/api/review/focusdata");
+        };
+      }
+    }
+    prevDateRef.current = selectedDate;
+  }, [selectedDate]);
 
   return (
     <FlexBox className="Analysis" width="100%" height="100%" top column>
