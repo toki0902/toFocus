@@ -19,8 +19,8 @@ const Header = ({ userProfile, setUserProfile }) => {
   if (userProfile) {
     return (
       <div className="header">
-        <h1 className="header__title" onClick={() => navigate("/")}>
-          <a href="#" className="header__title-link">
+        <h1 className="header__title">
+          <a href="/" className="header__title-link">
             {/* todo: 本当はtoFocusのロゴが入る */}
             logo
           </a>
@@ -51,7 +51,7 @@ const Header = ({ userProfile, setUserProfile }) => {
     return (
       <div className="header">
         <h1 className="header__title">
-          <a href="#" className="header__title-link">
+          <a href="/" className="header__title-link">
             {/* todo: 本当はtoFocusのロゴが入る */}
             logo
           </a>

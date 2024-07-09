@@ -172,7 +172,7 @@ const Graph = ({
         const focusTime_hour = Math.floor(item.focusTime / 60);
         const focusTime_minute = item.focusTime % 60;
         return (
-          <FlexBox width="100%" height="100%" column>
+          <FlexBox width="100%" height="100%" column key={item.dateObj}>
             <FlexBox width="100%" height="40%">
               <img
                 src={arrowIcon}
@@ -257,7 +257,7 @@ const Graph = ({
         const focusTime_hour = Math.floor(item.focusTime / 60);
         const focusTime_minute = item.focusTime % 60;
         return (
-          <FlexBox width="100%" height="100%" column>
+          <FlexBox width="100%" height="100%" column key={item.dateObj}>
             <FlexBox width="100%" height="40%">
               <img
                 src={arrowIcon}
@@ -337,10 +337,9 @@ const Graph = ({
         : Math.max((item.focusTime / 360) * 100, 0.2) + "%";
 
       return (
-        <FlexBox width={width} height="100%" bottom>
+        <FlexBox width={width} height="100%" bottom key={item.date_str}>
           <div
             className="graph__time-bar"
-            key={item.date_str}
             onClick={() => {
               setSelectedDate(item.dateObj);
             }}
@@ -361,7 +360,7 @@ const Graph = ({
         ? Math.max((item.focusTime / maxHeight_forMonthMode) * 100, 0.2) + "%"
         : Math.max((item.focusTime / 7200) * 100, 0.2) + "%";
       return (
-        <FlexBox width={width} height="100%" bottom>
+        <FlexBox width={width} height="100%" bottom key={item.date_str}>
           <div
             className="graph__time-bar"
             key={item.date_str}
@@ -436,10 +435,9 @@ const Graph = ({
         selectedDate.getMonth() === item.dateObj.getMonth() &&
         selectedDate.getDate() === item.dateObj.getDate();
       return (
-        <FlexBox width={width}>
+        <FlexBox width={width} key={item.date_str}>
           <p
             className="graph__date"
-            key={item.date_str}
             onClick={() => {
               setSelectedDate(item.dateObj);
             }}
@@ -454,10 +452,9 @@ const Graph = ({
         selectedDate.getFullYear() === item.dateObj.getFullYear() &&
         selectedDate.getMonth() === item.dateObj.getMonth();
       return (
-        <FlexBox width={width}>
+        <FlexBox width={width} key={item.date_str}>
           <p
             className="graph__date"
-            key={item.date_str}
             onClick={() => {
               setSelectedDate(item.dateObj);
             }}

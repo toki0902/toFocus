@@ -46,7 +46,6 @@ const Break = ({
   };
 
   useEffect(() => {
-    console.log(long);
     const timer = setInterval(() => {
       setTimeLimit_min((prev) => {
         let min;

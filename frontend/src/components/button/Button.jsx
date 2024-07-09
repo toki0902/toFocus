@@ -10,6 +10,7 @@ const Button = ({
   width = 120,
   height = 40,
   func = false,
+  type = null,
   children,
   color = "#333",
   isWhiteMain = false,
@@ -48,6 +49,7 @@ const Button = ({
   return (
     <button
       className="button"
+      type={type}
       style={style}
       onClick={func || null}
       onMouseOver={mouseOver}

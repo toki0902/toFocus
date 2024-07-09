@@ -22,6 +22,7 @@ const Authenticate = () => {
     setPassword(e.target.value);
   };
 
+  //SNSログインボタンについての情報を管理する配列
   const sns_arr = [
     {
       name: "google",
@@ -65,6 +66,7 @@ const Authenticate = () => {
     },
   ];
 
+  //SNSのログインボタンをレンダリングする用のmap
   const rendered_sns_arr = sns_arr.map((item) => {
     return (
       <FlexBox
@@ -85,6 +87,20 @@ const Authenticate = () => {
       </FlexBox>
     );
   });
+
+  //引数にMode, そのモードに使用する情報を取る
+  //ex)mode: email, userInfo: example@gmail.comみたいな
+  const login_withThisMode = async () => {
+    const reqData_JSON = JSON.stringify({
+      username: email,
+      password: password,
+    });
+    const res = await fetch(`http://localhost:8000/api/auth/local`, {
+      method: "POST",
+      body: reqData_JSON,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
 
   return (
     <div className="Authenticate">
@@ -110,6 +126,7 @@ const Authenticate = () => {
         >
           <input
             type="text"
+            name="username"
             className="auth-email__input"
             id="email"
             value={email}
@@ -141,6 +158,7 @@ const Authenticate = () => {
         >
           <input
             type="password"
+            name="password"
             className="auth-email__input"
             id="pass"
             value={password}
@@ -170,6 +188,7 @@ const Authenticate = () => {
           isWhiteMain
           mt="90px"
           width="150px"
+          func={password && email ? login_withThisMode : null}
         >
           認証する
         </Button>

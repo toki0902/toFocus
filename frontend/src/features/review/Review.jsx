@@ -124,6 +124,12 @@ const Review = ({ userProfile }) => {
         ref={sidebarRef}
       />
       {currentMenu}
+      {userProfile ? null : (
+        <>
+          <FlexBox className="review__mask" width="90%" height="81%"></FlexBox>
+          <h1 className="review-mask__title">ログインしてください</h1>
+        </>
+      )}
     </div>
   );
 };

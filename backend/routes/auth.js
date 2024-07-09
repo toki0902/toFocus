@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 const passport = require("passport");
+const bcrypt = require("bcrypt");
 const { pool } = require("../db");
 
 router.get("/logout", (req, res) => {
@@ -23,6 +24,59 @@ passport.deserializeUser((obj, done) => {
   done(null, obj);
 });
 
+const LocalStrategy = require("passport-local");
+router.post(
+  "/local",
+  passport.authenticate("local", { failureRedirect: "local/failure" })
+);
+
+router.get("/local/failure", (req, res) => {
+  res.status(404).json({ msg: "メールアドレスかパスワードが違います。" });
+});
+
+passport.use(
+  new LocalStrategy(
+    { usernameField: "username", passwordField: "password" },
+    async (username, password, cb) => {
+      try {
+        const targetData = await pool.query(
+          "SELECT * FROM user WHERE email = :email",
+          {
+            email: username,
+          },
+          (err) => {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+
+        if (targetData[0].length === 0) {
+          console.log("user not found");
+          cb(null, false);
+        } else {
+          const pepper = process.env["PEPPER"];
+          const correctPassword = targetData[0][0].password;
+          const isMatch = await bcrypt.compare(
+            pepper + password,
+            correctPassword
+          );
+          if (isMatch) {
+            console.log("user found");
+            cb(null, targetData[0][0]);
+          } else {
+            console.log("incorrect password");
+            cb(null, false);
+          }
+        }
+      } catch (err) {
+        console.log(`database error : ${err}`);
+        cb(err);
+      }
+    }
+  )
+);
+
 const GoogleStrategy = require("passport-google-oauth20");
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 router.get(
@@ -34,6 +88,7 @@ router.get(
     res.status(200).redirect("/");
   }
 );
+
 passport.use(
   //こっち側はユーザが最初にクリックしたときに実行される。
   new GoogleStrategy(

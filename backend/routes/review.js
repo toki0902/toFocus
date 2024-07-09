@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
 const { pool } = require("../db");
 const { toZonedTime } = require("date-fns-tz");
-const { lastDayOfYear, startOfYear, addDays } = require("date-fns");
+const { addDays } = require("date-fns");
 
 //DBの特定のfocusDataをfetchしてくれるAPI
 //focusDataエンドポイントで、focustimeテーブルへのfetchはすべて行う。
