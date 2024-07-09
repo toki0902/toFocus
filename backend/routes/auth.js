@@ -3,6 +3,8 @@ const router = express.Router();
 require("dotenv").config();
 const passport = require("passport");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 const { pool } = require("../db");
 
 router.get("/logout", (req, res) => {
@@ -16,6 +18,14 @@ router.get("/logout", (req, res) => {
   });
 });
 
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env["GOOGLE_MAIL"],
+    pass: process.env["GOOGLE_PASS"],
+  },
+});
+
 passport.serializeUser((user, done) => {
   done(null, user);
 });
@@ -24,14 +34,65 @@ passport.deserializeUser((obj, done) => {
   done(null, obj);
 });
 
+//registerにアクセスすると、仮のデータをuserテーブルに作成し、
+//それらを認証する用のメールをクライアントに送信する。
+router.post("/local/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!(name && email && password)) {
+    console.log("Information is missing");
+    return res.status(400).json({ msg: "必要なデータが足りていません" });
+  }
+
+  //16バイトのランダムな文字列をtokenとして作成
+  //tokenの期限を1時間に設定
+  const token = crypto.randomBytes(16).toString("hex");
+  const tokenExpires = new Date(Date.now() + 360000);
+
+  //pepperを先頭にpasswordをハッシュ化
+  const pepper = process.env["PEPPER"];
+  const hashedPassword = await bcrypt.hash(pepper + password, 8);
+
+  await pool.query(
+    "INSERT INTO user (name, email, password, icon_path, isVerified, verificationToken, tokenExpires) VALUES (:name, :email, :password, 'examplepath', false, :token, :expires)",
+    {
+      name: name,
+      email: email,
+      password: hashedPassword,
+      token: token,
+      expires: tokenExpires,
+    },
+    (err) => {
+      if (err) {
+        res.status(500).json({ msg: `database error : ${err}` });
+      }
+    }
+  );
+  console.log("register new user");
+
+  // const verificationURL = `http://localhost:8000/api/auth/local/verify?token=${token}`;
+  // const mailOption = {
+  //   from: process.env["GOOGLE_MAIL"],
+  //   to: email,
+  //   subject: "toConc : メールアドレスの認証",
+  //   text: `以下のリンクをクリックしてメールアドレスを認証してください: ${verificationURL}`,
+  // };
+
+  // transporter.sendMail(mailOption, (err, info) => {
+  //   if (err) {
+  //     console.log(err);
+  //     return res.status(500).json({ msg: "認証メールの送信に失敗しました。" });
+  //   }
+  //   return res.status(200).json({ msg: "認証用メールを送信しました。" });
+  // });
+});
+
 const LocalStrategy = require("passport-local");
 router.post(
   "/local",
   passport.authenticate("local", { failureRedirect: "local/failure" })
 );
-
 router.get("/local/failure", (req, res) => {
-  res.status(404).json({ msg: "メールアドレスかパスワードが違います。" });
+  res.status(404).json({ msg: "メールアドレスまたはパスワードが違います。" });
 });
 
 passport.use(
