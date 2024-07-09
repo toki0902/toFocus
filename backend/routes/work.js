@@ -11,16 +11,16 @@ router.post("/registerFocusData", async (req, res) => {
       //FIX :: 何でか知らんけど個々の関数が実行できなくてエラーハンドリングがうまくいかん
       (err, row) => {
         if (err) {
-          console.error("データベースエラー", err);
+          console.error("database error", err);
           return res.status(500).json({ msg: err });
         }
       }
     );
-    console.log("データベースに集中時間を登録しました。");
-    return res.status(200).json({ msg: "こちらにリクエストは届いています。" });
+    console.log("register complete");
+    return res.status(200).json({ msg: "register the data" });
   } else {
-    console.log("作業時間が短すぎます");
-    res.status(400).json({ msg: "作業時間が短すぎます" });
+    console.log("not enough time to work");
+    res.status(400).json({ msg: "not enough time to work" });
   }
 });
 

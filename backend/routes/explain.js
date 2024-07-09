@@ -6,7 +6,7 @@ router.get("/getProfile", (req, res) => {
     console.log("get PROFILE");
     res.status(200).json(req.user);
   } else {
-    console.log("not found profile");
+    console.log("can not find profile");
     res.status(204).send();
   }
 });

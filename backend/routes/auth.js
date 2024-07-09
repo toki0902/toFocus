@@ -85,7 +85,7 @@ passport.use(
             }
           }
         );
-        console.log("データベースにユーザ情報を登録しました。");
+        console.log("register new user");
         const id = newId[0];
         const user = { id: id, name: newName, iconPath: newIconPath };
         return cb(null, user);
@@ -157,7 +157,7 @@ passport.use(
             }
           }
         );
-        console.log("データベースにユーザ情報を登録しました。");
+        console.log("register new user");
         const id = newId[0];
         const user = { id: id, name: newName, iconPath: newIconPath };
         return cb(null, user);
@@ -229,7 +229,7 @@ passport.use(
             }
           }
         );
-        console.log("データベースにユーザ情報を登録しました。");
+        console.log("register new user");
         const id = newId[0];
         const user = { id: id, name: newName, iconPath: newIconPath };
         return cb(null, user);

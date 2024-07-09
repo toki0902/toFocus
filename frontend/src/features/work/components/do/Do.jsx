@@ -121,7 +121,7 @@ const Do = ({
 
       //何時から何時まで作業したのかをデータベースに送信
       if (userProfile) {
-        const submitWorkingTime = () => {
+        const submitWorkingTime = async () => {
           const start_timeDataType = `${start.getHours()}:${start.getMinutes()}`;
           const end_timeDataType = `${end.getHours()}:${end.getMinutes()}`;
           const data = {
@@ -129,11 +129,16 @@ const Do = ({
             start: start_timeDataType,
             end: end_timeDataType,
           };
-          fetch("http://localhost:8000/api/work/registerFocusData", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          });
+          const res = await fetch(
+            "http://localhost:8000/api/work/registerFocusData",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            }
+          );
+          const resData = await res.json();
+          console.log(resData.msg);
         };
         submitWorkingTime();
       }
