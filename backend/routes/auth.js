@@ -19,7 +19,7 @@ router.get("/logout", (req, res) => {
 });
 
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  service: "gmail",
   auth: {
     user: process.env["GOOGLE_MAIL"],
     pass: process.env["GOOGLE_PASS"],
@@ -63,36 +63,81 @@ router.post("/local/register", async (req, res) => {
     },
     (err) => {
       if (err) {
-        res.status(500).json({ msg: `database error : ${err}` });
+        return res.status(500).json({ msg: `database error : ${err}` });
       }
     }
   );
   console.log("register new user");
 
-  // const verificationURL = `http://localhost:8000/api/auth/local/verify?token=${token}`;
-  // const mailOption = {
-  //   from: process.env["GOOGLE_MAIL"],
-  //   to: email,
-  //   subject: "toConc : メールアドレスの認証",
-  //   text: `以下のリンクをクリックしてメールアドレスを認証してください: ${verificationURL}`,
-  // };
+  const verificationURL = `http://localhost:8000/api/auth/local/verify?token=${token}`;
+  const mailOption = {
+    from: process.env["GOOGLE_MAIL"],
+    to: email,
+    subject: "toConc : メールアドレスの認証",
+    text: `以下のリンクをクリックしてメールアドレスを認証してください: ${verificationURL}`,
+  };
 
-  // transporter.sendMail(mailOption, (err, info) => {
-  //   if (err) {
-  //     console.log(err);
-  //     return res.status(500).json({ msg: "認証メールの送信に失敗しました。" });
-  //   }
-  //   return res.status(200).json({ msg: "認証用メールを送信しました。" });
-  // });
+  transporter.sendMail(mailOption, (err, info) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ msg: "認証メールの送信に失敗しました。" });
+    }
+    return res.status(200).json({ msg: "認証用メールを送信しました。" });
+  });
+});
+
+//GETメソッドなのに、DBを更新するから安全性が、、っく、、
+router.get("/local/verify", async (req, res) => {
+  const { token } = req.query;
+
+  if (token) {
+    const now = Date.now();
+    const targetData = await pool.query(
+      "SELECT * FROM user WHERE verificationToken = :token AND tokenExpires > :now AND isVerified = false",
+      { token: token, now: now }
+    );
+    if (targetData[0].length === 0) {
+      console.log("not found user");
+      return res
+        .status(404)
+        .send(
+          "該当するデータが存在しないか、アクセストークンが無効です。もう一度サインアップをやり直してください"
+        );
+    } else {
+      console.log(targetData[0][0]);
+      const data = targetData[0][0];
+      await pool.query(
+        "UPDATE user SET isVerified = true, verificationToken = null, tokenExpires = null WHERE id = :userId",
+        { userId: data.id }
+      );
+
+      return res.status(201).send("ユーザを正式に認証しました。");
+    }
+  } else {
+    console.log("Access token does not exist");
+    return res
+      .status(400)
+      .send("このリクエストにはアクセストークンが含まれていません");
+  }
 });
 
 const LocalStrategy = require("passport-local");
 router.post(
   "/local",
-  passport.authenticate("local", { failureRedirect: "local/failure" })
+  passport.authenticate("local", {
+    failureRedirect: "local/failure",
+    successRedirect: "local/success",
+  })
 );
+
+router.get("/local/success", (req, res) => {
+  console.log("成功");
+  return res.status(200).json({ msg: "認証に成功しました。" });
+});
 router.get("/local/failure", (req, res) => {
-  res.status(404).json({ msg: "メールアドレスまたはパスワードが違います。" });
+  return res
+    .status(404)
+    .json({ msg: "メールアドレスまたはパスワードが違います。" });
 });
 
 passport.use(
@@ -101,7 +146,7 @@ passport.use(
     async (username, password, cb) => {
       try {
         const targetData = await pool.query(
-          "SELECT * FROM user WHERE email = :email",
+          "SELECT * FROM user WHERE email = :email AND isVerified = true",
           {
             email: username,
           },

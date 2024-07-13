@@ -35,6 +35,7 @@ const Explain = ({ userProfile, setUserProfile }) => {
       //認証されていない場合204が返ってくる。
       if (res.status === 200) {
         const userData = await res.json();
+        console.log(userData);
         setUserProfile({
           id: userData.id,
           name: userData.name,
