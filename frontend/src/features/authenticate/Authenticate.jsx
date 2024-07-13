@@ -9,18 +9,22 @@ import googleIcon from "@images/googleIcon.svg";
 import { json, useNavigate } from "react-router-dom";
 
 const Authenticate = () => {
+  const [isForgetPassword, setIsForgetPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignup, setIsSignup] = useState(true);
+
+  const [isSignup, setIsSignup] = useState(false);
+  const [signup_email, setSignup_email] = useState("");
+  const [signup_username, setSignup_username] = useState("");
+  const [signup_password, setSignup_password] = useState("");
 
   const navigate = useNavigate();
 
-  const onChangeEmail = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const onChangePassword = (e) => {
-    setPassword(e.target.value);
+  const backToSns = () => {
+    setIsSignup(false);
+    setSignup_email("");
+    setSignup_username("");
+    setSignup_password("");
   };
 
   //SNSログインボタンについての情報を管理する配列
@@ -109,6 +113,29 @@ const Authenticate = () => {
       navigate("/");
     } else {
       console.error(jsonRes.msg);
+      setIsSignup(true);
+    }
+  };
+
+  const signup = async () => {
+    const reqData_JSON = JSON.stringify({
+      name: signup_username,
+      password: signup_password,
+      email: signup_email,
+    });
+
+    const res = await fetch("http://localhost:8000/api/auth/local/register", {
+      method: "POST",
+      body: reqData_JSON,
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const jsonRes = await res.json();
+    if (res.ok) {
+      console.log(jsonRes.msg);
+      navigate("/認証完了");
+    } else {
+      console.error(jsonRes.msg);
     }
   };
 
@@ -118,94 +145,124 @@ const Authenticate = () => {
         className="auth__email-box"
         width="450px"
         height="550px"
-        top
-        column
         mr="50px"
-        pd="50px 20px 50px 20px"
       >
         <p className="auth__back-home" onClick={() => navigate("/")}>
           ←ホームへ戻る
         </p>
-        <h2 className="auth__title">email認証</h2>
+        {/* front側がユーザに見える方になる 
+      　今回の場合はisSignupのbool値で決まる
+      */}
         <FlexBox
-          className="auth-email__item"
-          width="75%"
-          height="45px"
-          mt="70px"
-          bottom
+          className={isForgetPassword ? "back" : "front"}
+          width="100%"
+          height="100%"
+          pd="50px 20px 50px 20px"
+          top
+          column
         >
-          <input
-            type="text"
-            name="username"
-            className="auth-email__input"
-            id="email"
-            value={email}
-            onChange={(e) => onChangeEmail(e)}
-          />
-          <label
-            className="auth-email__label"
-            htmlFor="email"
-            style={
+          <h2 className="auth__title">email認証</h2>
+          <FlexBox
+            className="auth-email__item"
+            width="75%"
+            height="45px"
+            mt="70px"
+            bottom
+          >
+            <input
+              type="text"
+              name="username"
+              className="auth-email__input"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <label
+              className="auth-email__label"
+              htmlFor="email"
+              style={
+                email
+                  ? {
+                      bottom: "45px",
+                      left: "5px",
+                      color: "#ff9f47",
+                      fontSize: "14px",
+                    }
+                  : null
+              }
+            >
               email
-                ? {
-                    bottom: "45px",
-                    left: "5px",
-                    color: "#ff9f47",
-                    fontSize: "14px",
-                  }
-                : null
-            }
+            </label>
+          </FlexBox>
+          <FlexBox
+            className="auth-email__item"
+            width="75%"
+            height="45px"
+            mt="70px"
+            bottom
           >
-            email
-          </label>
+            <input
+              type="password"
+              name="password"
+              className="auth-email__input"
+              id="pass"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <label
+              className="auth-email__label"
+              htmlFor="pass"
+              style={
+                password
+                  ? {
+                      bottom: "45px",
+                      left: "5px",
+                      color: "#ff9f47",
+                      fontSize: "14px",
+                    }
+                  : null
+              }
+            >
+              password
+            </label>
+            <p
+              className="auth-email__forget-msg"
+              onClick={() => setIsForgetPassword(true)}
+            >
+              パスワードを忘れた
+            </p>
+          </FlexBox>
+          <Button
+            className="auth-email__btn"
+            color={password && email ? "#ff9f47" : "#c1bdbd"}
+            isWhiteMain
+            mt="90px"
+            width="150px"
+            func={password && email ? login_withThisMode : null}
+          >
+            認証する
+          </Button>
         </FlexBox>
         <FlexBox
-          className="auth-email__item"
-          width="75%"
-          height="45px"
-          mt="70px"
-          bottom
+          className={isForgetPassword ? "front mainColor" : "back"}
+          width="100%"
+          height="100%"
+          pd="50px 20px 50px 20px"
+          top
+          column
         >
-          <input
-            type="password"
-            name="password"
-            className="auth-email__input"
-            id="pass"
-            value={password}
-            onChange={(e) => onChangePassword(e)}
-          />
-          <label
-            className="auth-email__label"
-            htmlFor="pass"
-            style={
-              password
-                ? {
-                    bottom: "45px",
-                    left: "5px",
-                    color: "#ff9f47",
-                    fontSize: "14px",
-                  }
-                : null
-            }
+          <p
+            className="auth__reverse-btn mainColor"
+            onClick={() => setIsForgetPassword(false)}
           >
-            password
-          </label>
-          <p className="auth-email__forget-msg">パスワードを忘れた</p>
+            ←email認証に戻る
+          </p>
         </FlexBox>
-        <Button
-          className="auth-email__btn"
-          color={password && email ? "#ff9f47" : "#c1bdbd"}
-          isWhiteMain
-          mt="90px"
-          width="150px"
-          func={password && email ? login_withThisMode : null}
-        >
-          認証する
-        </Button>
       </FlexBox>
+
       <FlexBox className="auth__sns-box" width="450px" height="550px" mr="50px">
         <FlexBox
-          className={isSignup ? "front" : "back"}
+          className={isSignup ? "front mainColor" : "back"}
           width="100%"
           height="100%"
           top
@@ -227,14 +284,14 @@ const Authenticate = () => {
               name="signup_name"
               className="auth-email__input"
               id="signup_name"
-              value={email}
-              onChange={(e) => onChangeEmail(e)}
+              value={signup_username}
+              onChange={(e) => setSignup_username(e.target.value)}
             />
             <label
               className="auth-email__label"
               htmlFor="signup_name"
               style={
-                email
+                signup_username
                   ? {
                       bottom: "45px",
                       left: "5px",
@@ -259,14 +316,14 @@ const Authenticate = () => {
               name="signup_email"
               className="auth-email__input"
               id="signup_email"
-              value={email}
-              onChange={(e) => onChangeEmail(e)}
+              value={signup_email}
+              onChange={(e) => setSignup_email(e.target.value)}
             />
             <label
               className="auth-email__label"
               htmlFor="signup_email"
               style={
-                email
+                signup_email
                   ? {
                       bottom: "45px",
                       left: "5px",
@@ -291,14 +348,14 @@ const Authenticate = () => {
               name="signup_password"
               className="auth-email__input"
               id="signup_password"
-              value={email}
-              onChange={(e) => onChangeEmail(e)}
+              value={signup_password}
+              onChange={(e) => setSignup_password(e.target.value)}
             />
             <label
               className="auth-email__label"
               htmlFor="signup_password"
               style={
-                email
+                signup_password
                   ? {
                       bottom: "45px",
                       left: "5px",
@@ -311,6 +368,25 @@ const Authenticate = () => {
               password
             </label>
           </FlexBox>
+          <Button
+            className="auth-email__btn"
+            color={
+              signup_email && signup_password && signup_username
+                ? "#ff9f47"
+                : "#c1bdbd"
+            }
+            isWhiteMain
+            mt="90px"
+            width="150px"
+            func={
+              signup_email && signup_password && signup_username ? signup : null
+            }
+          >
+            サインアップ
+          </Button>
+          <p className="auth__reverse-btn mainColor" onClick={backToSns}>
+            ←SNS認証に戻る
+          </p>
         </FlexBox>
 
         <FlexBox
@@ -332,6 +408,9 @@ const Authenticate = () => {
           >
             {rendered_sns_arr}
           </FlexBox>
+          <p className="auth__reverse-btn" onClick={() => setIsSignup(true)}>
+            ←サインアップ
+          </p>
         </FlexBox>
       </FlexBox>
     </div>

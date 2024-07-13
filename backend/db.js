@@ -12,4 +12,5 @@ const pool = mysql.createPool({
 //単一のクエリの場合にはpool.query()の方がrelease()も行ってくれて便利
 //複数のクエリを実行する場合にはpool.getConnection()を行い、クエリを実行後release()を行うことでコストがかからない。
 
+//FIX :: (err, row) => {}の関数を第三引数に入れても、エラーを検知できない。なぜ？？？
 exports.pool = pool;

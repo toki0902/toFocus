@@ -43,6 +43,20 @@ router.post("/local/register", async (req, res) => {
     return res.status(400).json({ msg: "必要なデータが足りていません" });
   }
 
+  //データベースに同じメールアドレスが登録されていないかを確かめる
+  const sameEmailAddress = await pool.query(
+    "SELECT COUNT(*) AS num FROM user WHERE email = :email",
+    { email: email }
+  );
+
+  //同じメアドが登録されていた場合エラーを返す
+  if (sameEmailAddress[0].num !== 0) {
+    console.log("this email is registered in the past");
+    return res
+      .status(404)
+      .json({ msg: "既に登録されているメールアドレスです" });
+  }
+
   //16バイトのランダムな文字列をtokenとして作成
   //tokenの期限を1時間に設定
   const token = crypto.randomBytes(16).toString("hex");
@@ -104,14 +118,13 @@ router.get("/local/verify", async (req, res) => {
           "該当するデータが存在しないか、アクセストークンが無効です。もう一度サインアップをやり直してください"
         );
     } else {
-      console.log(targetData[0][0]);
       const data = targetData[0][0];
       await pool.query(
         "UPDATE user SET isVerified = true, verificationToken = null, tokenExpires = null WHERE id = :userId",
         { userId: data.id }
       );
 
-      return res.status(201).send("ユーザを正式に認証しました。");
+      return res.status(201).redirect("/auth");
     }
   } else {
     console.log("Access token does not exist");
