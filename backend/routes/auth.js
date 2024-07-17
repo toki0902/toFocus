@@ -13,7 +13,7 @@ router.get("/logout", (req, res) => {
       console.log(`セッションの破壊に失敗しました。:${err}`);
       return res.status(500).end();
     }
-    console.log("ログアウトします");
+    console.log("logout and destroy session");
     return res.redirect("/");
   });
 });
@@ -40,7 +40,9 @@ router.post("/local/register", async (req, res) => {
   const { name, email, password } = req.body;
   if (!(name && email && password)) {
     console.log("Information is missing");
-    return res.status(400).json({ msg: "必要なデータが足りていません" });
+    return res.status(400).json({
+      msg: "必要なデータが足りていません。もう一度サインアップをやり直してください",
+    });
   }
 
   //データベースに同じメールアドレスが登録されていないかを確かめる
@@ -50,11 +52,12 @@ router.post("/local/register", async (req, res) => {
   );
 
   //同じメアドが登録されていた場合エラーを返す
-  if (sameEmailAddress[0].num !== 0) {
+  console.log(sameEmailAddress);
+  if (sameEmailAddress[0][0].num !== 0) {
     console.log("this email is registered in the past");
-    return res
-      .status(404)
-      .json({ msg: "既に登録されているメールアドレスです" });
+    return res.status(404).json({
+      msg: "既に登録されているメールアドレスです。別のメールアドレスをご用意いただき、もう一度サインアップをやり直してください。",
+    });
   }
 
   //16バイトのランダムな文字列をtokenとして作成
@@ -94,9 +97,13 @@ router.post("/local/register", async (req, res) => {
   transporter.sendMail(mailOption, (err, info) => {
     if (err) {
       console.log(err);
-      return res.status(500).json({ msg: "認証メールの送信に失敗しました。" });
+      return res.status(500).json({
+        msg: "認証メールの送信に失敗しました。もう一度サインアップをやり直してください",
+      });
     }
-    return res.status(200).json({ msg: "認証用メールを送信しました。" });
+    return res.status(200).json({
+      msg: "認証用メールを送信しました。案内に従いアカウント作成を完了させてください",
+    });
   });
 });
 
@@ -123,7 +130,104 @@ router.get("/local/verify", async (req, res) => {
         "UPDATE user SET isVerified = true, verificationToken = null, tokenExpires = null WHERE id = :userId",
         { userId: data.id }
       );
+      console.log("create new user");
+      return res.status(201).redirect("/auth");
+    }
+  } else {
+    console.log("Access token does not exist");
+    return res
+      .status(400)
+      .send("このリクエストにはアクセストークンが含まれていません");
+  }
+});
 
+//新しくパスワードを設定する用のapi
+router.post("/local/newpass", async (req, res) => {
+  //emailが含まれていなかったら返す
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ msg: "メールアドレスが含まれていません" });
+  }
+
+  //ここのtry文はdatabaseのエラーのみをキャッチするようにしたい
+  //pool.queryに不具合の応急処置
+  try {
+    const targetData = await pool.query(
+      //isVerifiedがtrueなのは正式なユーザのみ
+      //正式なユーザはaccesstokenもnullになっているため、それをパスワード更新のために利用する
+      "SELECT id FROM user WHERE email = :email AND isVerified = true",
+      { email: email }
+    );
+
+    if (targetData[0].length !== 0) {
+      const { id } = targetData[0][0];
+
+      //16バイトのランダムな文字列をtokenとして作成
+      //tokenの期限を1時間に設定
+      const token = crypto.randomBytes(16).toString("hex");
+      const tokenExpires = new Date(Date.now() + 360000);
+
+      await pool.query(
+        //上記の通り正式なユーザのtokenはパスワード更新用
+        "UPDATE user SET verificationToken = :token, tokenExpires = :expires WHERE id = :id AND isVerified = true",
+        {
+          id: id,
+          token: token,
+          expires: tokenExpires,
+        }
+      );
+
+      const verificationURL = `http://localhost:8000/api/auth/local/newpass/verify?token=${token}`;
+      const mailOption = {
+        from: process.env["GOOGLE_MAIL"],
+        to: email,
+        subject: "toConc : 新しいパスワードの設定",
+        text: `以下のリンクをクリックして新しいパスワードを設定してください: ${verificationURL}`,
+      };
+
+      transporter.sendMail(mailOption, (err, info) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            msg: "パスワード更新メールの送信に失敗しました。もう一度パスワード更新をやり直してください",
+          });
+        }
+        return res.status(200).json({
+          msg: "パスワード更新メールを送信しました。案内に従いパスワードの更新を完了させてください",
+        });
+      });
+    } else {
+      console.log("user not found");
+      return res.status(404).json({
+        msg: "このメールアドレスは登録されていません。新規登録をお願いします。",
+      });
+    }
+  } catch (err) {
+    console.log(`database error ${err}`);
+    return res.status(500).json({
+      msg: "データベースでエラーが発生しました。もう一度お試しください。",
+    });
+  }
+});
+
+router.get("/local/newpass/verify", async (req, res) => {
+  const { token } = req.query;
+
+  if (token) {
+    const now = Date.now();
+    const targetData = await pool.query(
+      "SELECT * FROM user WHERE verificationToken = :token AND tokenExpires > :now AND isVerified = true",
+      { token: token, now: now }
+    );
+    if (targetData[0].length === 0) {
+      console.log("not found user");
+      return res
+        .status(404)
+        .send(
+          "該当するデータが存在しないか、アクセストークンが無効です。もう一度パスワード設定をやり直してください"
+        );
+    } else {
+      console.log("create new user");
       return res.status(201).redirect("/auth");
     }
   } else {
