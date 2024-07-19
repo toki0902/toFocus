@@ -300,7 +300,12 @@ passport.use(
           );
           if (isMatch) {
             console.log("user found");
-            cb(null, targetData[0][0]);
+            const user = {
+              id: targetData[0][0].id,
+              name: targetData[0][0].name,
+              iconPath: targetData[0][0].icon_path,
+            };
+            cb(null, user);
           } else {
             console.log("incorrect password");
             cb(null, false);
@@ -378,7 +383,7 @@ passport.use(
           }
         );
         console.log("register new user");
-        const id = newId[0];
+        const id = newId[0][0].id;
         const user = { id: id, name: newName, iconPath: newIconPath };
         return cb(null, user);
       }
@@ -450,7 +455,7 @@ passport.use(
           }
         );
         console.log("register new user");
-        const id = newId[0];
+        const id = newId[0][0].id;
         const user = { id: id, name: newName, iconPath: newIconPath };
         return cb(null, user);
       }
@@ -488,6 +493,7 @@ passport.use(
           }
         }
       );
+
       if (resultRow.length > 0) {
         const user = {
           id: resultRow[0].id,
@@ -522,8 +528,10 @@ passport.use(
           }
         );
         console.log("register new user");
-        const id = newId[0];
+        const id = newId[0][0].id;
+        console.log(id);
         const user = { id: id, name: newName, iconPath: newIconPath };
+        console.log(user);
         return cb(null, user);
       }
     }

@@ -20,7 +20,7 @@ router.post("/registerFocusData", async (req, res) => {
     return res.status(200).json({ msg: "register the data" });
   } else {
     console.log("not enough time to work");
-    res.status(400).json({ msg: "not enough time to work" });
+    return res.status(400).json({ msg: "not enough time to work" });
   }
 });
 

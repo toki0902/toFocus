@@ -14,7 +14,7 @@ import {
   subMonths,
 } from "date-fns";
 
-const Calender = ({ sampleData, selectedDate, setSelectedDate }) => {
+const Calender = ({ concentrateData, selectedDate, setSelectedDate }) => {
   const calender_title_str = `${toPadStart(
     selectedDate.getFullYear()
   )}年${toPadStart(selectedDate.getMonth() + 1)}月の足跡`;
@@ -31,7 +31,7 @@ const Calender = ({ sampleData, selectedDate, setSelectedDate }) => {
   });
 
   const calender_items = date_arr.map((item) => {
-    const focusData = searchDataWithThisDay(item, sampleData)[0];
+    const focusData = searchDataWithThisDay(item, concentrateData)[0];
     const date = item.getDate();
     const month = item.getMonth();
     const year = item.getFullYear();

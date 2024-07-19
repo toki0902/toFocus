@@ -5,7 +5,12 @@ import Calender from "./components/calender/Calender";
 import TrackBoard from "./components/trackBoard/TrackBoard";
 import { searchDataWithThisDay } from "../../utils";
 
-const Track = ({ sampleData, selectedDate, setSelectedDate }) => {
+const Track = ({
+  concentrateData,
+  selectedDate,
+  setSelectedDate,
+  userProfile,
+}) => {
   const targetRef = useRef(null);
   const [tracks, setTracks] = useState();
   useEffect(() => {
@@ -19,7 +24,7 @@ const Track = ({ sampleData, selectedDate, setSelectedDate }) => {
   }, [tracks]);
 
   useEffect(() => {
-    const focusData = searchDataWithThisDay(selectedDate, sampleData)[0];
+    const focusData = searchDataWithThisDay(selectedDate, concentrateData)[0];
 
     if (focusData) {
       setTracks(() => {
@@ -42,10 +47,11 @@ const Track = ({ sampleData, selectedDate, setSelectedDate }) => {
   return (
     <div className="Track">
       <h2 className="track__title">
-        「」さんの<span className="track__title--sub-color">足跡</span>を辿る
+        「{userProfile ? userProfile.name : "無名"}」さんの
+        <span className="track__title--sub-color">足跡</span>を辿る
       </h2>
       <Calender
-        sampleData={sampleData}
+        concentrateData={concentrateData}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
       />

@@ -23,7 +23,7 @@ import {
 } from "date-fns";
 
 const Graph = ({
-  sampleData,
+  concentrateData,
   selectedDate,
   setSelectedDate,
   renderMode,
@@ -36,107 +36,106 @@ const Graph = ({
 
   //renderItemを更新するための関数
   //criterionを基準にrenderModeにあったItemに更新する。
-  const updateItem = useCallback(
-    (criterion) => {
-      switch (renderMode) {
-        case "date": {
-          //renderModeがdateだった場合、
-          //criterionを含む週のdataをItemとして更新する。
+  const updateItem = (criterion) => {
+    switch (renderMode) {
+      case "date": {
+        //renderModeがdateだった場合、
+        //criterionを含む週のdataをItemとして更新する。
 
-          //週を割り出すための関数
-          const firstDayOfWeek = startOfWeek(criterion, { weekStartsOn: 1 });
-          const lastDayOfWeek = endOfWeek(criterion, { weekStartsOn: 1 });
+        //週を割り出すための関数
+        const firstDayOfWeek = startOfWeek(criterion, { weekStartsOn: 1 });
+        const lastDayOfWeek = endOfWeek(criterion, { weekStartsOn: 1 });
 
-          const weekDays_arr = eachDayOfInterval({
-            start: firstDayOfWeek,
-            end: lastDayOfWeek,
-          });
+        const weekDays_arr = eachDayOfInterval({
+          start: firstDayOfWeek,
+          end: lastDayOfWeek,
+        });
 
-          const newArray = weekDays_arr.map((item) => {
-            const month = item.getMonth() + 1;
-            const date = item.getDate();
-            //mm:ddの形式の文字列を作成
-            const date_str = `${toPadStart(month)}/${toPadStart(date)}`;
+        const newArray = weekDays_arr.map((item) => {
+          const month = item.getMonth() + 1;
+          const date = item.getDate();
+          //mm:ddの形式の文字列を作成
+          const date_str = `${toPadStart(month)}/${toPadStart(date)}`;
 
-            //日付に該当するデータを検索
-            const filteredData = searchDataWithThisDay(item, sampleData);
+          //日付に該当するデータを検索
+          const filteredData = searchDataWithThisDay(item, concentrateData);
 
-            //該当するデータ内のfocusTimeを「分」で計算する。
-            const focus_time =
-              filteredData[0] === undefined
-                ? 0
-                : filteredData[0].focusTime.reduce((prev, current) => {
-                    const time = timeDifference(current.start, current.end);
-                    return prev + time;
-                  }, 0);
-
-            return { date_str: date_str, focusTime: focus_time, dateObj: item };
-          });
-
-          setRenderItem(newArray);
-          break;
-        }
-        case "month": {
-          //月の前半だったら1月から6月を、後半だったら6月から12月を取得する
-          let pastHarfYear = [];
-          const isFirstHarf = criterion.getMonth() < 6;
-
-          //criterionの1月1日と、7月1日を取得する
-          const firstDayOfFirstHarfYear = startOfYear(criterion);
-          const firstDayOfLastHarfYear = addMonths(firstDayOfFirstHarfYear, 6);
-          //pastHarfYearに1 ~ 6、もしくは7 ~ 12月の初日を追加
-          for (let i = 0; i < 6; i++) {
-            if (isFirstHarf) {
-              pastHarfYear.push(addMonths(firstDayOfFirstHarfYear, i));
-            } else {
-              pastHarfYear.push(addMonths(firstDayOfLastHarfYear, i));
-            }
-          }
-
-          //pastHarfYearを基準に「期間」、「月の集中時間」、「dateオブジェクト」を作成しrenderItemを更新
-          const newArray = pastHarfYear.map((item) => {
-            const firstDayOfMonth = startOfMonth(item);
-            const endDayOfMonth = endOfMonth(item);
-
-            //focusDataを検索
-            const focusDataOfTheMonth = searchDataWithThisDuration(
-              firstDayOfMonth,
-              endDayOfMonth,
-              sampleData
-            );
-
-            //各月の期間をYYYY/MM形式の文字列で整形 ex)2024年 6月
-            const date_str = `${firstDayOfMonth.getFullYear()}/${
-              firstDayOfMonth.getMonth() + 1
-            }月`;
-
-            //月のデータをもとに合計のfocusTimeを算出
-            const focus_Time =
-              focusDataOfTheMonth?.reduce((prev, current) => {
-                const sum_time = current.focusTime.reduce((prev, current) => {
-                  return prev + timeDifference(current.start, current.end);
+          //該当するデータ内のfocusTimeを「分」で計算する。
+          const focus_time =
+            filteredData[0] === undefined
+              ? 0
+              : filteredData[0].focusTime.reduce((prev, current) => {
+                  const time = timeDifference(current.start, current.end);
+                  return prev + time;
                 }, 0);
 
-                return prev + sum_time;
-              }, 0) ?? 0;
+          return { date_str: date_str, focusTime: focus_time, dateObj: item };
+        });
 
-            return {
-              date_str: date_str,
-              focusTime: focus_Time,
-              dateObj: firstDayOfMonth,
-            };
-          });
-
-          setRenderItem(newArray);
-          break;
-        }
-        case "year": {
-          break;
-        }
+        setRenderItem(newArray);
+        break;
       }
-    },
-    [renderMode]
-  );
+      case "month": {
+        //月の前半だったら1月から6月を、後半だったら6月から12月を取得する
+        let pastHarfYear = [];
+        const isFirstHarf = criterion.getMonth() < 6;
+
+        //criterionの1月1日と、7月1日を取得する
+        const firstDayOfFirstHarfYear = startOfYear(criterion);
+        const firstDayOfLastHarfYear = addMonths(firstDayOfFirstHarfYear, 6);
+        //pastHarfYearに1 ~ 6、もしくは7 ~ 12月の初日を追加
+        for (let i = 0; i < 6; i++) {
+          if (isFirstHarf) {
+            pastHarfYear.push(addMonths(firstDayOfFirstHarfYear, i));
+          } else {
+            pastHarfYear.push(addMonths(firstDayOfLastHarfYear, i));
+          }
+        }
+
+        //pastHarfYearを基準に「期間」、「月の集中時間」、「dateオブジェクト」を作成しrenderItemを更新
+        const newArray = pastHarfYear.map((item) => {
+          const firstDayOfMonth = startOfMonth(item);
+          const endDayOfMonth = endOfMonth(item);
+
+          //focusDataを検索
+          const focusDataOfTheMonth = searchDataWithThisDuration(
+            firstDayOfMonth,
+            endDayOfMonth,
+            concentrateData
+          );
+
+          console.log(focusDataOfTheMonth);
+
+          //各月の期間をYYYY/MM形式の文字列で整形 ex)2024年 6月
+          const date_str = `${firstDayOfMonth.getFullYear()}/${
+            firstDayOfMonth.getMonth() + 1
+          }月`;
+
+          //月のデータをもとに合計のfocusTimeを算出
+          const focus_Time =
+            focusDataOfTheMonth?.reduce((prev, current) => {
+              const sum_time = current.focusTime.reduce((prev, current) => {
+                return prev + timeDifference(current.start, current.end);
+              }, 0);
+
+              return prev + sum_time;
+            }, 0) ?? 0;
+
+          return {
+            date_str: date_str,
+            focusTime: focus_Time,
+            dateObj: firstDayOfMonth,
+          };
+        });
+
+        setRenderItem(newArray);
+        break;
+      }
+      case "year": {
+        break;
+      }
+    }
+  };
 
   const today = new Date();
 

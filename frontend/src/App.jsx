@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Router from "./Router";
 import Header from "./components/header/Header";
 import "./App.css";
-import { set } from "date-fns";
 
 function App() {
   //プロトタイプは{id: 01, name:"zizi0902", icon_path:"https://expample.com"}

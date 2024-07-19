@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "./review.css";
 import Sidebar from "./components/sidebar/Sidebar";
 import { FlexBox } from "@component";
@@ -6,89 +6,7 @@ import Analysis from "./components/analysis/Analysis";
 import Track from "./components/track/Track";
 
 const Review = ({ userProfile }) => {
-  const sampleData = [
-    {
-      dateString: "2024/06/26",
-      year: 2024,
-      month: 6,
-      day: 26,
-      completeTasks: ["出材カンプを作成する。", "VSCodeのインストール"],
-      focusTime: [
-        { start: "15:00", end: "22:23" },
-        { start: "10:00", end: "13:30" },
-      ],
-      tracks: [
-        [
-          { type: "h1", children: [{ text: "タイトル1" }] },
-          {
-            type: "paragraph",
-            children: [{ text: "見出しこれはテキストサンプルです" }],
-          },
-          {
-            type: "paragraph",
-            children: [
-              {
-                text: "これはテキストサンプルですこれはテキストサンプルですこれはテキストサンプルですこれはテ",
-              },
-              { text: "キストサ", bold: true },
-              { text: "ンプル", underline: true, bold: true },
-              { underline: true, text: "ですこれはテキストサンプルですこれ" },
-              {
-                text: "はテキストサンプルですこれはテキストサンプルですこれはテキストサンプルです",
-              },
-              { text: "これはテキストサンプルですこれはテキスト", bold: true },
-              {
-                text: "サンプルですこれはテキストサンプルですこれはテキストサンプル",
-              },
-              { text: "ですこれはテキストサンプルで", italic: true },
-            ],
-          },
-          { type: "paragraph", children: [{ italic: true, text: "" }] },
-          {
-            type: "list",
-            children: [{ italic: true, text: "これはリストです" }],
-          },
-          {
-            type: "paragraph",
-            children: [{ italic: true, text: "colaについての講義なう" }],
-          },
-          { type: "paragraph", children: [{ italic: true, text: "" }] },
-        ],
-        [
-          {
-            type: "h1",
-            children: [{ text: "" }],
-          },
-          {
-            type: "paragraph",
-            children: [{ text: "" }],
-          },
-        ],
-        [
-          {
-            type: "h1",
-            children: [{ text: "" }],
-          },
-          {
-            type: "paragraph",
-            children: [{ text: "" }],
-          },
-        ],
-      ],
-    },
-    {
-      dateString: "2024/06/23",
-      year: 2024,
-      month: 6,
-      day: 23,
-      completeTasks: ["出材カンプを作成する。", "VSCodeのインストール"],
-      focusTime: [
-        { start: "15:00", end: "16:00" },
-        { start: "17:00", end: "18:30" },
-      ],
-      tracks: [],
-    },
-  ];
+  const [concentrateData, setConcentrateData] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -104,17 +22,50 @@ const Review = ({ userProfile }) => {
   const currentMenu =
     whichMenuIsOpen === "analysis" ? (
       <Analysis
-        sampleData={sampleData}
+        concentrateData={concentrateData}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
+        userProfile={userProfile}
       />
     ) : whichMenuIsOpen === "track" ? (
       <Track
-        sampleData={sampleData}
+        concentrateData={concentrateData}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
+        userProfile={userProfile}
       />
     ) : null;
+
+  const prevDateRef = useRef();
+
+  useEffect(() => {
+    if (prevDateRef.current) {
+      if (selectedDate.getFullYear() !== prevDateRef.current.getFullYear()) {
+        console.log("year change");
+        const fetchCurrentYearFocusData = async () => {
+          const res = await fetch(
+            `http://localhost:8000/api/review/focusdata/${
+              userProfile.id
+            }/${selectedDate.getFullYear()}/year`,
+            { method: "GET" }
+          );
+
+          const res_json = await res.json();
+          if (res.status === 200) {
+            console.log(res_json.msg);
+
+            setConcentrateData(res_json.dataOnConcentration);
+          } else {
+            console.error(res_json.msg);
+          }
+        };
+
+        fetchCurrentYearFocusData();
+        console.log("今終わり");
+      }
+    }
+    prevDateRef.current = selectedDate;
+  }, [selectedDate]);
 
   return (
     <div className="Review" onMouseMove={(event) => onMouseMove(event)}>

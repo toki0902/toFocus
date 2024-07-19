@@ -9,15 +9,21 @@ import {
 } from "../../../../utils";
 import { endOfMonth, startOfMonth } from "date-fns";
 
-const TextData = ({ sampleData, selectedDate, renderMode }) => {
+const TextData = ({ concentrateData, selectedDate, renderMode }) => {
   const firstDayOfMonth = startOfMonth(selectedDate);
   const firstDate = toPadStart(firstDayOfMonth.getDate());
   const lastDayOfMonth = endOfMonth(selectedDate);
   const lastDate = toPadStart(lastDayOfMonth.getDate());
   const focusData =
     renderMode === "date"
-      ? searchDataWithThisDay(selectedDate, sampleData)
-      : searchDataWithThisDuration(firstDayOfMonth, lastDayOfMonth, sampleData);
+      ? searchDataWithThisDay(selectedDate, concentrateData)
+      : searchDataWithThisDuration(
+          firstDayOfMonth,
+          lastDayOfMonth,
+          concentrateData
+        );
+
+  console.log("いまおわり");
 
   const focus_Year = toPadStart(selectedDate.getFullYear());
   const focus_Month = toPadStart(selectedDate.getMonth() + 1);
