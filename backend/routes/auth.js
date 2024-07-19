@@ -144,7 +144,7 @@ router.get("/local/verify", async (req, res) => {
 //新しくパスワードを設定する用のapi
 router.post("/local/newpass", async (req, res) => {
   //emailが含まれていなかったら返す
-  const { email } = req.body;
+  const { email, password } = req.body;
   if (!email) {
     return res.status(400).json({ msg: "メールアドレスが含まれていません" });
   }
@@ -177,7 +177,11 @@ router.post("/local/newpass", async (req, res) => {
         }
       );
 
-      const verificationURL = `http://localhost:8000/api/auth/local/newpass/verify?token=${token}`;
+      //パスワードをハッシュ化
+      const pepper = process.env["PEPPER"];
+      const hashedPassword = await bcrypt.hash(pepper + password, 8);
+
+      const verificationURL = `http://localhost:8000/api/auth/local/newpass/verify?token=${token}&p=${hashedPassword}`;
       const mailOption = {
         from: process.env["GOOGLE_MAIL"],
         to: email,
@@ -189,9 +193,10 @@ router.post("/local/newpass", async (req, res) => {
         if (err) {
           console.log(err);
           return res.status(500).json({
-            msg: "パスワード更新メールの送信に失敗しました。もう一度パスワード更新をやり直してください",
+            msg: "パスワード更新メールの送信に失敗しました。お手数ですが、もう一度パスワード更新をやり直してください",
           });
         }
+        console.log("generate new token and send email to update password");
         return res.status(200).json({
           msg: "パスワード更新メールを送信しました。案内に従いパスワードの更新を完了させてください",
         });
@@ -199,37 +204,46 @@ router.post("/local/newpass", async (req, res) => {
     } else {
       console.log("user not found");
       return res.status(404).json({
-        msg: "このメールアドレスは登録されていません。新規登録をお願いします。",
+        msg: "このメールアドレスは登録されていません。お手数ですが、新規登録をお願いします。",
       });
     }
   } catch (err) {
     console.log(`database error ${err}`);
     return res.status(500).json({
-      msg: "データベースでエラーが発生しました。もう一度お試しください。",
+      msg: "データベースでエラーが発生しました。お手数ですが、もう一度お試しください。",
     });
   }
 });
 
 router.get("/local/newpass/verify", async (req, res) => {
-  const { token } = req.query;
+  const { token, p } = req.query;
 
   if (token) {
-    const now = Date.now();
-    const targetData = await pool.query(
-      "SELECT * FROM user WHERE verificationToken = :token AND tokenExpires > :now AND isVerified = true",
-      { token: token, now: now }
-    );
-    if (targetData[0].length === 0) {
-      console.log("not found user");
-      return res
-        .status(404)
-        .send(
-          "該当するデータが存在しないか、アクセストークンが無効です。もう一度パスワード設定をやり直してください"
+    try {
+      const now = Date.now();
+      const targetData = await pool.query(
+        "SELECT id FROM user WHERE verificationToken = :token AND tokenExpires > :now AND isVerified = true",
+        { token: token, now: now }
+      );
+      if (targetData[0].length === 0) {
+        console.log("not found user");
+        return res
+          .status(404)
+          .send(
+            "該当するデータが存在しないか、アクセストークンが無効です。もう一度パスワード設定をやり直してください"
+          );
+      } else {
+        await pool.query(
+          "UPDATE user SET password = :newpass, verificationToken = null, tokenExpires = null WHERE id = :id",
+          {
+            newpass: p,
+            id: targetData[0][0].id,
+          }
         );
-    } else {
-      console.log("create new user");
-      return res.status(201).redirect("/auth");
-    }
+        console.log("update password");
+        return res.status(201).redirect("/auth");
+      }
+    } catch (err) {}
   } else {
     console.log("Access token does not exist");
     return res

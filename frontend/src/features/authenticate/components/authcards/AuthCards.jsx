@@ -20,6 +20,7 @@ const AuthCards = ({ setWhichPageIsOpen }) => {
   const [signup_password, setSignup_password] = useState("");
 
   const [forgetPassword__email, setForgetPassword_email] = useState("");
+  const [forgetPassword__newpass, setForgetPassword_newpass] = useState("");
 
   const navigate = useNavigate();
 
@@ -149,14 +150,37 @@ const AuthCards = ({ setWhichPageIsOpen }) => {
   };
 
   const sendUpdateMail = async () => {
-    const reqData_JSON = JSON.stringify({ email: forgetPassword__email });
+    const reqData_JSON = JSON.stringify({
+      email: forgetPassword__email,
+      password: forgetPassword__newpass,
+    });
     const res = await fetch("http://localhost:8000/api/auth/local/newpass", {
       method: "POST",
       headers: { "Content-Type": "Application/json" },
       body: reqData_JSON,
     });
 
-    console.log(res);
+    const jsonRes = await res.json();
+
+    if (res.status === 200) {
+      setWhichPageIsOpen(
+        <ResInfo
+          headline="パスワードの更新を受理しました"
+          descript={jsonRes.msg}
+        />
+      );
+    } else if (res.status === 404) {
+      setWhichPageIsOpen(
+        <ResInfo
+          headline="ユーザが見つかりませんでした"
+          descript={jsonRes.msg}
+        />
+      );
+    } else {
+      setWhichPageIsOpen(
+        <ResInfo headline="サーバーエラー" descript={jsonRes.msg} />
+      );
+    }
   };
 
   return (
@@ -181,12 +205,14 @@ const AuthCards = ({ setWhichPageIsOpen }) => {
           top
           column
         >
-          <h2 className="auth__title">email認証</h2>
+          <h2 className="auth__title" style={{ height: "15%" }}>
+            email認証
+          </h2>
           <FlexBox
             className="auth-email__item"
             width="75%"
             height="45px"
-            mt="70px"
+            mt="40px"
             bottom
           >
             <input
@@ -218,7 +244,7 @@ const AuthCards = ({ setWhichPageIsOpen }) => {
             className="auth-email__item"
             width="75%"
             height="45px"
-            mt="70px"
+            mt="40px"
             bottom
           >
             <input
@@ -272,9 +298,9 @@ const AuthCards = ({ setWhichPageIsOpen }) => {
           column
         >
           <h2 className="auth__title">
-            登録したメールアドレスを
+            登録したメールアドレスと
             <br />
-            入力してください
+            パスワードを入力してください
           </h2>
           <FlexBox
             className="auth-email__item"
@@ -308,6 +334,38 @@ const AuthCards = ({ setWhichPageIsOpen }) => {
               email
             </label>
           </FlexBox>
+          <FlexBox
+            className="auth-email__item"
+            width="75%"
+            height="45px"
+            mt="40px"
+            bottom
+          >
+            <input
+              type="text"
+              name="forgetPassword__newpass"
+              className="auth-email__input"
+              id="forgetPassword__newpass"
+              value={forgetPassword__newpass}
+              onChange={(e) => setForgetPassword_newpass(e.target.value)}
+            />
+            <label
+              className="auth-email__label"
+              htmlFor="forgetPassword__newpass"
+              style={
+                forgetPassword__newpass
+                  ? {
+                      bottom: "45px",
+                      left: "5px",
+                      color: "#ff9f47",
+                      fontSize: "14px",
+                    }
+                  : null
+              }
+            >
+              newpassword
+            </label>
+          </FlexBox>
           <Button
             className="auth-email__btn"
             color={forgetPassword__email ? "#8ddaeb" : "#c1bdbd"}
@@ -316,13 +374,14 @@ const AuthCards = ({ setWhichPageIsOpen }) => {
             width="150px"
             func={forgetPassword__email ? sendUpdateMail : null}
           >
-            新規登録
+            更新申請
           </Button>
           <p
             className="auth__reverse-btn mainColor"
             onClick={() => {
               setIsForgetPassword(false);
               setForgetPassword_email("");
+              setForgetPassword_newpass("");
             }}
           >
             ←email認証に戻る
