@@ -3,6 +3,7 @@ import "./memo.css";
 import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
 import removeIcon from "@images/cross.svg";
+import memobg from "@images/memobg.jpg";
 // Import the Slate editor factory.
 import {
   Editor,
@@ -37,10 +38,6 @@ const Memo = ({ myKey, removeThisTool }) => {
   };
 
   const initialElement = [
-    {
-      type: "h1",
-      children: [{ text: "" }],
-    },
     {
       type: "paragraph",
       children: [{ text: "" }],
@@ -121,7 +118,10 @@ const Memo = ({ myKey, removeThisTool }) => {
         return (
           //fix : 改行した箇所すべてにplaceholderがついてしまうので、それを避けたい。
           //そのためには、現在のNodeが最終行かどうかを判定しなければいけない。
-          <p {...attributes} style={{ position: "relative" }}>
+          <p
+            {...attributes}
+            style={{ position: "relative", fontWeight: "normal" }}
+          >
             {isEmpty ? (
               <span
                 contentEditable={false}
@@ -165,7 +165,7 @@ const Memo = ({ myKey, removeThisTool }) => {
       case "h2": {
         return (
           <h2
-            style={{ fontSize: 22, fontWeight: "bolder", position: "relative" }}
+            style={{ fontSize: 24, fontWeight: "bolder", position: "relative" }}
             {...attributes}
           >
             {children}
@@ -513,7 +513,7 @@ const Memo = ({ myKey, removeThisTool }) => {
           whichMemoMenuIsOpen={whichMemoMenuIsOpen}
         />
         <FlexBox right width="100%" height="20px" mt="10px">
-          <p style={{ color: "#8c8c8c" }}>現在{char_num}文字です</p>
+          <p style={{ color: "#e4e4e4" }}>現在{char_num}文字です</p>
         </FlexBox>
       </FlexBox>
     </>

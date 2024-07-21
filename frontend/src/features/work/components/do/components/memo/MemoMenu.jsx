@@ -33,6 +33,8 @@ const MemoMenu = ({
     }
   }, [currentState]);
 
+  console.log(currentState);
+
   const elements_info_arr = [
     {
       imgUrl: textIcon,
@@ -215,7 +217,7 @@ const MemoMenu = ({
                 marginRight: "5px",
                 overflow: "hidden",
               }}
-              value={currentState.color || "#333"}
+              value={currentState.color || "#e5e5e5"}
               onChange={(e) => applyColor(e.target.value)}
             ></input>
             <img

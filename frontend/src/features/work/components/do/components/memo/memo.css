@@ -1,10 +1,9 @@
 .Memo {
-  background-color: #fff;
   position: absolute;
-  top: 50px;
   right: 250px;
   color: #333;
   border-radius: 5px;
+  background-image: url("@images/memobg.jpg");
 }
 .memo__remove-icon {
   width: 30px;
@@ -49,11 +48,12 @@
 
 .memo__editor {
   width: 100%;
+  background-color: #0a0a0a;
+  color: #e5e5e5;
   height: calc(100% - 30px);
   line-height: 2em;
   border: 1px solid #333;
   border-radius: 5px;
-  box-shadow: 2px 2px 2px;
   padding: 10px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -62,10 +62,11 @@
 .memo__editor:focus {
   outline: none;
 }
-.memo-menu__element-tool:hover {
+.memo-menu__element-tool {
   display: flex;
   justify-content: center;
   cursor: pointer;
+  color: #333;
 }
 .memo-menu__element-tool:hover {
   background-color: #dcdcdc;
@@ -74,23 +75,16 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  width: 100px;
-  height: 100px;
-  border: none;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
   border-radius: 50%;
-  background: none;
   padding: 0;
   overflow: hidden;
+  border: 1px solid #000;
 }
 
 .memo-menu__color-input::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-.memo-menu__color-input::-webkit-color-swatch {
-  border: none;
-  border-radius: 50%;
   padding: 0;
 }
 
