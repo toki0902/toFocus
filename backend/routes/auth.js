@@ -10,7 +10,7 @@ const { pool } = require("../db");
 router.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.log(`セッションの破壊に失敗しました。:${err}`);
+      console.log(`failer destroing session:${err}`);
       return res.status(500).end();
     }
     console.log("logout and destroy session");
@@ -45,66 +45,69 @@ router.post("/local/register", async (req, res) => {
     });
   }
 
-  //データベースに同じメールアドレスが登録されていないかを確かめる
-  const sameEmailAddress = await pool.query(
-    "SELECT COUNT(*) AS num FROM user WHERE email = :email",
-    { email: email }
-  );
+  //データベースのエラーはtry catch文で取得
+  //その他のエラーはコールバックベースのエラーハンドリングを使用
+  try {
+    //データベースに同じメールアドレスが登録されていないかを確かめる
+    const sameEmailAddress = await pool.query(
+      "SELECT COUNT(*) AS num FROM user WHERE email = :email",
+      { email: email }
+    );
 
-  //同じメアドが登録されていた場合エラーを返す
-  console.log(sameEmailAddress);
-  if (sameEmailAddress[0][0].num !== 0) {
-    console.log("this email is registered in the past");
-    return res.status(404).json({
-      msg: "既に登録されているメールアドレスです。別のメールアドレスをご用意いただき、もう一度サインアップをやり直してください。",
-    });
-  }
-
-  //16バイトのランダムな文字列をtokenとして作成
-  //tokenの期限を1時間に設定
-  const token = crypto.randomBytes(16).toString("hex");
-  const tokenExpires = new Date(Date.now() + 360000);
-
-  //pepperを先頭にpasswordをハッシュ化
-  const pepper = process.env["PEPPER"];
-  const hashedPassword = await bcrypt.hash(pepper + password, 8);
-
-  await pool.query(
-    "INSERT INTO user (name, email, password, icon_path, isVerified, verificationToken, tokenExpires) VALUES (:name, :email, :password, 'examplepath', false, :token, :expires)",
-    {
-      name: name,
-      email: email,
-      password: hashedPassword,
-      token: token,
-      expires: tokenExpires,
-    },
-    (err) => {
-      if (err) {
-        return res.status(500).json({ msg: `database error : ${err}` });
-      }
-    }
-  );
-  console.log("register new user");
-
-  const verificationURL = `http://localhost:8000/api/auth/local/verify?token=${token}`;
-  const mailOption = {
-    from: process.env["GOOGLE_MAIL"],
-    to: email,
-    subject: "toConc : メールアドレスの認証",
-    text: `以下のリンクをクリックしてメールアドレスを認証してください: ${verificationURL}`,
-  };
-
-  transporter.sendMail(mailOption, (err, info) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({
-        msg: "認証メールの送信に失敗しました。もう一度サインアップをやり直してください",
+    //同じメアドが登録されていた場合エラーを返す
+    if (sameEmailAddress[0][0].num !== 0) {
+      console.log("this email is registered in the past");
+      return res.status(404).json({
+        msg: "既に登録されているメールアドレスです。別のメールアドレスをご用意いただき、もう一度サインアップをやり直してください。",
       });
     }
-    return res.status(200).json({
-      msg: "認証用メールを送信しました。案内に従いアカウント作成を完了させてください",
+
+    //16バイトのランダムな文字列をtokenとして作成
+    //tokenの期限を1時間に設定
+    const token = crypto.randomBytes(16).toString("hex");
+    const tokenExpires = new Date(Date.now() + 360000);
+
+    //pepperを先頭にpasswordをハッシュ化
+    const pepper = process.env["PEPPER"];
+    const hashedPassword = await bcrypt.hash(pepper + password, 8);
+
+    await pool.query(
+      "INSERT INTO user (name, email, password, icon_path, isVerified, verificationToken, tokenExpires) VALUES (:name, :email, :password, 'examplepath', false, :token, :expires)",
+      {
+        name: name,
+        email: email,
+        password: hashedPassword,
+        token: token,
+        expires: tokenExpires,
+      }
+    );
+    console.log("register new user");
+
+    const verificationURL = `http://localhost:8000/api/auth/local/verify?token=${token}`;
+    const mailOption = {
+      from: process.env["GOOGLE_MAIL"],
+      to: email,
+      subject: "toConc : メールアドレスの認証",
+      text: `以下のリンクをクリックしてメールアドレスを認証してください: ${verificationURL}`,
+    };
+
+    transporter.sendMail(mailOption, (err, info) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({
+          msg: "認証メールの送信に失敗しました。もう一度サインアップをやり直してください",
+        });
+      }
+      return res.status(200).json({
+        msg: "認証用メールを送信しました。案内に従いアカウント作成を完了させてください",
+      });
     });
-  });
+  } catch (err) {
+    console.error(`database error : ${err}`);
+    return res.status(500).json({
+      msg: "データベースでエラーが発生しました。お手数ですが、もう一度サインアップをやり直してください。",
+    });
+  }
 });
 
 //GETメソッドなのに、DBを更新するから安全性が、、っく、、
@@ -112,26 +115,34 @@ router.get("/local/verify", async (req, res) => {
   const { token } = req.query;
 
   if (token) {
-    const now = Date.now();
-    const targetData = await pool.query(
-      "SELECT * FROM user WHERE verificationToken = :token AND tokenExpires > :now AND isVerified = false",
-      { token: token, now: now }
-    );
-    if (targetData[0].length === 0) {
-      console.log("not found user");
-      return res
-        .status(404)
-        .send(
-          "該当するデータが存在しないか、アクセストークンが無効です。もう一度サインアップをやり直してください"
-        );
-    } else {
-      const data = targetData[0][0];
-      await pool.query(
-        "UPDATE user SET isVerified = true, verificationToken = null, tokenExpires = null WHERE id = :userId",
-        { userId: data.id }
+    //データベースのエラーをtry catch文で取得
+    try {
+      const now = Date.now();
+      const targetData = await pool.query(
+        "SELECT * FROM user WHERE verificationToken = :token AND tokenExpires > :now AND isVerified = false",
+        { token: token, now: now }
       );
-      console.log("create new user");
-      return res.status(201).redirect("/auth");
+      if (targetData[0].length === 0) {
+        console.log("not found user");
+        return res
+          .status(404)
+          .send(
+            "該当するデータが存在しないか、アクセストークンが無効です。もう一度サインアップをやり直してください"
+          );
+      } else {
+        const data = targetData[0][0];
+        await pool.query(
+          "UPDATE user SET isVerified = true, verificationToken = null, tokenExpires = null WHERE id = :userId",
+          { userId: data.id }
+        );
+        console.log("create new user");
+        return res.status(201).redirect("/auth");
+      }
+    } catch (err) {
+      console.error(`database error : ${err}`);
+      return res.status(500).json({
+        msg: "データベースでエラーが発生しました。お手数ですが、もう一度サインアップをやり直してください。",
+      });
     }
   } else {
     console.log("Access token does not exist");
@@ -145,8 +156,9 @@ router.get("/local/verify", async (req, res) => {
 router.post("/local/newpass", async (req, res) => {
   //emailが含まれていなかったら返す
   const { email, password } = req.body;
-  if (!email) {
-    return res.status(400).json({ msg: "メールアドレスが含まれていません" });
+  if (!(email && password)) {
+    console.error("Required parameters are missing");
+    return res.status(400).json({ msg: "必要な情報が含まれていません" });
   }
 
   //ここのtry文はdatabaseのエラーのみをキャッチするようにしたい
@@ -261,8 +273,8 @@ router.post(
   })
 );
 
+// ***********ここまでしかやってません
 router.get("/local/success", (req, res) => {
-  console.log("成功");
   return res.status(200).json({ msg: "認証に成功しました。" });
 });
 router.get("/local/failure", (req, res) => {

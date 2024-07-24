@@ -25,14 +25,46 @@ router.post("/concTime", async (req, res) => {
   }
 });
 
+router.post("/track", async (req, res) => {
+  if (req.isAuthenticated()) {
+    const { tree, userId } = req.body;
+    if (!(tree && userId)) {
+      console.log("Required parameters are missing");
+      return res
+        .status(400)
+        .json({
+          msg: "足跡の登録に必要な情報がリクエストに含まれていません。",
+        });
+    }
+
+    try {
+      await pool.execute(
+        "INSERT INTO track (tree_for_slate, user_id) VALUES (:tree, :userId)",
+        { tree: tree, userId: userId }
+      );
+    } catch (err) {
+      console.error(`database error : ${err}`);
+      return res.status(500).json({
+        msg: "データベースでエラーがありました。もう一度やり直してください。",
+      });
+    }
+
+    return res.status(200).json({ msg: "足跡を記録しました。" });
+  } else {
+    console.log("unauthorized user");
+    res.status(401).json({
+      msg: "unauthorized",
+    });
+  }
+});
+
 //DBの特定のconcDataをfetchしてくれるAPI
 //concDataエンドポイントで、focustimeテーブルへのfetchはすべて行う。
 //ユーザのidと基準となる数字(年単位の検索なら2024など)とsearchMode(yearなど)をURLパラメータで受け取る。
 router.get("/:userId/:target/:searchMode", async (req, res) => {
   if (req.isAuthenticated()) {
     const { userId, searchMode, target } = req.params;
-    console.log(userId, searchMode, target);
-    if (!(userId || searchMode || target)) {
+    if (!(userId && searchMode && target)) {
       res.status(400).json({ msg: "Required parameters are missing" });
     }
     //queryが複数あるためconnectionを使用。
