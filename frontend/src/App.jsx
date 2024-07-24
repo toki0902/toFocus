@@ -7,7 +7,6 @@ function App() {
   //プロトタイプは{id: 01, name:"zizi0902", icon_path:"https://expample.com"}
   //みたいなデータを設定する。
   const [userProfile, setUserProfile] = useState(null);
-  console.log(userProfile);
   return (
     <div className="App">
       <Header userProfile={userProfile} setUserProfile={setUserProfile} />

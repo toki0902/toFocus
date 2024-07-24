@@ -383,7 +383,7 @@ passport.use(
           }
         );
         console.log("register new user");
-        const id = newId[0][0].id;
+        const id = newId[0][0];
         const user = { id: id, name: newName, iconPath: newIconPath };
         return cb(null, user);
       }

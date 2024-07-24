@@ -130,7 +130,7 @@ const Do = ({
             end: end_timeDataType,
           };
           const res = await fetch(
-            "http://localhost:8000/api/work/registerFocusData",
+            "http://localhost:8000/api/concData/concTime",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

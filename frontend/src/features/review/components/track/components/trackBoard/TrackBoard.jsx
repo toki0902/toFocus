@@ -18,10 +18,13 @@ const TrackBoard = ({ initialValue, focusData }) => {
       children = <u>{children}</u>;
     }
 
-    return <span {...attributes}>{children}</span>;
+    return (
+      <span style={leaf.color ? { color: leaf.color } : null} {...attributes}>
+        {children}
+      </span>
+    );
   };
   const renderElement = ({ children, attributes, element }) => {
-    const isEmpty = Node.string(element).length === 0;
     switch (element.type) {
       case "paragraph": {
         return (

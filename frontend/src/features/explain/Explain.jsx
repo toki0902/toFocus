@@ -28,7 +28,7 @@ const Explain = ({ userProfile, setUserProfile }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch("/api/explain/getProfile", {
+      const res = await fetch("/api/user", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });

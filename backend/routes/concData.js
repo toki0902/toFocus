@@ -1,12 +1,34 @@
 const express = require("express");
 const router = express.Router();
-const { pool } = require("../db");
-const { addDays } = require("date-fns");
 
-//DBの特定のfocusDataをfetchしてくれるAPI
-//focusDataエンドポイントで、focustimeテーブルへのfetchはすべて行う。
+const { pool } = require("../db");
+
+//ユーザのconcTimeを登録する用のAPI
+router.post("/concTime", async (req, res) => {
+  if (req.body.start != req.body.end) {
+    await pool.query(
+      "INSERT INTO focustime (start, end, user_id) VALUES (:start, :end, :userid)",
+      { start: req.body.start, end: req.body.end, userid: req.body.id },
+      //FIX :: 何でか知らんけど個々の関数が実行できなくてエラーハンドリングがうまくいかん
+      (err, row) => {
+        if (err) {
+          console.error("database error", err);
+          return res.status(500).json({ msg: err });
+        }
+      }
+    );
+    console.log("register complete");
+    return res.status(200).json({ msg: "register the data" });
+  } else {
+    console.log("not enough time to work");
+    return res.status(400).json({ msg: "not enough time to work" });
+  }
+});
+
+//DBの特定のconcDataをfetchしてくれるAPI
+//concDataエンドポイントで、focustimeテーブルへのfetchはすべて行う。
 //ユーザのidと基準となる数字(年単位の検索なら2024など)とsearchMode(yearなど)をURLパラメータで受け取る。
-router.get("/focusData/:userId/:target/:searchMode", async (req, res) => {
+router.get("/:userId/:target/:searchMode", async (req, res) => {
   if (req.isAuthenticated()) {
     const { userId, searchMode, target } = req.params;
     console.log(userId, searchMode, target);
@@ -155,50 +177,50 @@ router.get("/focusData/:userId/:target/:searchMode", async (req, res) => {
   }
 });
 
-router.get("/createRandomFocusData", (req, res) => {
-  function getRandomDate() {
-    const start = new Date(2024, 0, 1); // 2024年1月1日
-    const end = new Date(2024, 11, 31); // 2024年12月31日
-    const randomTime =
-      start.getTime() + Math.random() * (end.getTime() - start.getTime());
-    return new Date(randomTime);
-  }
-  function formatDateToTimestamp(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // 月は0から始まるので+1
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  }
-  for (let i = 0; i < 250; i++) {
-    const created_at = getRandomDate();
-    const formated = formatDateToTimestamp(created_at);
-    const task_name = `task${i}`;
-    const start = Math.floor(Math.random() * 24);
-    const end = Math.floor(Math.random() * (24 - (start + 1))) + (start + 1);
+// router.get("/createRandomFocusData", (req, res) => {
+//   function getRandomDate() {
+//     const start = new Date(2024, 0, 1); // 2024年1月1日
+//     const end = new Date(2024, 11, 31); // 2024年12月31日
+//     const randomTime =
+//       start.getTime() + Math.random() * (end.getTime() - start.getTime());
+//     return new Date(randomTime);
+//   }
+//   function formatDateToTimestamp(date) {
+//     const year = date.getFullYear();
+//     const month = String(date.getMonth() + 1).padStart(2, "0"); // 月は0から始まるので+1
+//     const day = String(date.getDate()).padStart(2, "0");
+//     const hours = String(date.getHours()).padStart(2, "0");
+//     const minutes = String(date.getMinutes()).padStart(2, "0");
+//     const seconds = String(date.getSeconds()).padStart(2, "0");
+//     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+//   }
+//   for (let i = 0; i < 250; i++) {
+//     const created_at = getRandomDate();
+//     const formated = formatDateToTimestamp(created_at);
+//     const task_name = `task${i}`;
+//     const start = Math.floor(Math.random() * 24);
+//     const end = Math.floor(Math.random() * (24 - (start + 1))) + (start + 1);
 
-    const start_str = `${start}:00`;
-    const end_str = `${end}:00`;
+//     const start_str = `${start}:00`;
+//     const end_str = `${end}:00`;
 
-    pool.query(
-      "INSERT INTO task (name, user_id, created_at) VALUES (:name, 40, :created_at)",
-      {
-        name: task_name,
-        created_at: formated,
-      }
-    );
-    pool.query(
-      "INSERT INTO focustime (start, end, user_id, created_at) VALUES (:start, :end, 40, :created_at)",
-      {
-        start: start_str,
-        end: end_str,
-        created_at: formated,
-      }
-    );
-  }
-  res.send("complete");
-});
+//     pool.query(
+//       "INSERT INTO task (name, user_id, created_at) VALUES (:name, 40, :created_at)",
+//       {
+//         name: task_name,
+//         created_at: formated,
+//       }
+//     );
+//     pool.query(
+//       "INSERT INTO focustime (start, end, user_id, created_at) VALUES (:start, :end, 40, :created_at)",
+//       {
+//         start: start_str,
+//         end: end_str,
+//         created_at: formated,
+//       }
+//     );
+//   }
+//   res.send("complete");
+// });
 
 module.exports = router;

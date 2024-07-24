@@ -44,7 +44,7 @@ const Review = ({ userProfile }) => {
         console.log("year change");
         const fetchCurrentYearFocusData = async () => {
           const res = await fetch(
-            `http://localhost:8000/api/review/focusdata/${
+            `http://localhost:8000/api/concData/${
               userProfile.id
             }/${selectedDate.getFullYear()}/year`,
             { method: "GET" }

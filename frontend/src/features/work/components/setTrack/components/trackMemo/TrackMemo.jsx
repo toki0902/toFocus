@@ -12,7 +12,7 @@ import {
   Node,
 } from "slate";
 // Import the Slate components and React plugin.
-import { Slate, Editable, withReact } from "slate-react";
+import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
 import MemoMenu from "./TrackMemoMenu";
 
@@ -20,10 +20,6 @@ const TrackMemo = () => {
   const [editor] = useState(() => withHistory(withReact(createEditor())));
 
   const initialElement = [
-    {
-      type: "h1",
-      children: [{ text: "" }],
-    },
     {
       type: "paragraph",
       children: [{ text: "" }],
@@ -78,15 +74,20 @@ const TrackMemo = () => {
   };
 
   const renderElement = ({ children, attributes, element }) => {
+    //elementとpathと、カーソルの位置のpathが一致するかを判断する
+    const editor_ins = useState();
+    const { selection } = editor;
+
+    const isSelected =
+      ReactEditor.findPath(editor_ins, element)[0] ==
+      selection?.anchor?.path[0];
     const isEmpty = Node.string(element).length === 0;
     switch (element.type) {
       //fix : 全角入力だとなぜか、placeholderの削除が遅い
       case "paragraph": {
         return (
-          //fix : 改行した箇所すべてにplaceholderがついてしまうので、それを避けたい。
-          //そのためには、現在のNodeが最終行かどうかを判定しなければいけない。
           <p {...attributes} style={{ position: "relative" }}>
-            {isEmpty ? (
+            {isEmpty && isSelected ? (
               <span
                 contentEditable={false}
                 style={{
@@ -157,7 +158,7 @@ const TrackMemo = () => {
             {...attributes}
           >
             {children}
-            {isEmpty ? (
+            {isEmpty && isSelected ? (
               <span
                 contentEditable={false}
                 style={{

@@ -33,8 +33,6 @@ const MemoMenu = ({
     }
   }, [currentState]);
 
-  console.log(currentState);
-
   const elements_info_arr = [
     {
       imgUrl: textIcon,

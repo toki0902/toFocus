@@ -20,14 +20,12 @@ app.use(express.static(path.join(__dirname, "../frontend/dist")));
 app.use(express.json());
 
 const authRouter = require("./routes/auth");
-const explainRouter = require("./routes/explain");
-const reviewRouter = require("./routes/review");
-const workRouter = require("./routes/work");
+const userRouter = require("./routes/user");
+const cocnDataRouter = require("./routes/concData");
 
 app.use("/api/auth", authRouter);
-app.use("/api/explain", explainRouter);
-app.use("/api/review", reviewRouter);
-app.use("/api/work", workRouter);
+app.use("/api/user", userRouter);
+app.use("/api/concData", cocnDataRouter);
 
 app.get("*", async (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
