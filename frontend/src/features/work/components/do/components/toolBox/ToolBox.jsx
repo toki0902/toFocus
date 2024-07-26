@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import { FlexBox } from "@component";
 import Memo from "../memo/Memo";
 import "./toolBox.css";
@@ -7,7 +7,7 @@ import { BgmMaker, BgmMakerConfig } from "../bgmMaker";
 //toolをDoコンポーネントに追加するためのメニューを表示するコンポーネント
 //tool自体を生成する関数を定義するのはtoolboxコンポーネントで、
 //実行するのは各toolのconfigページ
-const ToolBox = ({ removeThisTool, closeToolBox, setTools }) => {
+const ToolBox = ({ removeThisTool, closeToolBox, setTools }, ref) => {
   //閉じるエフェクトを開始するためのuseState。
   //startがtrueになるとスタイルが当てられ、animaitonが0.3sで開始する。
   const [isStart, setIsStart] = useState(false);

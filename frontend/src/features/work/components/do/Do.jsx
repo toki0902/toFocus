@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./do.css";
 import { FlexBox } from "@component";
 import { BgmMaker } from "./components/bgmMaker/index.jsx";

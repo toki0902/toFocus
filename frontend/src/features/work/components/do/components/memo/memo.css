@@ -5,6 +5,11 @@
   border-radius: 5px;
   background-image: url("@images/memobg.jpg");
 }
+.Memo *::selection {
+  background: transparent; /* 背景色を透明に */
+  color: inherit; /* テキストの色を継承 */
+}
+
 .memo__remove-icon {
   width: 30px;
   width: 30px;
@@ -22,7 +27,7 @@
   top: -50px;
   z-index: 10;
   opacity: 0;
-  animation: closeMenu 0.3s;
+  transition: all 0.3s;
   color: #8c8c8c;
 }
 @keyframes closeMenu {
@@ -58,6 +63,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   cursor: text;
+  position: relative;
 }
 .memo__editor:focus {
   outline: none;
@@ -119,15 +125,15 @@
   border: 1px solid #333;
   position: absolute;
   top: 50%;
-  z-index: 10;
+  z-index: -2;
   opacity: 0;
-  animation: closeMenu 0.3s;
+  transition: all 0.2s;
   color: #8c8c8c;
   overflow-y: auto;
 }
 .memo__element-menu.open {
-  animation: appearMenu 0.3s;
   opacity: 1;
+  z-index: 10;
 }
 .element-menu__item {
   border-radius: 5px;
@@ -186,4 +192,20 @@
   height: 25px;
   border: 1px solid #8c8c8c;
   margin-right: 5px;
+}
+
+.element {
+  border-radius: 5px;
+  margin: 5px 0;
+  transition: all 0.2s;
+}
+.element.selected {
+  background-color: #333;
+}
+.rectangle {
+  position: absolute;
+  z-index: 10;
+  background-color: #e6ab8a;
+  opacity: 0.3;
+  pointer-events: none;
 }

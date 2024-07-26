@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import "./memo.css";
 import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
@@ -17,9 +17,81 @@ import {
 import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
 import MemoMenu from "./MemoMenu";
+import MemoMask from "./MemoMask";
 
 const Memo = ({ myKey, removeThisTool }) => {
   const interact_ = useInteract();
+
+  //Memoツール用のState
+  const [rect, setRect] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [start, setStart] = useState({});
+
+  const handleMouseDown = async (e) => {
+    const allElement = document.querySelectorAll(".element");
+    allElement.forEach((item) => {
+      return item.classList.remove("selected");
+    });
+
+    const rectArea = interact_.ref.current.getBoundingClientRect();
+    setStart({
+      x: e.clientX - rectArea.left,
+      y: e.clientY - rectArea.top,
+    });
+    setIsDrawing(true);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDrawing) return;
+
+    const rectArea = interact_.ref.current.getBoundingClientRect();
+
+    const currentX = e.clientX - rectArea.left;
+    const currentY = e.clientY - rectArea.top;
+
+    const rectWidth = Math.abs(start.x - currentX);
+    const rectHeight = Math.abs(start.y - currentY);
+    const rectTop = currentY < start.y ? currentY : start.y;
+    const rectLeft = currentX < start.x ? currentX : start.x;
+
+    const rectBottom = rectTop + rectHeight;
+    const rectRight = rectLeft + rectWidth;
+
+    const allElement = document.querySelectorAll(".element");
+
+    const filtered = [...allElement].filter((item) => {
+      const top = item.offsetTop;
+      const left = item.offsetLeft;
+      const bottom = top + item.offsetHeight;
+      const right = left + item.offsetWidth;
+      return (
+        bottom > rectTop &&
+        right > rectLeft &&
+        rectBottom > top &&
+        rectRight > left
+      );
+    });
+
+    allElement.forEach((item) => {
+      item.classList.remove("selected");
+    });
+
+    filtered.forEach((item) => {
+      item.classList.add("selected");
+    });
+
+    setRect({
+      width: rectWidth,
+      height: rectHeight,
+      top: rectTop,
+      left: rectLeft,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setRect(false);
+    setIsDrawing(false);
+  };
 
   //要素を動かせるかどうかを管理するStateと、
 
@@ -115,7 +187,8 @@ const Memo = ({ myKey, removeThisTool }) => {
     const { selection } = editor;
 
     const isSelected =
-      ReactEditor.findPath(editor_ins, element)[0] == selection.anchor.path[0];
+      ReactEditor.findPath(editor_ins, element)[0] ==
+      selection?.anchor?.path[0];
     const isEmpty = Node.string(element).length === 0;
 
     switch (element.type) {
@@ -123,6 +196,7 @@ const Memo = ({ myKey, removeThisTool }) => {
       case "paragraph": {
         return (
           <p
+            className="element"
             {...attributes}
             style={{ position: "relative", fontWeight: "normal" }}
           >
@@ -145,7 +219,17 @@ const Memo = ({ myKey, removeThisTool }) => {
       case "h1": {
         return (
           <h1
-            style={{ fontSize: 28, fontWeight: "bold", position: "relative" }}
+            className="element"
+            style={{
+              fontSize: "1.85rem",
+              height: "50px",
+              fontWeight: "bold",
+              position: "relative",
+              // fix :: overflowXが折り返してくれない
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
             {...attributes}
           >
             {children}
@@ -169,7 +253,12 @@ const Memo = ({ myKey, removeThisTool }) => {
       case "h2": {
         return (
           <h2
-            style={{ fontSize: 24, fontWeight: "bolder", position: "relative" }}
+            className="element"
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "bolder",
+              position: "relative",
+            }}
             {...attributes}
           >
             {children}
@@ -193,6 +282,7 @@ const Memo = ({ myKey, removeThisTool }) => {
       case "list": {
         return (
           <li
+            className="element"
             style={{ listStyleType: "disc", position: "relative" }}
             {...attributes}
           >
@@ -502,7 +592,21 @@ const Memo = ({ myKey, removeThisTool }) => {
             renderLeaf={renderLeaf}
             renderElement={renderElement}
             onKeyDown={(e) => onKeyDown(e)}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
           ></Editable>
+          {isDrawing && (
+            <div
+              className="rectangle"
+              style={{
+                left: `${rect.left}px`,
+                top: `${rect.top}px`,
+                width: `${rect.width}px`,
+                height: `${rect.height}px`,
+              }}
+            />
+          )}
         </Slate>
         <MemoMenu
           isInteract={isInteract}
@@ -520,6 +624,10 @@ const Memo = ({ myKey, removeThisTool }) => {
           <p style={{ color: "#e4e4e4" }}>現在{char_num}文字です</p>
         </FlexBox>
       </FlexBox>
+      <MemoMask
+        handleMouseMove={handleMouseMove}
+        handleMouseUp={handleMouseUp}
+      ></MemoMask>
     </>
   );
 };
