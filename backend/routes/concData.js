@@ -5,23 +5,31 @@ const { pool } = require("../db");
 
 //ユーザのconcTimeを登録する用のAPI
 router.post("/concTime", async (req, res) => {
-  if (req.body.start != req.body.end) {
-    await pool.query(
-      "INSERT INTO focustime (start, end, user_id) VALUES (:start, :end, :userid)",
-      { start: req.body.start, end: req.body.end, userid: req.body.id },
-      //FIX :: 何でか知らんけど個々の関数が実行できなくてエラーハンドリングがうまくいかん
-      (err, row) => {
-        if (err) {
-          console.error("database error", err);
-          return res.status(500).json({ msg: err });
-        }
+  if (req.isAuthenticated()) {
+    //作業の開始と終了が同じ場合エラーを返す
+    if (req.body.start != req.body.end) {
+      try {
+        await pool.query(
+          "INSERT INTO focustime (start, end, user_id) VALUES (:start, :end, :userid)",
+          { start: req.body.start, end: req.body.end, userid: req.body.id }
+        );
+        console.log("register complete");
+        return res.status(200).json({ msg: "データを登録しました。" });
+      } catch {
+        console.error("database error", err);
+        return res.status(500).json({
+          msg: "データベースでエラーが発生しました。もう一度やり直してください。",
+        });
       }
-    );
-    console.log("register complete");
-    return res.status(200).json({ msg: "register the data" });
+    } else {
+      console.log("not enough time to work");
+      return res.status(400).json({ msg: "作業時間が短すぎます。" });
+    }
   } else {
-    console.log("not enough time to work");
-    return res.status(400).json({ msg: "not enough time to work" });
+    console.log("unauthorized user");
+    res.status(401).json({
+      msg: "ユーザ認証に失敗しました。ログインしてください。",
+    });
   }
 });
 
@@ -30,15 +38,13 @@ router.post("/track", async (req, res) => {
     const { tree, userId } = req.body;
     if (!(tree && userId)) {
       console.log("Required parameters are missing");
-      return res
-        .status(400)
-        .json({
-          msg: "足跡の登録に必要な情報がリクエストに含まれていません。",
-        });
+      return res.status(400).json({
+        msg: "足跡の登録に必要な情報がリクエストに含まれていません。",
+      });
     }
 
     try {
-      await pool.execute(
+      await pool.query(
         "INSERT INTO track (tree_for_slate, user_id) VALUES (:tree, :userId)",
         { tree: tree, userId: userId }
       );
@@ -53,7 +59,7 @@ router.post("/track", async (req, res) => {
   } else {
     console.log("unauthorized user");
     res.status(401).json({
-      msg: "unauthorized",
+      msg: "ユーザ認証に失敗しました。ログインしてください。",
     });
   }
 });
