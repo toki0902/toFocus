@@ -89,23 +89,25 @@ const Memo = ({ myKey, removeThisTool }) => {
 
     //selectedクラスを持つ要素をslate内で選択させる
     const selectedDom = document.querySelectorAll(".element.selected");
-    const node_arr = [...selectedDom].map((item) => {
-      const slateNode = ReactEditor.toSlateNode(editor, item);
-      const path = ReactEditor.findPath(editor, slateNode);
-      return { node: slateNode, path: path[0] };
-    });
-    if (node_arr.length > 0) {
-      const focusNode = node_arr[node_arr.length - 1];
-      const lastChildrenLength = focusNode.node.children.length;
-      const endOffset =
-        focusNode.node.children[lastChildrenLength - 1].text.length;
-      Transforms.select(editor, {
-        anchor: { path: [node_arr[0].path, 0], offset: 0 },
-        focus: {
-          path: [focusNode.path, lastChildrenLength - 1],
-          offset: endOffset,
-        },
+    if (selectedDom.length !== 0) {
+      const node_arr = [...selectedDom].map((item) => {
+        const slateNode = ReactEditor.toSlateNode(editor, item);
+        const path = ReactEditor.findPath(editor, slateNode);
+        return { node: slateNode, path: path[0] };
       });
+      if (node_arr.length > 0) {
+        const focusNode = node_arr[node_arr.length - 1];
+        const lastChildrenLength = focusNode.node.children.length;
+        const endOffset =
+          focusNode.node.children[lastChildrenLength - 1].text.length;
+        Transforms.select(editor, {
+          anchor: { path: [node_arr[0].path, 0], offset: 0 },
+          focus: {
+            path: [focusNode.path, lastChildrenLength - 1],
+            offset: endOffset,
+          },
+        });
+      }
     }
 
     //四角形の形を反映
@@ -205,7 +207,7 @@ const Memo = ({ myKey, removeThisTool }) => {
       match: (n) => Text.isText(n),
     });
 
-    return selectedNode[0].color;
+    return selectedNode.color;
   };
 
   const renderElement = ({ children, attributes, element }) => {
@@ -430,6 +432,7 @@ const Memo = ({ myKey, removeThisTool }) => {
     const [selectedNode] = Editor.nodes(editor, {
       match: (n) => Element.isElement(n),
     });
+    const selectedElements = document.querySelectorAll(".element.selected");
     if (event.ctrlKey || event.metaKey) {
       //ctrl or metakeyが押されている場合
       switch (event.key) {
@@ -557,7 +560,6 @@ const Memo = ({ myKey, removeThisTool }) => {
               case "テキスト": {
                 applyElement("paragraph");
                 setIsOpenMemoMenu(false);
-                console.log(isOpenChoiseElementMenu);
                 break;
               }
               case "見出し1": {
@@ -576,6 +578,28 @@ const Memo = ({ myKey, removeThisTool }) => {
                 break;
               }
             }
+          } else if (selectedElements.length > 0) {
+            //fix :: エンターを押したときの理想挙動は
+            //一番下のselectedの最後のoffsetにmove後に、selectedを外す
+
+            event.preventDefault();
+
+            const [lastTextNode] = Editor.nodes(editor, {
+              reverse: true,
+              match: (n) => Text.isText(n),
+            });
+
+            Transforms.deselect(editor);
+            Transforms.move(editor, {
+              at: {
+                path: lastTextNode[1],
+                offset: lastTextNode[0].text.length - 1,
+              },
+            });
+
+            selectedElements.forEach((item) => {
+              return item.classList.remove("selected");
+            });
           }
           break;
         }
