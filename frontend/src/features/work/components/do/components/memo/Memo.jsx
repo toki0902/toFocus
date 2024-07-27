@@ -12,6 +12,7 @@ import {
   Transforms,
   Range,
   Node,
+  path,
 } from "slate";
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact, ReactEditor } from "slate-react";
@@ -21,6 +22,7 @@ import MemoMask from "./MemoMask";
 
 const Memo = ({ myKey, removeThisTool }) => {
   const interact_ = useInteract();
+  const [editor] = useState(() => withHistory(withReact(createEditor())));
 
   //Memoツール用のState
   const [rect, setRect] = useState(false);
@@ -43,12 +45,16 @@ const Memo = ({ myKey, removeThisTool }) => {
 
   const handleMouseMove = (e) => {
     if (!isDrawing) return;
+    if (isInteract) return;
 
+    //memoコンポーネントの画面に対する位置をtop, left, width, heightの形で取得
     const rectArea = interact_.ref.current.getBoundingClientRect();
 
+    //現在のマウスの位置をmemoコンポーネントから見たtop,leftで取得
     const currentX = e.clientX - rectArea.left;
     const currentY = e.clientY - rectArea.top;
 
+    //最初にクリックした地点と現在のマウスの位置で作成される四角形の形を算出
     const rectWidth = Math.abs(start.x - currentX);
     const rectHeight = Math.abs(start.y - currentY);
     const rectTop = currentY < start.y ? currentY : start.y;
@@ -59,6 +65,7 @@ const Memo = ({ myKey, removeThisTool }) => {
 
     const allElement = document.querySelectorAll(".element");
 
+    //四角形の中にあるelementクラスを持つ要素にselectedクラスを付与
     const filtered = [...allElement].filter((item) => {
       const top = item.offsetTop;
       const left = item.offsetLeft;
@@ -80,6 +87,28 @@ const Memo = ({ myKey, removeThisTool }) => {
       item.classList.add("selected");
     });
 
+    //selectedクラスを持つ要素をslate内で選択させる
+    const selectedDom = document.querySelectorAll(".element.selected");
+    const node_arr = [...selectedDom].map((item) => {
+      const slateNode = ReactEditor.toSlateNode(editor, item);
+      const path = ReactEditor.findPath(editor, slateNode);
+      return { node: slateNode, path: path[0] };
+    });
+    if (node_arr.length > 0) {
+      const focusNode = node_arr[node_arr.length - 1];
+      const lastChildrenLength = focusNode.node.children.length;
+      const endOffset =
+        focusNode.node.children[lastChildrenLength - 1].text.length;
+      Transforms.select(editor, {
+        anchor: { path: [node_arr[0].path, 0], offset: 0 },
+        focus: {
+          path: [focusNode.path, lastChildrenLength - 1],
+          offset: endOffset,
+        },
+      });
+    }
+
+    //四角形の形を反映
     setRect({
       width: rectWidth,
       height: rectHeight,
@@ -114,8 +143,6 @@ const Memo = ({ myKey, removeThisTool }) => {
       children: [{ text: "" }],
     },
   ];
-
-  const [editor] = useState(() => withHistory(withReact(createEditor())));
 
   //インライン要素(フォント等)をレンダリングする関数。
   //ブロック要素(liやh1等)とは区別してレンダリングされる。
@@ -485,6 +512,8 @@ const Memo = ({ myKey, removeThisTool }) => {
               children[selectedItem_index].classList.remove("selected");
               children[selectedItem_index + 1].classList.add("selected");
             }
+          } else {
+            Transforms.move(editor, { unit: "line" });
           }
           break;
         }
@@ -507,6 +536,8 @@ const Memo = ({ myKey, removeThisTool }) => {
               children[selectedItem_index].classList.remove("selected");
               children[selectedItem_index - 1].classList.add("selected");
             }
+          } else {
+            Transforms.move(editor, { unit: "line", reverse: true });
           }
           break;
         }
