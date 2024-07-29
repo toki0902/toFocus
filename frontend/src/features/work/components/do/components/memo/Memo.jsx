@@ -589,7 +589,7 @@ const Memo = ({ myKey, removeThisTool }) => {
               match: (n) => Text.isText(n),
             });
 
-            Transforms.deselect(editor);
+            console.log(lastTextNode[1], lastTextNode[0].text.length);
             Transforms.move(editor, {
               at: {
                 path: lastTextNode[1],

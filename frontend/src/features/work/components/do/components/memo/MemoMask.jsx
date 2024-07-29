@@ -11,7 +11,6 @@ const MemoMask = ({ handleMouseMove, handleMouseUp }) => {
         position: "fixed",
         top: 0,
         left: 0,
-        backgroundColor: "#fff",
         opacity: 0.3,
         zIndex: -1,
       }}
