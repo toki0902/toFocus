@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { forwardRef, memo, useEffect, useRef, useState } from "react";
 import "./memo.css";
 import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
@@ -12,10 +12,9 @@ import {
   Transforms,
   Range,
   Node,
-  path,
 } from "slate";
 // Import the Slate components and React plugin.
-import { Slate, Editable, withReact, ReactEditor } from "slate-react";
+import { Slate, Editable, withReact, ReactEditor, useSlate } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
 import MemoMenu from "./MemoMenu";
 import MemoMask from "./MemoMask";
@@ -29,6 +28,10 @@ const Memo = ({ myKey, removeThisTool }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [start, setStart] = useState({});
 
+  const handleMouseOut = () => {
+    setIsDrawing(false);
+    setRect(false);
+  };
   const handleMouseDown = async (e) => {
     const allElement = document.querySelectorAll(".element");
     allElement.forEach((item) => {
@@ -207,12 +210,12 @@ const Memo = ({ myKey, removeThisTool }) => {
       match: (n) => Text.isText(n),
     });
 
-    return selectedNode.color;
+    return selectedNode[0].color;
   };
 
   const renderElement = ({ children, attributes, element }) => {
     //elementとpathと、カーソルの位置のpathが一致するかを判断する
-    const editor_ins = useState();
+    const editor_ins = useSlate();
     const { selection } = editor;
 
     const isSelected =
@@ -364,14 +367,21 @@ const Memo = ({ myKey, removeThisTool }) => {
   const [isOpenChoiseElementMenu, setIsOpenChoiseElementMenu] = useState(false);
   const [whichMemoMenuIsOpen, setWhichMemoMenuIsOpen] = useState("leaf");
 
-  const onChangeEditor = () => {
+  const onChangeEditor = async () => {
+    const selectedDom = document.querySelectorAll(".element.selected");
+    const MemoDom = document.querySelector(".Memo");
+    if (selectedDom.length === 0) {
+      MemoDom.classList.remove("noneSelection");
+    } else {
+      MemoDom.classList.add("noneSelection");
+    }
+    updateSelection();
     appearMenu();
     updateChar();
   };
 
   //複数の文字が選択されているときに選択されているテキストについてMemoMenuを開く関数
   const appearMenu = () => {
-    updateSelection();
     const { selection } = editor;
     if (selection && !Range.isCollapsed(selection)) {
       setWhichMemoMenuIsOpen("leaf");
@@ -579,24 +589,21 @@ const Memo = ({ myKey, removeThisTool }) => {
               }
             }
           } else if (selectedElements.length > 0) {
-            //fix :: エンターを押したときの理想挙動は
-            //一番下のselectedの最後のoffsetにmove後に、selectedを外す
-
             event.preventDefault();
-
             const [lastTextNode] = Editor.nodes(editor, {
               reverse: true,
               match: (n) => Text.isText(n),
             });
-
-            console.log(lastTextNode[1], lastTextNode[0].text.length);
-            Transforms.move(editor, {
-              at: {
+            Transforms.select(editor, {
+              anchor: {
                 path: lastTextNode[1],
-                offset: lastTextNode[0].text.length - 1,
+                offset: lastTextNode[0].text.length,
+              },
+              focus: {
+                path: lastTextNode[1],
+                offset: lastTextNode[0].text.length,
               },
             });
-
             selectedElements.forEach((item) => {
               return item.classList.remove("selected");
             });
@@ -613,77 +620,76 @@ const Memo = ({ myKey, removeThisTool }) => {
   };
 
   return (
-    <>
-      <FlexBox
-        className="Memo"
-        width="500px"
-        height="800px"
-        pb="10px"
-        pl="10px"
-        pr="10px"
-        pt="10px"
-        column
-        sb
-        top
-        ref={interact_.ref}
-      >
-        <img
-          onClick={() => {
-            removeThisTool(myKey);
-          }}
-          className="memo__remove-icon"
-          src={removeIcon}
-          alt="remove"
-        />
+    <FlexBox
+      className="Memo"
+      width="500px"
+      height="800px"
+      pb="10px"
+      pl="10px"
+      pr="10px"
+      pt="10px"
+      column
+      sb
+      top
+      ref={interact_.ref}
+    >
+      <img
+        onClick={() => {
+          removeThisTool(myKey);
+        }}
+        className="memo__remove-icon"
+        src={removeIcon}
+        alt="remove"
+      />
 
-        <Slate
-          editor={editor}
-          onChange={onChangeEditor}
-          initialValue={initialElement}
-        >
-          <Editable
-            className="memo__editor"
-            spellCheck="false"
-            renderLeaf={renderLeaf}
-            renderElement={renderElement}
-            onKeyDown={(e) => onKeyDown(e)}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-          ></Editable>
-          {isDrawing && (
-            <div
-              className="rectangle"
-              style={{
-                left: `${rect.left}px`,
-                top: `${rect.top}px`,
-                width: `${rect.width}px`,
-                height: `${rect.height}px`,
-              }}
-            />
-          )}
-        </Slate>
-        <MemoMenu
-          isInteract={isInteract}
-          toggleInteract={toggleInteract}
-          applyFont={applyFont}
-          applyColor={applyColor}
-          applyElement={applyElement}
-          currentState={currentState}
-          isOpenMemoMenu={isOpenMemoMenu}
-          isOpenChoiseElementMenu={isOpenChoiseElementMenu}
-          setIsOpenChoiseElementMenu={setIsOpenChoiseElementMenu}
-          whichMemoMenuIsOpen={whichMemoMenuIsOpen}
-        />
-        <FlexBox right width="100%" height="20px" mt="10px">
-          <p style={{ color: "#e4e4e4" }}>現在{char_num}文字です</p>
-        </FlexBox>
+      <Slate
+        editor={editor}
+        onChange={onChangeEditor}
+        initialValue={initialElement}
+      >
+        <Editable
+          className="memo__editor"
+          spellCheck="false"
+          renderLeaf={renderLeaf}
+          renderElement={renderElement}
+          onKeyDown={(e) => onKeyDown(e)}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        ></Editable>
+        {isDrawing && (
+          <div
+            className="rectangle"
+            style={{
+              left: `${rect.left}px`,
+              top: `${rect.top}px`,
+              width: `${rect.width}px`,
+              height: `${rect.height}px`,
+            }}
+          />
+        )}
+      </Slate>
+      <MemoMenu
+        isInteract={isInteract}
+        toggleInteract={toggleInteract}
+        applyFont={applyFont}
+        applyColor={applyColor}
+        applyElement={applyElement}
+        currentState={currentState}
+        isOpenMemoMenu={isOpenMemoMenu}
+        isOpenChoiseElementMenu={isOpenChoiseElementMenu}
+        setIsOpenChoiseElementMenu={setIsOpenChoiseElementMenu}
+        whichMemoMenuIsOpen={whichMemoMenuIsOpen}
+      />
+      <FlexBox right width="100%" height="20px" mt="10px">
+        <p style={{ color: "#e4e4e4" }}>現在{char_num}文字です</p>
       </FlexBox>
       <MemoMask
         handleMouseMove={handleMouseMove}
         handleMouseUp={handleMouseUp}
+        handleMouseOut={handleMouseOut}
       ></MemoMask>
-    </>
+    </FlexBox>
   );
 };
 

@@ -13,6 +13,10 @@
   color: inherit;
 }
 
+.Memo.noneSelection *::selection {
+  background: transparent;
+}
+
 .memo__remove-icon {
   width: 30px;
   width: 30px;
