@@ -19,6 +19,10 @@ import { withHistory, HistoryEditor } from "slate-history";
 import MemoMenu from "./MemoMenu";
 import MemoMask from "./MemoMask";
 
+//fix :: めもが2つ以上あるときの挙動と、
+//rectがいつでも出てきてしまう問題を解決したらとりあえずおっけい。
+//後は、elementの種類を増やしたい。
+//リンクの設定も。
 const Memo = ({ myKey, removeThisTool }) => {
   const interact_ = useInteract();
   const [editor] = useState(() => withHistory(withReact(createEditor())));
