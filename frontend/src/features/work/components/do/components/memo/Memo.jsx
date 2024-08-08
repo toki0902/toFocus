@@ -19,8 +19,7 @@ import { withHistory, HistoryEditor } from "slate-history";
 import MemoMenu from "./MemoMenu";
 import MemoMask from "./MemoMask";
 
-//fix :: めもが2つ以上あるときの挙動と、
-//rectがいつでも出てきてしまう問題を解決したらとりあえずおっけい。
+//fix :: めもが2つ以上あるときの挙動が変
 //後は、elementの種類を増やしたい。
 //リンクの設定も。
 const Memo = ({ myKey, removeThisTool }) => {
@@ -30,24 +29,28 @@ const Memo = ({ myKey, removeThisTool }) => {
   //Memoツール用のState
   const [rect, setRect] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [start, setStart] = useState({});
+  const [start, setStart] = useState(false);
 
   const handleMouseOut = () => {
     setIsDrawing(false);
     setRect(false);
   };
   const handleMouseDown = async (e) => {
+    const isOnBoard = !!!e.target.closest('[isnotboard="true"]');
+
     const allElement = document.querySelectorAll(".element");
     allElement.forEach((item) => {
       return item.classList.remove("selected");
     });
 
-    const rectArea = interact_.ref.current.getBoundingClientRect();
-    setStart({
-      x: e.clientX - rectArea.left,
-      y: e.clientY - rectArea.top,
-    });
-    setIsDrawing(true);
+    if (isOnBoard) {
+      const rectArea = interact_.ref.current.getBoundingClientRect();
+      setStart({
+        x: e.clientX - rectArea.left,
+        y: e.clientY - rectArea.top,
+      });
+      setIsDrawing(true);
+    }
   };
 
   const handleMouseMove = (e) => {
@@ -129,6 +132,7 @@ const Memo = ({ myKey, removeThisTool }) => {
   const handleMouseUp = () => {
     setRect(false);
     setIsDrawing(false);
+    setStart(false);
   };
 
   //要素を動かせるかどうかを管理するStateと、
@@ -234,6 +238,7 @@ const Memo = ({ myKey, removeThisTool }) => {
           <p
             className="element"
             {...attributes}
+            isnotboard="true"
             style={{ position: "relative", fontWeight: "normal" }}
           >
             {isEmpty && isSelected ? (
@@ -266,6 +271,7 @@ const Memo = ({ myKey, removeThisTool }) => {
               alignItems: "center",
               flexWrap: "wrap",
             }}
+            isnotboard="true"
             {...attributes}
           >
             {children}
@@ -295,6 +301,7 @@ const Memo = ({ myKey, removeThisTool }) => {
               fontWeight: "bolder",
               position: "relative",
             }}
+            isnotboard="true"
             {...attributes}
           >
             {children}
@@ -320,6 +327,7 @@ const Memo = ({ myKey, removeThisTool }) => {
           <li
             className="element"
             style={{ listStyleType: "disc", position: "relative" }}
+            isnotboard="true"
             {...attributes}
           >
             {children}
@@ -374,10 +382,14 @@ const Memo = ({ myKey, removeThisTool }) => {
   const onChangeEditor = async () => {
     const selectedDom = document.querySelectorAll(".element.selected");
     const MemoDom = document.querySelector(".Memo");
-    if (selectedDom.length === 0) {
-      MemoDom.classList.remove("noneSelection");
-    } else {
+    if (selectedDom.length > 0) {
       MemoDom.classList.add("noneSelection");
+    } else {
+      if (!isDrawing) {
+        MemoDom.classList.remove("noneSelection");
+      } else {
+        MemoDom.classList.add("noneSelection");
+      }
     }
     updateSelection();
     appearMenu();
