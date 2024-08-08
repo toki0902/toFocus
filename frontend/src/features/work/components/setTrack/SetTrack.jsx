@@ -40,9 +40,10 @@ const SetTrack = () => {
       <h2 className="settrack__text--big">
         諸君、お疲れさまだ。もし気が進めば今日の学習の記録、「足跡」を残さないか？
       </h2>
-      <FlexBox className="settrack__btn-wrap" width="50%" sb mt="100px">
+      <FlexBox className="settrack__btn-wrap" width="50%" sb mt="60px">
         <Button
-          width="250px"
+          width="40%"
+          maxWidth="200px"
           height="50px"
           color="#8ddaeb"
           func={disableActiveTrackMode}
@@ -51,7 +52,8 @@ const SetTrack = () => {
           いいえ
         </Button>
         <Button
-          width="250px"
+          width="40%"
+          maxWidth="200px"
           height="50px"
           color="#8ddaeb"
           func={enableActiveTrackMode}
@@ -61,7 +63,7 @@ const SetTrack = () => {
         </Button>
       </FlexBox>
       {isClicked ? (
-        <FlexBox className="settrack__end-btn" width="100%" mt="100px" column>
+        <FlexBox className="settrack__end-btn" width="100%" mt="80px" column>
           {isActiveTrackMode ? (
             <>
               <TrackMemo />

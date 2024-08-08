@@ -8,7 +8,9 @@ import "./button.css";
 //isWhiteMainはボタンの色が白を基調としているかどうか。
 const Button = ({
   width = 120,
+  maxWidth = null,
   height = 40,
+  maxHeight = null,
   func = false,
   type = null,
   children,
@@ -31,7 +33,9 @@ const Button = ({
   const style = isWhiteMain
     ? {
         width: width,
+        maxWidth: maxWidth,
         height: height,
+        maxHeight: maxHeight,
         backgroundColor: isHover ? color : "#fff",
         border: border_str,
         color: isHover ? "#fff" : color,
@@ -39,7 +43,9 @@ const Button = ({
       }
     : {
         width: width,
+        maxWidth: maxWidth,
         height: height,
+        maxHeight: maxHeight,
         backgroundColor: isHover ? "#fff" : color,
         border: border_str,
         color: isHover ? color : "#fff",

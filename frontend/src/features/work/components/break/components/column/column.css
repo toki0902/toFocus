@@ -7,14 +7,13 @@
   font-weight: bold;
   margin-bottom: 20px;
   height: fit-content;
-  height: 10%;
+  height: calc(15% - 20px);
 }
 .column__text {
-  height: 80%;
+  height: 85%;
   animation: appear 1s;
-  overflow-x: hidden;
+  overflow-wrap: break-word;
   overflow-y: auto;
-  word-wrap: break-word;
 }
 .column__text.fade-out {
   animation: fade-out 1s;

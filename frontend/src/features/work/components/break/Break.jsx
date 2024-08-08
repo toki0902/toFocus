@@ -141,7 +141,8 @@ const Break = ({
         <Button
           color="#ff9f47"
           height="60px"
-          width="200px"
+          maxWidth="200px"
+          width="40%"
           isWhiteMain
           func={() => openThisPopUp("toDo")}
         >
@@ -150,7 +151,8 @@ const Break = ({
         <Button
           color="#ff9f47"
           height="60px"
-          width="200px"
+          maxWidth="200px"
+          width="40%"
           isWhiteMain
           func={() => openThisPopUp("quit")}
         >
