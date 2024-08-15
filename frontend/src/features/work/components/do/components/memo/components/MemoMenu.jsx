@@ -30,6 +30,10 @@ const MemoMenu = ({
       return "リスト";
     } else if (currentState.includes("callout")) {
       return "コールアウト";
+    } else if (currentState.includes("check")) {
+      return "チェックリスト";
+    } else if (currentState.includes("numberlist")) {
+      return "番号付きリスト";
     } else {
       return "テキスト";
     }
@@ -69,6 +73,24 @@ const MemoMenu = ({
       text: "リストを表示します。",
       onClick: () => {
         applyElement("list");
+        setIsOpenChoiseElementMenu(false);
+      },
+    },
+    {
+      imgUrl: listIcon,
+      title: "番号付きリスト",
+      text: "番号付きのリストを表示します。",
+      onClick: () => {
+        applyElement("numberlist");
+        setIsOpenChoiseElementMenu(false);
+      },
+    },
+    {
+      imgUrl: listIcon,
+      title: "チェックリスト",
+      text: "チェックボックス付きのリストを表示します。",
+      onClick: () => {
+        applyElement("check");
         setIsOpenChoiseElementMenu(false);
       },
     },

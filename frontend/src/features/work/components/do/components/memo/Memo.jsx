@@ -13,6 +13,7 @@ import {
   Transforms,
   Range,
   Node,
+  Path,
 } from "slate";
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact, ReactEditor, useSlate } from "slate-react";
@@ -244,10 +245,21 @@ const Memo = ({ myKey, removeThisTool }) => {
     const editor_ins = useSlate();
     const { selection } = editor;
 
-    const isSelected =
-      ReactEditor.findPath(editor_ins, element)[0] ==
-      selection?.anchor?.path[0];
+    const elementPath = ReactEditor.findPath(editor_ins, element);
+
+    const isSelected = elementPath[0] == selection?.anchor?.path[0];
     const isEmpty = Node.string(element).length === 0;
+
+    useEffect(() => {
+      if (element.type === "callout") {
+        //text部分のheightによって要素自体の高さを変え、折り返しを有効にする
+
+        const callOutDom = ReactEditor.toDOMNode(editor_ins, element);
+        const textAreaDom = callOutDom.querySelector(".textarea");
+        const originalHeight = textAreaDom?.clientHeight ?? 32;
+        callOutDom.style.height = `${80 + originalHeight - 32}px`;
+      }
+    }, [editor_ins, element]);
 
     switch (element.type) {
       //fix : 全角入力だとなぜか、placeholderの削除が遅い
@@ -281,18 +293,15 @@ const Memo = ({ myKey, removeThisTool }) => {
             className="element"
             style={{
               fontSize: "1.85rem",
-              height: "50px",
               fontWeight: "bold",
               position: "relative",
-              // fix :: overflowXが折り返してくれない
-              display: "flex",
-              alignItems: "center",
-              flexWrap: "wrap",
+              verticalAlign: "middle",
             }}
             isnotboard="true"
             {...attributes}
           >
             {children}
+
             {isEmpty ? (
               <span
                 contentEditable={false}
@@ -357,7 +366,7 @@ const Memo = ({ myKey, removeThisTool }) => {
                   pointerEvents: "none",
                   position: "absolute",
                   top: "50%",
-                  left: "20px",
+                  left: "30px",
                   translate: "0 -50%",
                 }}
               >
@@ -367,15 +376,62 @@ const Memo = ({ myKey, removeThisTool }) => {
           </li>
         );
       }
+      case "numberlist": {
+        let number = 1;
+        if (elementPath[0] !== 0) {
+          const prevPath = Path.previous(elementPath);
+          const prevNode = Editor.node(editor, prevPath)[0];
+          const prevDom = ReactEditor.toDOMNode(editor, prevNode);
+          const prevNumber = Number(prevDom.dataset.listNumber) || 0;
+
+          number = prevNumber + 1;
+        }
+        return (
+          <div
+            className="element"
+            //listとmarkerの幅が違うから文字がずれる💦
+            style={{ listStyleType: "space-counter", position: "relative" }}
+            isnotboard="true"
+            data-list-number={number}
+            {...attributes}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "left",
+                alignItems: "center",
+                whiteSpace: "pre-wrap",
+                overflowWrap: "break-word",
+              }}
+            >
+              <div contentEditable="false" style={{ marginRight: "11px" }}>
+                {number}.
+              </div>
+              <div style={{ maxWidth: "calc(100% - 15px)" }}>{children}</div>
+            </div>
+
+            {isEmpty && isSelected ? (
+              <span
+                contentEditable={false}
+                style={{
+                  opacity: 0.3,
+                  pointerEvents: "none",
+                  position: "absolute",
+                  top: "50%",
+                  left: "30px",
+                  translate: "0 -50%",
+                }}
+              >
+                番号付きリスト
+              </span>
+            ) : null}
+          </div>
+        );
+      }
       case "code": {
         return <CodeElement {...attributes}>{children}</CodeElement>;
       }
       case "callout": {
-        //text部分のheightによって要素自体の高さを変え、折り返しを有効にする
-        const callOutDom = ReactEditor.toDOMNode(editor, element);
-        const textAreaDom = callOutDom.querySelector(".textarea");
-        const originalHeight = textAreaDom.clientHeight;
-
         return (
           <div
             className="element"
@@ -383,7 +439,6 @@ const Memo = ({ myKey, removeThisTool }) => {
             {...attributes}
             style={{
               width: "100%",
-              height: 80 + originalHeight - 32, //ここがheightの計算部分
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -423,6 +478,25 @@ const Memo = ({ myKey, removeThisTool }) => {
                 {children}
               </div>
             </div>
+          </div>
+        );
+      }
+      case "check": {
+        return (
+          <div
+            {...attributes}
+            className="element"
+            style={{
+              display: "flex",
+              justifyContent: "left",
+              alignItems: "center",
+              whiteSpace: "pre-wrap",
+              overflowWrap: "break-word",
+            }}
+            isnotboard="true"
+          >
+            <input type="checkbox" style={{ marginRight: "15px" }} />
+            <div style={{ maxWidth: "calc(100% - 28px)" }}>{children}</div>
           </div>
         );
       }
@@ -500,7 +574,16 @@ const Memo = ({ myKey, removeThisTool }) => {
     setChar_num(char);
   };
 
-  const element_arr = ["h1", "h2", "list", "paragraph", "callout", "code"];
+  const element_arr = [
+    "h1",
+    "h2",
+    "list",
+    "paragraph",
+    "callout",
+    "code",
+    "check",
+    "numberlist",
+  ];
   const leaf_arr = ["bold", "italic", "underline", "color"];
   //現在の選択範囲に何の要素が適応しているかを配列で管理するState
   //使用用途はtoolのスタイル適応
@@ -556,7 +639,11 @@ const Memo = ({ myKey, removeThisTool }) => {
           break;
         }
         case "Backspace": {
-          if (selectedNode[0].type === "list") {
+          if (
+            selectedNode[0].type === "list" ||
+            selectedNode[0].type === "check" ||
+            selectedNode[0].type === "numberlist"
+          ) {
             const [textnode] = Editor.nodes(editor, {
               match: (n) => Text.isText(n),
             });
@@ -647,7 +734,6 @@ const Memo = ({ myKey, removeThisTool }) => {
           break;
         }
         case "Enter": {
-          console.log(selectedNode);
           if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
             event.preventDefault();
             Transforms.delete(editor, { unit: "character", reverse: true });
@@ -680,14 +766,25 @@ const Memo = ({ myKey, removeThisTool }) => {
                 setIsOpenMemoMenu(false);
                 break;
               }
+              case "番号付きリスト": {
+                applyElement("numberlist");
+                setIsOpenMemoMenu(false);
+                break;
+              }
               case "コード":
                 {
                   applyElement("code");
                   setIsOpenMemoMenu(false);
                 }
                 break;
-              case "コールアウト": {
-                applyElement("callout");
+              case "コールアウト":
+                {
+                  applyElement("callout");
+                  setIsOpenMemoMenu(false);
+                }
+                break;
+              case "チェックリスト": {
+                applyElement("check");
                 setIsOpenMemoMenu(false);
               }
             }
@@ -710,7 +807,11 @@ const Memo = ({ myKey, removeThisTool }) => {
             selectedElements.forEach((item) => {
               return item.classList.remove("selected");
             });
-          } else if (selectedNode[0].type === "callout") {
+          } else if (
+            selectedNode[0].type === "callout" ||
+            selectedNode[0].type === "h1" ||
+            selectedNode[0].type === "h2"
+          ) {
             event.preventDefault();
             Transforms.insertNodes(
               editor,
@@ -718,8 +819,12 @@ const Memo = ({ myKey, removeThisTool }) => {
                 type: "paragraph",
                 children: [{ text: "" }],
               },
-              { at: selectedNode[1][0] }
+              { at: [selectedNode[1][0] + 1] }
             );
+            Transforms.move(editor, {
+              distance: 1,
+              unit: "line",
+            });
           }
           break;
         }
