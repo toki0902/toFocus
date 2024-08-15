@@ -206,6 +206,7 @@
   margin: 3px 0;
   transition: all 0.2s;
   cursor: text;
+  padding: 0 10px;
 }
 .element.selected {
   background-color: #333;
@@ -216,4 +217,13 @@
   background-color: #6f6e6e;
   opacity: 0.5;
   pointer-events: none;
+}
+
+.highlighted-code pre {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  white-space: pre-wrap;
+  overflow: hidden;
 }

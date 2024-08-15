@@ -22,7 +22,7 @@ const BgmMaker = ({ myKey, removeThisTool, genre }) => {
       ? "W-23ZX_9tkY"
       : genre === "fire"
       ? "kmythL1LppA"
-      : "FZOmkLbm66I";
+      : "HQVF387Ilc8";
 
   useEffect(() => {
     const script = document.createElement("script");

@@ -3,6 +3,7 @@ import "./memo.css";
 import { useInteract } from "../../../../hooks/useInteract";
 import { FlexBox } from "@component";
 import removeIcon from "@images/cross.svg";
+import goodIcon from "@images/goodIcon.svg";
 // Import the Slate editor factory.
 import {
   Editor,
@@ -16,15 +17,26 @@ import {
 // Import the Slate components and React plugin.
 import { Slate, Editable, withReact, ReactEditor, useSlate } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
-import MemoMenu from "./MemoMenu";
-import MemoMask from "./MemoMask";
+import MemoMenu from "./components/MemoMenu";
+import MemoMask from "./components/MemoMask";
+import CodeElement from "./components/CodeElement";
 
 //fix :: めもが2つ以上あるときの挙動が変
 //後は、elementの種類を増やしたい。
 //リンクの設定も。
 const Memo = ({ myKey, removeThisTool }) => {
   const interact_ = useInteract();
-  const [editor] = useState(() => withHistory(withReact(createEditor())));
+  const withVoidElements = (editor) => {
+    const { isVoid } = editor;
+    editor.isVoid = (element) => {
+      // ここでvoidとしたいエレメントタイプを指定
+      return element.type === "code" || isVoid(element);
+    };
+    return editor;
+  };
+  const [editor] = useState(() =>
+    withHistory(withReact(withVoidElements(createEditor())))
+  );
 
   //Memoツール用のState
   const [rect, setRect] = useState(false);
@@ -35,6 +47,7 @@ const Memo = ({ myKey, removeThisTool }) => {
     setIsDrawing(false);
     setRect(false);
   };
+
   const handleMouseDown = async (e) => {
     const isOnBoard = !!!e.target.closest('[isnotboard="true"]');
 
@@ -218,9 +231,14 @@ const Memo = ({ myKey, removeThisTool }) => {
       match: (n) => Text.isText(n),
     });
 
-    return selectedNode[0].color;
+    if (selectedNode) {
+      return selectedNode[0]?.color;
+    } else {
+      return undefined;
+    }
   };
 
+  //elementを追加する時はrenderElement, MemoMenu, currentStateにも追加しなければいけない
   const renderElement = ({ children, attributes, element }) => {
     //elementとpathと、カーソルの位置のpathが一致するかを判断する
     const editor_ins = useSlate();
@@ -349,6 +367,65 @@ const Memo = ({ myKey, removeThisTool }) => {
           </li>
         );
       }
+      case "code": {
+        return <CodeElement {...attributes}>{children}</CodeElement>;
+      }
+      case "callout": {
+        //text部分のheightによって要素自体の高さを変え、折り返しを有効にする
+        const callOutDom = ReactEditor.toDOMNode(editor, element);
+        const textAreaDom = callOutDom.querySelector(".textarea");
+        const originalHeight = textAreaDom.clientHeight;
+
+        return (
+          <div
+            className="element"
+            isnotboard="true"
+            {...attributes}
+            style={{
+              width: "100%",
+              height: 80 + originalHeight - 32, //ここがheightの計算部分
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              overflowWrap: "break-word",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "calc(100% - 10px)",
+                display: "flex",
+                justifyContent: "left",
+                alignItems: "center",
+                backgroundColor: "#404040",
+                paddingLeft: "15px",
+                paddingRight: "15px",
+                borderRadius: "5px",
+              }}
+            >
+              <img
+                src={goodIcon}
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  marginRight: "20px",
+                }}
+              ></img>
+              <div
+                className="textarea"
+                style={{
+                  whiteSpace: "normal",
+                  overflowWrap: "break-word",
+                  width: "auto", // <-- 幅を auto に設定
+                  maxWidth: "calc(100% - 40px)",
+                }}
+              >
+                {children}
+              </div>
+            </div>
+          </div>
+        );
+      }
     }
   };
 
@@ -423,7 +500,7 @@ const Memo = ({ myKey, removeThisTool }) => {
     setChar_num(char);
   };
 
-  const element_arr = ["h1", "h2", "list", "paragraph"];
+  const element_arr = ["h1", "h2", "list", "paragraph", "callout", "code"];
   const leaf_arr = ["bold", "italic", "underline", "color"];
   //現在の選択範囲に何の要素が適応しているかを配列で管理するState
   //使用用途はtoolのスタイル適応
@@ -520,7 +597,6 @@ const Memo = ({ myKey, removeThisTool }) => {
             //FIX : ここに記述すると、choiseElementMenu内での
             //onKeyDownが発火しないため別の場所に記述しよう。
           } else if (isOpenMemoMenu && isOpenChoiseElementMenu) {
-            console.log("open");
             const [choiseElement_menu] =
               document.getElementsByClassName("memo-sub-menu");
             const children = choiseElement_menu.children;
@@ -571,6 +647,7 @@ const Memo = ({ myKey, removeThisTool }) => {
           break;
         }
         case "Enter": {
+          console.log(selectedNode);
           if (isOpenMemoMenu && whichMemoMenuIsOpen === "element") {
             event.preventDefault();
             Transforms.delete(editor, { unit: "character", reverse: true });
@@ -603,6 +680,16 @@ const Memo = ({ myKey, removeThisTool }) => {
                 setIsOpenMemoMenu(false);
                 break;
               }
+              case "コード":
+                {
+                  applyElement("code");
+                  setIsOpenMemoMenu(false);
+                }
+                break;
+              case "コールアウト": {
+                applyElement("callout");
+                setIsOpenMemoMenu(false);
+              }
             }
           } else if (selectedElements.length > 0) {
             event.preventDefault();
@@ -623,6 +710,16 @@ const Memo = ({ myKey, removeThisTool }) => {
             selectedElements.forEach((item) => {
               return item.classList.remove("selected");
             });
+          } else if (selectedNode[0].type === "callout") {
+            event.preventDefault();
+            Transforms.insertNodes(
+              editor,
+              {
+                type: "paragraph",
+                children: [{ text: "" }],
+              },
+              { at: selectedNode[1][0] }
+            );
           }
           break;
         }
