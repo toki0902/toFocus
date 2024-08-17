@@ -23,8 +23,6 @@ const TextData = ({ concentrateData, selectedDate, renderMode }) => {
           concentrateData
         );
 
-  console.log("いまおわり");
-
   const focus_Year = toPadStart(selectedDate.getFullYear());
   const focus_Month = toPadStart(selectedDate.getMonth() + 1);
   const focus_Date = toPadStart(selectedDate.getDate());

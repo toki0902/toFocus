@@ -104,8 +104,6 @@ const Graph = ({
             concentrateData
           );
 
-          console.log(focusDataOfTheMonth);
-
           //各月の期間をYYYY/MM形式の文字列で整形 ex)2024年 6月
           const date_str = `${firstDayOfMonth.getFullYear()}/${
             firstDayOfMonth.getMonth() + 1

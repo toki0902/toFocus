@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import "./review.css";
 import Sidebar from "./components/sidebar/Sidebar";
 import { FlexBox } from "@component";
@@ -10,6 +10,7 @@ const Review = ({ userProfile }) => {
 
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const [currentMenu, setCurrentMenu] = useState(null);
   const [whichMenuIsOpen, setWhichMenuIsOpen] = useState("analysis");
   const sidebarRef = useRef(null);
 
@@ -19,23 +20,6 @@ const Review = ({ userProfile }) => {
     }
   };
 
-  const currentMenu =
-    whichMenuIsOpen === "analysis" ? (
-      <Analysis
-        concentrateData={concentrateData}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        userProfile={userProfile}
-      />
-    ) : whichMenuIsOpen === "track" ? (
-      <Track
-        concentrateData={concentrateData}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        userProfile={userProfile}
-      />
-    ) : null;
-
   const prevDateRef = useRef();
 
   useEffect(() => {
@@ -43,6 +27,9 @@ const Review = ({ userProfile }) => {
       if (selectedDate.getFullYear() !== prevDateRef.current.getFullYear()) {
         console.log("year change");
         const fetchCurrentYearFocusData = async () => {
+          //年をまたぐと、ひとつ前の年のデータが閲覧できなくなる。
+          //2025年01月02日にいると、2024年12月31日のデータが見えなくなる
+
           const res = await fetch(
             `http://localhost:8000/api/concData/${
               userProfile.id
@@ -61,11 +48,54 @@ const Review = ({ userProfile }) => {
         };
 
         fetchCurrentYearFocusData();
-        console.log("今終わり");
       }
     }
     prevDateRef.current = selectedDate;
   }, [selectedDate]);
+
+  useEffect(() => {
+    const fetchCurrentYearFocusData = async () => {
+      const res = await fetch(
+        `http://localhost:8000/api/concData/${
+          userProfile.id
+        }/${selectedDate.getFullYear()}/year`,
+        { method: "GET" }
+      );
+
+      const res_json = await res.json();
+      if (res.status === 200) {
+        console.log(res_json.msg);
+
+        setConcentrateData(res_json.dataOnConcentration);
+      } else {
+        console.error(res_json.msg);
+      }
+    };
+
+    fetchCurrentYearFocusData();
+  }, []);
+
+  useEffect(() => {
+    if (whichMenuIsOpen === "analysis") {
+      setCurrentMenu(
+        <Analysis
+          concentrateData={concentrateData}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          userProfile={userProfile}
+        />
+      );
+    } else if (whichMenuIsOpen === "track") {
+      setCurrentMenu(
+        <Track
+          concentrateData={concentrateData}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          userProfile={userProfile}
+        />
+      );
+    }
+  }, [concentrateData, whichMenuIsOpen, selectedDate, userProfile]);
 
   return (
     <div className="Review" onMouseMove={(event) => onMouseMove(event)}>
