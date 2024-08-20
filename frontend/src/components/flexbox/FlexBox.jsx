@@ -34,6 +34,7 @@ const FlexBox = forwardRef(
       onMouseOut = null,
       onMouseMove = null,
       noWrap,
+      tabIndex = false,
     },
     ref
   ) => {
@@ -85,6 +86,7 @@ const FlexBox = forwardRef(
           onMouseMove={onMouseMove}
           onKeyDown={onKeyDown}
           ref={ref}
+          tabIndex={tabIndex ? 0 : null}
         >
           {children}
         </ul>
@@ -100,6 +102,7 @@ const FlexBox = forwardRef(
           onMouseMove={onMouseMove}
           onKeyDown={onKeyDown}
           ref={ref}
+          tabIndex={tabIndex ? 0 : null}
         >
           {children}
         </li>
@@ -115,6 +118,7 @@ const FlexBox = forwardRef(
           onMouseMove={onMouseMove}
           onKeyDown={onKeyDown}
           ref={ref}
+          tabIndex={tabIndex ? 0 : null}
         >
           {children}
         </div>

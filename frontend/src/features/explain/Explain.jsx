@@ -66,6 +66,7 @@ const Explain = ({ userProfile, setUserProfile }) => {
           func={() => {
             navigate("work");
           }}
+          isWhiteMain
         >
           <p style={{ fontSize: "25px" }}>集中ワールドへ行く</p>
         </Button>

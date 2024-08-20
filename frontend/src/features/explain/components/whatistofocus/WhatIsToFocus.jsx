@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import "./whatistofocus.css";
 import { FlexBox } from "@component";
 import { changePageWhenKeyDown } from "./utils";
@@ -10,6 +10,11 @@ const WhatIsToFocus = ({
   toggleWhatIsToFocus,
 }) => {
   //fix : えぐいくらい冗長性があるので何とかしたい。
+  const whatIsToFocusRef = useRef(null);
+
+  useEffect(() => {
+    whatIsToFocusRef.current.focus();
+  }, []);
   const page0 = (
     <>
       <h2 className="whatIsToFocus__title">toFocusの目的</h2>
@@ -331,10 +336,11 @@ const WhatIsToFocus = ({
       className="whatIsToFocus"
       width="65vw"
       height="65vh"
-      //fix : なぜか発動しないので、直さねば。
       onKeyDown={(e) => {
         changePageWhenKeyDown(e, prevPage, nextPage);
       }}
+      tabIndex
+      ref={whatIsToFocusRef}
     >
       <FlexBox
         className="whatIsToFocus__wrap-toPosition"

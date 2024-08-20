@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 
 const Header = ({ userProfile, setUserProfile }) => {
   const navigate = useNavigate();
-  const [login, setLogin] = useState(true);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const openMenu = () => {
     setIsOpenMenu(true);

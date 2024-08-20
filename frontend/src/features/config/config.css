@@ -1,0 +1,49 @@
+.Config {
+  width: 100%;
+  height: calc(100% - 70px);
+  overflow: auto;
+  padding: 10px 10%;
+  color: var(--sub-color);
+  position: relative;
+}
+.config__title {
+  font-size: 32px;
+  font-weight: bold;
+}
+.config__setting-list {
+  margin-top: 32px;
+  width: 100%;
+  height: auto;
+  padding-left: 20px;
+}
+.config__list-item {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.config__item-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+.config__item-explain {
+  margin-left: 30px;
+}
+
+.Config input[type="range"] {
+  width: 150px;
+  margin: 0;
+}
+
+.Config input[type="range"]::-webkit-slider-runnable-track {
+  height: 10px;
+  border-radius: 6px;
+  background-color: var(--sub-color);
+}
+
+.Config input[type="range"]::-webkit-slider-thumb {
+  background: var(--sub-color);
+  width: 4px;
+  height: 4px;
+}

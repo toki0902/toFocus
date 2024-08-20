@@ -216,50 +216,50 @@ router.get("/:userId/:target/:searchMode", async (req, res) => {
   }
 });
 
-// router.get("/createRandomFocusData", (req, res) => {
-//   function getRandomDate() {
-//     const start = new Date(2024, 0, 1); // 2024年1月1日
-//     const end = new Date(2024, 11, 31); // 2024年12月31日
-//     const randomTime =
-//       start.getTime() + Math.random() * (end.getTime() - start.getTime());
-//     return new Date(randomTime);
-//   }
-//   function formatDateToTimestamp(date) {
-//     const year = date.getFullYear();
-//     const month = String(date.getMonth() + 1).padStart(2, "0"); // 月は0から始まるので+1
-//     const day = String(date.getDate()).padStart(2, "0");
-//     const hours = String(date.getHours()).padStart(2, "0");
-//     const minutes = String(date.getMinutes()).padStart(2, "0");
-//     const seconds = String(date.getSeconds()).padStart(2, "0");
-//     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-//   }
-//   for (let i = 0; i < 250; i++) {
-//     const created_at = getRandomDate();
-//     const formated = formatDateToTimestamp(created_at);
-//     const task_name = `task${i}`;
-//     const start = Math.floor(Math.random() * 24);
-//     const end = Math.floor(Math.random() * (24 - (start + 1))) + (start + 1);
+router.get("/createRandomFocusData", (req, res) => {
+  function getRandomDate() {
+    const start = new Date(2024, 0, 1); // 2024年1月1日
+    const end = new Date(2024, 11, 31); // 2024年12月31日
+    const randomTime =
+      start.getTime() + Math.random() * (end.getTime() - start.getTime());
+    return new Date(randomTime);
+  }
+  function formatDateToTimestamp(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // 月は0から始まるので+1
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+  for (let i = 0; i < 250; i++) {
+    const created_at = getRandomDate();
+    const formated = formatDateToTimestamp(created_at);
+    const task_name = `task${i}`;
+    const start = Math.floor(Math.random() * 24);
+    const end = Math.floor(Math.random() * (24 - (start + 1))) + (start + 1);
 
-//     const start_str = `${start}:00`;
-//     const end_str = `${end}:00`;
+    const start_str = `${start}:00`;
+    const end_str = `${end}:00`;
 
-//     pool.query(
-//       "INSERT INTO task (name, user_id, created_at) VALUES (:name, 41, :created_at)",
-//       {
-//         name: task_name,
-//         created_at: formated,
-//       }
-//     );
-//     pool.query(
-//       "INSERT INTO focustime (start, end, user_id, created_at) VALUES (:start, :end, 41, :created_at)",
-//       {
-//         start: start_str,
-//         end: end_str,
-//         created_at: formated,
-//       }
-//     );
-//   }
-//   res.send("complete");
-// });
+    pool.query(
+      "INSERT INTO task (name, user_id, created_at) VALUES (:name, 41, :created_at)",
+      {
+        name: task_name,
+        created_at: formated,
+      }
+    );
+    pool.query(
+      "INSERT INTO focustime (start, end, user_id, created_at) VALUES (:start, :end, 41, :created_at)",
+      {
+        start: start_str,
+        end: end_str,
+        created_at: formated,
+      }
+    );
+  }
+  res.send("complete");
+});
 
 module.exports = router;

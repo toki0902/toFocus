@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 import homeIcon from "@images/home.svg";
 import graphIcon from "@images/graph main-color.svg";
 import focusIcon from "@images/focus.png";
+import settingIcon from "@images/settingIcon.svg";
 import loginIcon from "@images/user.svg";
 import logoutIcon from "@images/logout.svg";
-import { set } from "date-fns";
 
 const HeaderMenu = ({ userProfile, setUserProfile, isMenuOpen }) => {
   const navigate = useNavigate();
@@ -61,7 +61,6 @@ const HeaderMenu = ({ userProfile, setUserProfile, isMenuOpen }) => {
     <nav
       className="header__menu"
       style={{
-        //fix:なぜかメニュー出現時にかくついてしまうので改善したい
         top: isMenuOpen ? "100%" : "90%",
         opacity: isMenuOpen ? 1 : 0,
         zIndex: isMenuOpen ? 10 : -10,
@@ -78,7 +77,7 @@ const HeaderMenu = ({ userProfile, setUserProfile, isMenuOpen }) => {
           >
             <img
               src={userProfile.icon_path}
-              alt=""
+              alt="userIcon"
               className="header__user-icon"
             />
             <h2 className="header-menu__username">{userProfile.name}</h2>
@@ -104,6 +103,25 @@ const HeaderMenu = ({ userProfile, setUserProfile, isMenuOpen }) => {
                 className="header-menu-item__image"
               />
               <p className="header-menu-item__text">ログアウトする</p>
+            </FlexBox>
+            <FlexBox
+              className="header-menu__item"
+              width="100%"
+              height="30px"
+              left
+              onClick={async () => {
+                navigate("/config");
+              }}
+              pl="10px"
+              pr="10px"
+              mt="10px"
+            >
+              <img
+                src={settingIcon}
+                alt=""
+                className="header-menu-item__image"
+              />
+              <p className="header-menu-item__text">設定する</p>
             </FlexBox>
           </FlexBox>
         ) : null}

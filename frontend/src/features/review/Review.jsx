@@ -10,6 +10,9 @@ const Review = ({ userProfile }) => {
 
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  //fetch後のStateの更新を待ってからレンダリングするためのState
+  const [isLoading, setIsLoading] = useState(false);
+
   const [currentMenu, setCurrentMenu] = useState(null);
   const [whichMenuIsOpen, setWhichMenuIsOpen] = useState("analysis");
   const sidebarRef = useRef(null);
@@ -30,6 +33,8 @@ const Review = ({ userProfile }) => {
           //年をまたぐと、ひとつ前の年のデータが閲覧できなくなる。
           //2025年01月02日にいると、2024年12月31日のデータが見えなくなる
 
+          setIsLoading(true);
+
           const res = await fetch(
             `http://localhost:8000/api/concData/${
               userProfile.id
@@ -45,9 +50,11 @@ const Review = ({ userProfile }) => {
           } else {
             console.error(res_json.msg);
           }
+          return setIsLoading(false);
         };
 
         fetchCurrentYearFocusData();
+        console.log(isLoading);
       }
     }
     prevDateRef.current = selectedDate;
@@ -55,6 +62,7 @@ const Review = ({ userProfile }) => {
 
   useEffect(() => {
     const fetchCurrentYearFocusData = async () => {
+      setIsLoading(true);
       const res = await fetch(
         `http://localhost:8000/api/concData/${
           userProfile.id
@@ -70,32 +78,36 @@ const Review = ({ userProfile }) => {
       } else {
         console.error(res_json.msg);
       }
+
+      return setIsLoading(false);
     };
 
     fetchCurrentYearFocusData();
   }, []);
 
   useEffect(() => {
-    if (whichMenuIsOpen === "analysis") {
-      setCurrentMenu(
-        <Analysis
-          concentrateData={concentrateData}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          userProfile={userProfile}
-        />
-      );
-    } else if (whichMenuIsOpen === "track") {
-      setCurrentMenu(
-        <Track
-          concentrateData={concentrateData}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          userProfile={userProfile}
-        />
-      );
+    if (!isLoading) {
+      if (whichMenuIsOpen === "analysis") {
+        setCurrentMenu(
+          <Analysis
+            concentrateData={concentrateData}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            userProfile={userProfile}
+          />
+        );
+      } else if (whichMenuIsOpen === "track") {
+        setCurrentMenu(
+          <Track
+            concentrateData={concentrateData}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            userProfile={userProfile}
+          />
+        );
+      }
     }
-  }, [concentrateData, whichMenuIsOpen, selectedDate, userProfile]);
+  }, [concentrateData, whichMenuIsOpen, selectedDate, userProfile, isLoading]);
 
   return (
     <div className="Review" onMouseMove={(event) => onMouseMove(event)}>
